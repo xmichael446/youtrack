@@ -100,7 +100,9 @@
                                         minute: '2-digit'
                                     })}
                                     </u>
+                                    <br><a href={claim.link}>Click to View</a>
                                 </p>
+                                <p></p>
                             </div>
                             <span class="font-medium">
                                 {claim.reward.cost} coins

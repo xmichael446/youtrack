@@ -13,17 +13,6 @@
         });
     });
 
-    // Helper to make reason human-readable
-    const formatReason = (reason) => {
-        switch (reason) {
-            case "ATTENDANCE":
-                return "Attendance";
-            case "HOMETASK":
-                return "Homework";
-            default:
-                return reason;
-        }
-    };
 
     const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp).toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"});
@@ -50,26 +39,34 @@
             <table class="w-full mt-4 border-collapse striped">
                 <thead class="bg-gray-50 text-left">
                 <tr>
-                    <th class="px-3 py-2 border-b">#</th>
-                    <th class="px-3 py-2 border-b">Timestamp</th>
-                    <th class="px-3 py-2 border-b" data-tooltip="Why you earned said point?">Reason</th>
-                    <th class="px-3 py-2 border-b text-right">Points</th>
-                    <th class="px-3 py-2 border-b text-right">Coins</th>
+                    <th class="px-3 py-2 border-b">Time</th>
+                    <th class="px-3 py-2 border-b">Action</th>
+                    <th class="px-3 py-2 border-b text-right">XP Change</th>
+                    <th class="px-3 py-2 border-b text-right">Coin Change</th>
                 </tr>
                 </thead>
                 <tbody>
-                {#each $activity as item, i}
+                {#each $activity as item}
                     <tr class="hover:bg-gray-50">
-                        <td class="px-3 py-2 border-b text-right">{i + 1}</td>
                         <td class="px-3 py-2 border-b">{formatTimestamp(item.created_at)}</td>
-                        <td class="px-3 py-2 border-b">{formatReason(item.reason)}</td>
+                        <td class="px-3 py-2 border-b">{item.action}</td>
                         <td class="px-3 py-2 border-b text-right">
-                            <ins>+{item.points} XP</ins>
+                            {#if item.points > 0}
+                                <ins>+{item.points} XP</ins>
+                            {:else}
+                                N/A
+                            {/if}
                         </td>
                         <td class="px-3 py-2 border-b text-right">
-                            <ins>
-                                +{item.coins} <i class="fa-regular fa-coin"></i>
-                            </ins>
+                            {#if item.coins_change > 0}
+                                <ins>
+                                    +{item.coins_change} <i class="fa-regular fa-coin"></i>
+                                </ins>
+                            {:else}
+                                <ins class="balance-negative">
+                                    {item.coins_change} <i class="fa-regular fa-coin"></i>
+                                </ins>
+                            {/if}
                         </td>
                     </tr>
                 {/each}
@@ -84,3 +81,9 @@
         <p class="mt-4 text-red-600">{error}</p>
     {/if}
 {/if}
+
+<style>
+    .balance-negative {
+        color: #F06048;
+    }
+</style>
