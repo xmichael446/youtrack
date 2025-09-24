@@ -1,4 +1,5 @@
 <script>
+    import "@picocss/pico"
     import "./app.css"
     import {routes} from "./routes/routes.js";
 

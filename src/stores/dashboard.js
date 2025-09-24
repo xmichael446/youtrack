@@ -3,7 +3,8 @@ import {writable} from "svelte/store"
 export const enrollment = writable({
     "full_name": null,
     "total_points": null,
-    "rank": null
+    "rank": null,
+    "balance": null,
 })
 
 export const groupInfo = writable({
@@ -13,5 +14,5 @@ export const groupInfo = writable({
 
 export const courseInfo = writable({
     "enrollments": null,
-    "name": null
+    "name": null,
 })

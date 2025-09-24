@@ -64,87 +64,45 @@
 
 
 <div class="login-wrapper">
-    <div class="login-box">
-        <h2>Welcome to YouTrack!</h2>
-        <input type="text" bind:value={studentCode} placeholder="Student Code"/>
-        <input type="text" bind:value={groupCode} placeholder="Group Code"/>
-        {#if errorMessage}
-            <div class="error-message">{errorMessage}</div>
-        {/if}
-        <button on:click={handleLogin} disabled={isLoading}>
-            {isLoading ? 'Verifying...' : 'Login'}
-        </button>
-    </div>
+    <article>
+        <header>
+            <div class="login-title">
+                <strong>
+                    Welcome to YouTrack!
+                </strong>
+            </div>
+        </header>
+        <form>
+            <fieldset>
+                <input type="text" bind:value={studentCode} placeholder="Student Code"/>
+                <input type="text" bind:value={groupCode} placeholder="Group Code"/>
+            </fieldset>
+            {#if errorMessage}
+                <small class="error-message">{errorMessage}</small>
+            {/if}
+        </form>
+        <footer>
+            <input type="submit" on:click={handleLogin} disabled={isLoading}
+                   value={isLoading ? 'Verifying...' : 'Login to Dashboard'}>
+        </footer>
+    </article>
 </div>
 
 <style>
     .login-wrapper {
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #f5f5f5;
+        width: 25rem;
+        margin: 0 auto;
+        padding-top: 4rem;
     }
 
-    .login-box {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-        width: 300px;
-    }
-
-    .login-box h2 {
-        margin-bottom: 1rem;
+    .login-title {
         text-align: center;
-    }
-
-    .login-box input, select {
-        width: 100%;
-        padding: 8px 10px;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
-        background-color: white;
-    }
-
-    .login-box button {
-        width: 100%;
-        padding: 10px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 15px;
-    }
-
-    .login-box button:hover {
-        background: #45a049;
     }
 
     .error-message {
-        color: red;
-        font-size: 14px;
-        margin-bottom: 1rem;
         text-align: center;
+        color: red;
     }
-
-    .login-box select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-color: white;
-        border: 1px solid #ccc;
-        color: #777;
-        transition: border-color 0.2s ease;
-    }
-
-    /* When something is selected, use input text color */
-    .login-box select.selected {
-        color: #000;
-    }
-
 </style>
+
 
