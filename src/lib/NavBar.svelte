@@ -62,7 +62,8 @@
 
         {#each navLinks as item}
             <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_click_events_have_key_events -->
-            <li data-tooltip="{item.tooltip}" data-placement="bottom" onclick={handleItemClick} transition:fly={{ y: 10, duration: 200 }}>
+            <li data-tooltip="{item.tooltip}" data-placement="bottom" onclick={handleItemClick}
+                transition:fly={{ y: 10, duration: 200 }}>
                 <i class="{item.icon}"></i>
                 {#if $location === item.path}
                     <a href="#{item.path}" class="contrast">{item.name}</a>
@@ -100,7 +101,7 @@
         border: none;
         font-size: 1.2rem;
         cursor: pointer;
-        color: black;
+        color: var(--contrast);
     }
 
     @media (max-width: 768px) {
@@ -113,14 +114,24 @@
             position: absolute;
             top: 100%;
             right: 1rem;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            /* Solid adaptive background */
+            background-color: var(--pico-background-color, #fff);
+            border: 1px solid var(--muted-border-color, #ccc);
+            border-radius: var(--border-radius, 6px);
             padding: 0.5rem 1rem;
             z-index: 1000;
             opacity: 0;
             transform: translateY(-10px);
             transition: opacity 0.25s ease, transform 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Override for dark theme */
+        @media (prefers-color-scheme: dark) {
+            .navbar > ul:last-child {
+                background-color: #1a1a1a; /* solid dark */
+                border-color: #333;
+            }
         }
 
         .navbar > ul:last-child.open {
@@ -134,4 +145,5 @@
             margin: 0.5rem 0;
         }
     }
+
 </style>

@@ -88,7 +88,7 @@
             {#if $claimedRewards.length > 0}
                 <ul class="mt-4 space-y-3">
                     {#each $claimedRewards as claim}
-                        <li class="flex justify-between items-center p-3 rounded-lg border border-gray-100 bg-gray-50">
+                        <li class="flex justify-between items-center p-3 rounded-lg border border-gray-100">
                             <div>
                                 <b>{claim.reward.name}</b>
                                 <p>
