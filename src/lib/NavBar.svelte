@@ -11,9 +11,9 @@
     let menuRef;
 
     const navLinks = [
-        {name: "Leaderboard", icon: "fa-regular fa-list-ol", tooltip: "Rankings", path: "/home/leaderboard"},
-        {name: "Activity", icon: "fa-regular fa-list-check", tooltip: "Activity", path: "/home/activity"},
-        {name: "Rewards", icon: "fa-regular fa-cart-shopping", tooltip: "Rewards", path: "/home/rewards"}
+        {name: "Leaderboard", icon: "fa-regular fa-list-ol", path: "/home/leaderboard"},
+        {name: "Activity", icon: "fa-regular fa-list-check", path: "/home/activity"},
+        {name: "Rewards", icon: "fa-regular fa-cart-shopping", path: "/home/rewards"}
     ];
 
     function logout() {
@@ -62,7 +62,7 @@
 
         {#each navLinks as item}
             <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_click_events_have_key_events -->
-            <li data-tooltip="{item.tooltip}" data-placement="bottom" onclick={handleItemClick}
+            <li data-placement="bottom" onclick={handleItemClick}
                 transition:fly={{ y: 10, duration: 200 }}>
                 <i class="{item.icon}"></i>
                 {#if $location === item.path}
