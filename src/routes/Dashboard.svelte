@@ -38,7 +38,7 @@
 <main class="container p-6 flex-1">
 
     {#if isLoading}
-        <p class="text-center text-gray-500 text-lg mt-20">Loading dashboard...</p>
+        <article class="text-center text-gray-500 text-lg mt-20" aria-busy="true">Loading dashboard...</article>
     {:else if errorMessage}
         <p class="text-center text-red-600 font-semibold mt-20">{errorMessage}</p>
     {:else if $enrollment}

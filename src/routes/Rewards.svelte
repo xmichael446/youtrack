@@ -100,7 +100,7 @@
                                         minute: '2-digit'
                                     })}
                                     </u>
-                                    <br><a href={claim.link}>Click to View</a>
+                                    <br><a href={claim.link} target="_blank">Click to View</a>
                                 </p>
                                 <p></p>
                             </div>
