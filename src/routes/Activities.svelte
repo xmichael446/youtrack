@@ -15,9 +15,9 @@
 
 
     const formatTimestamp = (timestamp) => {
-        const date = new Date(timestamp).toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"});
-        const time = new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})
-        return `${date} at ${time}`;
+        const date = new Date(timestamp).toLocaleDateString("en-US", {month: "short", day: "numeric"});
+        const time = new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false})
+        return `${date}<br>${time}`;
     }
 </script>
 
@@ -48,7 +48,7 @@
                 <tbody>
                 {#each $activity as item}
                     <tr class="hover:bg-gray-50">
-                        <td class="px-3 py-2 border-b">{formatTimestamp(item.created_at)}</td>
+                        <td class="px-3 py-2 border-b">{@html formatTimestamp(item.created_at)}</td>
                         <td class="px-3 py-2 border-b">{item.action}</td>
                         <td class="px-3 py-2 border-b text-right">
                             {#if item.points > 0}
