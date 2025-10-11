@@ -15,7 +15,7 @@
     </thead>
     <tbody>
     {#each enrollments as entry, i}
-        {#if entry.rank === highlightStudent?.rank}
+        {#if entry.rank === highlightStudent?.rank && entry.full_name === highlightStudent?.full_name}
             <tr>
                 <td>#{i + 1}</td>
                 <td><mark data-tooltip="Your rank">{entry.full_name}</mark></td>
