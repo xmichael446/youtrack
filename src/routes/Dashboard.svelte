@@ -22,7 +22,10 @@
 
             errorMessage = await fetchDashboard({studentCode, groupCode})
 
-            if (errorMessage) push("/")
+            if (errorMessage) {
+                localStorage.clear()
+                push("/")
+            }
         } catch (e) {
             console.error(e);
         } finally {
