@@ -48,9 +48,13 @@
         </li>
     </ul>
 
-    <!-- Hamburger -->
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button class="hamburger" onclick={(e) => { e.stopPropagation(); menuOpen = !menuOpen; }}>
-        ☰
+        {#if !menuOpen}
+            <i in:fade={{ duration: 150 }} class="fa-solid fa-bars"></i>
+        {:else}
+            <i in:fade={{ duration: 150 }} class="fa-solid fa-xmark"></i>
+        {/if}
     </button>
 
     <!-- Right-side nav -->
@@ -91,6 +95,11 @@
         position: relative;
     }
 
+    .navbar > ul:last-child {
+        background-color: var(--pico-card-background-color, var(--pico-background-color));
+        border-color: var(--pico-muted-border-color, #333);
+    }
+
     .logout-btn {
         cursor: pointer;
     }
@@ -104,6 +113,15 @@
         color: var(--contrast);
     }
 
+    .hamburger:focus,
+    .hamburger:focus-visible,
+    .hamburger:focus:not(:focus-visible) {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+
     @media (max-width: 768px) {
         .hamburger {
             display: block;
@@ -114,24 +132,15 @@
             position: absolute;
             top: 100%;
             right: 1rem;
-            /* Solid adaptive background */
             background-color: var(--pico-background-color, #fff);
-            border: 1px solid var(--muted-border-color, #ccc);
+            border: 1px solid var(--pico-muted-border-color, #ccc);
             border-radius: var(--border-radius, 6px);
             padding: 0.5rem 1rem;
             z-index: 1000;
             opacity: 0;
             transform: translateY(-10px);
             transition: opacity 0.25s ease, transform 0.25s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-
-        /* Override for dark theme */
-        @media (prefers-color-scheme: dark) {
-            .navbar > ul:last-child {
-                background-color: #1a1a1a; /* solid dark */
-                border-color: #333;
-            }
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .navbar > ul:last-child.open {

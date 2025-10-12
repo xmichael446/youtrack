@@ -1,1 +1,9 @@
 @import "flowbite";
+
+[data-tooltip],
+abbr[title],
+abbr {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    cursor: inherit !important;
+}
