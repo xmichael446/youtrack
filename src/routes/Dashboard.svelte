@@ -21,6 +21,8 @@
             if (!studentCode || !groupCode) push("/")
 
             errorMessage = await fetchDashboard({studentCode, groupCode})
+
+            if (errorMessage) push("/")
         } catch (e) {
             console.error(e);
         } finally {
