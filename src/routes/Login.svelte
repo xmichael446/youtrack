@@ -86,7 +86,15 @@
                    value={isLoading ? 'Verifying...' : 'Login to Dashboard'}>
         </footer>
     </article>
+
+    <p class="developer-credit">
+        Developed and maintained by
+        <a href="https://t.me/Michael_IELTS" target="_blank" rel="noopener noreferrer">
+            Michael
+        </a>
+    </p>
 </div>
+
 
 <style>
     .login-wrapper {
@@ -102,6 +110,23 @@
     .error-message {
         text-align: center;
         color: red;
+    }
+
+    .developer-credit {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #777;
+    }
+
+    .developer-credit a {
+        color: #0077b6;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .developer-credit a:hover {
+        text-decoration: underline;
     }
 </style>
 

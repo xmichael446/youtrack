@@ -16,8 +16,7 @@
 
     const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp).toLocaleDateString("en-US", {month: "short", day: "numeric"});
-        const time = new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false})
-        return `${date}<br>${time}`;
+        return `${date}`;
     }
 </script>
 
@@ -46,9 +45,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                {#each $activity as item}
+                {#each $activity.reverse() as item}
                     <tr class="hover:bg-gray-50">
-                        <td class="px-3 py-2 border-b">{@html formatTimestamp(item.created_at)}</td>
+                        <td class="px-3 py-2 border-b">{@html formatTimestamp(item.for_date)}</td>
                         <td class="px-3 py-2 border-b">{item.action}</td>
                         <td class="px-3 py-2 border-b text-right">
                             {#if item.points > 0}
