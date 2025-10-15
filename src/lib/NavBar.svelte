@@ -93,9 +93,10 @@
         justify-content: space-between;
         align-items: center;
         position: relative;
+        background-color: var(--pico-card-background-color, var(--pico-background-color));
     }
 
-    .navbar > ul:last-child {
+    .navbar > ul {
         background-color: var(--pico-card-background-color, var(--pico-background-color));
         border-color: var(--pico-muted-border-color, #333);
     }
@@ -137,7 +138,7 @@
             border-radius: var(--border-radius, 6px);
             padding: 0.5rem 1rem;
             z-index: 1000;
-            opacity: 0;
+            opacity: 1;
             transform: translateY(-10px);
             transition: opacity 0.25s ease, transform 0.25s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);

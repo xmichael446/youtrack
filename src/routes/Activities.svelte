@@ -38,15 +38,15 @@
             <table class="w-full mt-4 border-collapse striped">
                 <thead class="bg-gray-50 text-left">
                 <tr>
-                    <th class="px-3 py-2 border-b">Time</th>
+                    <th class="px-3 py-2 border-b">Date</th>
                     <th class="px-3 py-2 border-b">Action</th>
                     <th class="px-3 py-2 border-b text-right">XP Change</th>
                     <th class="px-3 py-2 border-b text-right">Coin Change</th>
                 </tr>
                 </thead>
                 <tbody>
-                {#each $activity.reverse() as item}
-                    <tr class="hover:bg-gray-50">
+                {#each $activity as item}
+                    <tr class:danger-row={item.action === 'Blacklist'}>
                         <td class="px-3 py-2 border-b">{@html formatTimestamp(item.for_date)}</td>
                         <td class="px-3 py-2 border-b">{item.action}</td>
                         <td class="px-3 py-2 border-b text-right">
@@ -85,4 +85,15 @@
     .balance-negative {
         color: #F06048;
     }
+
+    .danger-row {
+        background-color: rgba(255, 0, 0, 0.08);
+        color: var(--pico-color-danger);
+    }
+
+    [data-theme="dark"] .danger-row {
+        background-color: rgba(255, 60, 60, 0.15);
+        color: var(--pico-color-danger);
+    }
+
 </style>
