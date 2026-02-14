@@ -15,6 +15,7 @@ export default {
   "attended": "Attended",
   "by": "by",
   "cancel": "Cancel",
+  "change": "Change",
   "chooseFile": "Choose File",
   "claimed": "CLAIMED",
   "claimNow": "CLAIM REQARD",

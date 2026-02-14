@@ -8,10 +8,11 @@ import { apiService } from '../services/ApiService';
 interface LoginProps {
     onLogin: (code: string) => void;
     isDark: boolean;
+    toggleTheme: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, isDark }) => {
-    const { t, language } = useLanguage();
+const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
+    const { t, language, setLanguage } = useLanguage();
     const [studentCode, setStudentCode] = useState('');
     const { mutate: loginMutation, loading: isLoading, error: apiError } = useMutation<{ token: string; user: any }>('api/login/', 'POST');
 
@@ -39,17 +40,43 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark }) => {
         }
     };
 
-    const handleTelegramLogin = () => {
-        // Placeholder for Telegram login logic
-        console.log("Telegram login clicked");
-    };
-
     return (
         <div className={`min-h-screen w-full flex flex-col items-center justify-center p-4 transition-colors duration-500 selection:bg-brand-primary/30 relative overflow-hidden font-sans ${isDark ? 'bg-slate-950 text-white' : 'bg-gray-50 text-slate-900'}`}>
 
             {/* Dynamic Premium Background */}
             <div className={`absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[140px] animate-pulse transition-colors duration-1000 ${isDark ? 'bg-brand-primary/20' : 'bg-brand-primary/10'}`}></div>
             <div className={`absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] rounded-full blur-[140px] animate-pulse delay-700 transition-colors duration-1000 ${isDark ? 'bg-brand-primary/15' : 'bg-brand-primary/5'}`}></div>
+
+            {/* Top Right Controls */}
+            <div className="absolute top-6 right-6 z-50 flex items-center space-x-3 animate-in fade-in slide-in-from-top-4 duration-700">
+                {/* Theme Toggle */}
+                <button
+                    onClick={toggleTheme}
+                    className={`p-3 rounded-2xl transition-all duration-300 backdrop-blur-md shadow-lg hover:scale-105 active:scale-95 ${isDark ? 'bg-slate-900/50 border border-white/10 text-yellow-400 hover:bg-slate-800/50' : 'bg-white/80 border border-white text-slate-600 hover:bg-white'}`}
+                >
+                    {isDark ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></svg>
+                    )}
+                </button>
+
+                {/* Language Switcher */}
+                <div className={`flex items-center p-1.5 rounded-2xl backdrop-blur-md shadow-lg border transition-colors duration-300 ${isDark ? 'bg-slate-900/50 border-white/10' : 'bg-white/80 border-white'}`}>
+                    <button
+                        onClick={() => setLanguage('uz')}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all duration-300 ${language === 'uz' ? 'bg-brand-primary text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                    >
+                        UZ
+                    </button>
+                    <button
+                        onClick={() => setLanguage('en')}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all duration-300 ${language === 'en' ? 'bg-brand-primary text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                    >
+                        EN
+                    </button>
+                </div>
+            </div>
 
             {/* Main Content Container */}
             <div className="w-full max-w-sm md:max-w-4xl z-10 animate-in fade-in slide-in-from-bottom-12 duration-1000 ease-out">
@@ -140,30 +167,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark }) => {
                                     )}
                                 </button>
                             </form>
-
-                            <div className="relative my-8">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className={`w-full border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}></div>
-                                </div>
-                                <div className="relative flex justify-center text-xs uppercase font-black tracking-widest">
-                                    <span className={`px-4 ${isDark ? 'bg-slate-900 text-slate-500' : 'bg-white text-gray-400'}`}>
-                                        {t('orContinueWith')}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={handleTelegramLogin}
-                                className={`w-full py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-sm md:text-base border-2 flex items-center justify-center transition-all duration-300 group ${isDark
-                                    ? 'border-white/10 bg-white/5 hover:bg-[#229ED9]/10 hover:border-[#229ED9]/50 text-white'
-                                    : 'border-gray-100 bg-white hover:bg-[#229ED9]/5 hover:border-[#229ED9]/50 text-slate-700'
-                                    }`}
-                            >
-                                <svg className="w-6 h-6 mr-3 text-[#229ED9] fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12.004 12.004 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-                                </svg>
-                                <span className="group-hover:text-[#229ED9] transition-colors">{t('loginTelegram')}</span>
-                            </button>
 
                             {/* Support Link */}
                             <div className="mt-6 md:mt-8 text-center relative z-10">

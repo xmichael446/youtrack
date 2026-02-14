@@ -229,20 +229,21 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   </div>
                 </div>
 
-                <div className="p-2 border-t-2 border-gray-100 dark:border-slate-800 md:hidden">
-                  <button
-                    className="w-full flex items-center px-3 py-3 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors group"
-                    onClick={() => {
-                      setShowProfileMenu(false);
-                      onLogout();
-                    }}
-                  >
+                {/* Logout Button in Dropdown */}
+                <button
+                  className="w-full flex items-center justify-between px-3 py-3 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors group"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    onLogout();
+                  }}
+                >
+                  <div className="flex items-center">
                     <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center mr-3 group-hover:bg-red-100 dark:group-hover:bg-red-500/20 transition-all">
                       <LogOut className="w-4 h-4" />
                     </div>
-                    {t('logout')}
-                  </button>
-                </div>
+                    <span>{t('logout')}</span>
+                  </div>
+                </button>
               </div>
             )}
           </div>

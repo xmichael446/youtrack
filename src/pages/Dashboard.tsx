@@ -7,9 +7,8 @@ import Curriculum from '../components/Curriculum';
 const Dashboard: React.FC = () => {
   const { t } = useLanguage();
   const { user, course, upcomingLesson, loading } = useDashboard();
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/";
+  const BASE_URL = import.meta.env.VITE_API_URL || "https://api.youtrack.cc/";
 
-  // Countdown State - use upcoming lesson if available
   const [timeLeft, setTimeLeft] = React.useState({
     days: 0,
     hours: 0,

@@ -15,6 +15,7 @@ export default {
   "attended": "Qatnashdi",
   "by": "ustoz",
   "cancel": "Bekor Qilish",
+  "change": "O'zgarish",
   "chooseFile": "Fayl Tanlash",
   "claimed": "OLINGAN",
   "claimNow": "SOTIB OLISH",

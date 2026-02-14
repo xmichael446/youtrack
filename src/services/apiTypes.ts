@@ -132,6 +132,7 @@ export interface Transaction {
     reason: string;
     xp: number;
     coins: number;
+    negative?: boolean;
 }
 
 export interface ShopData {

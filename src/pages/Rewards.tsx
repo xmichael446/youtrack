@@ -9,8 +9,8 @@ import { Reward } from '../services/apiTypes';
 const RewardsContent: React.FC = () => {
   const { t } = useLanguage();
   const { rewards, transactions, loading, error, claimReward } = useShop();
-  // Using user from DashboardContext to get current balance
-  const { user } = useDashboard();
+  // Using user from DashboardContext to get current balance and refetch
+  const { user, refetch } = useDashboard();
   const currentBalance = user?.coins || 0;
 
   const [processingId, setProcessingId] = useState<number | null>(null);
@@ -45,6 +45,7 @@ const RewardsContent: React.FC = () => {
     setProcessingId(reward.id);
     try {
       await claimReward(reward.id);
+      refetch(); // Update balance
       // Success toast could be added here
     } catch (err) {
       console.error("Failed to claim:", err);
@@ -112,11 +113,11 @@ const RewardsContent: React.FC = () => {
                   <div className="h-48 bg-gray-100 dark:bg-slate-800 relative overflow-hidden flex items-center justify-center">
                     {reward.image ? (
                       <img
-                        src={reward.image.startsWith('http') ? reward.image : `${import.meta.env.VITE_API_BASE_URL || ''}${reward.image}`}
+                        src={`${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/${(reward.image || '').replace(/^\/+/, '')}`}
                         alt={reward.name}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover/reward:scale-110"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://picsum.photos/400/200?grayscale'; // Fallback
+                          (e.target as HTMLImageElement).src = 'https://picsum.photos/400/200?grayscale';
                         }}
                       />
                     ) : (

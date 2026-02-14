@@ -27,6 +27,7 @@ export interface ActivityItem {
   action: string;
   xpChange: number | null;
   coinChange: number;
+  negative?: boolean;
 }
 
 

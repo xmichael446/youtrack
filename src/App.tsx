@@ -59,8 +59,34 @@ const App: React.FC = () => {
     localStorage.removeItem('isLogged');
   };
 
+  React.useEffect(() => {
+    // Dynamic Favicon Management
+    const setFavicon = (mode: 'light' | 'dark') => {
+      const links = [
+        { rel: 'apple-touch-icon', sizes: '180x180', href: `/favicon/${mode}/apple-touch-icon.png` },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: `/favicon/${mode}/favicon-32x32.png` },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: `/favicon/${mode}/favicon-16x16.png` },
+        { rel: 'manifest', href: `/favicon/${mode}/site.webmanifest` }
+      ];
+
+      links.forEach(linkDef => {
+        let link = document.querySelector(`link[rel="${linkDef.rel}"]${linkDef.sizes ? `[sizes="${linkDef.sizes}"]` : ''}`) as HTMLLinkElement;
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = linkDef.rel;
+          if (linkDef.sizes) link.sizes = linkDef.sizes;
+          if (linkDef.type) link.type = linkDef.type;
+          document.head.appendChild(link);
+        }
+        link.href = linkDef.href;
+      });
+    };
+
+    setFavicon(isDark ? 'dark' : 'light');
+  }, [isDark]);
+
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} isDark={isDark} />;
+    return <Login onLogin={handleLogin} isDark={isDark} toggleTheme={toggleTheme} />;
   }
 
   return (
@@ -182,14 +208,6 @@ const AppContent: React.FC<{
 
           <div className="space-y-4">
             <SidebarProgress />
-
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center md:justify-start px-5 py-4 rounded-[18px] text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-300 font-bold group"
-            >
-              <LogOut className="w-5 h-5 mr-4 group-hover:-translate-x-1 transition-transform" />
-              {t('logout')}
-            </button>
 
             <div className="mt-auto pt-6 border-t border-gray-100 dark:border-slate-800/50">
               <Footer isDark={isDark} />
