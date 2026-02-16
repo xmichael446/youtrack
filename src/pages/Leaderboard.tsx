@@ -10,6 +10,14 @@ const Leaderboard: React.FC = () => {
   const { groupLeaderboard, courseLeaderboard, enrollment, loading } = useLeaderboard();
   const { user } = useDashboard();
 
+  /* Force scroll to top on mount */
+  React.useEffect(() => {
+    const mainContainer = document.getElementById('main-scroll-container');
+    if (mainContainer) {
+      mainContainer.scrollTop = 0;
+    }
+  }, []);
+
   // Show loader while data is being fetched
   if (loading || !user.id) {
     return (

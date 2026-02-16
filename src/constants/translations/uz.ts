@@ -48,7 +48,7 @@ export default {
   "groupRank": "Guruh Reytingi",
   "guideVideo": "Video Qo'llanma",
   "hello": "Xush kelibsiz",
-  "helpSupport": "Muammo bormi? Admin bilan bog'laning!",
+  "helpSupport": "Muammo bormi? \n Admin bilan bog'laning!",
   "homeworkDescription": "Topshiriq Tavsifi",
   "homeworkResources": "Topshiriq Manbalari",
   "hours": "Soat",

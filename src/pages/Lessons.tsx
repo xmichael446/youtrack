@@ -45,6 +45,11 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () 
 };
 
 // Submission Modal Component
+import ReactDOM from 'react-dom';
+
+// ... (keep Toast component as is)
+
+// Submission Modal Component
 const SubmissionModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
@@ -63,6 +68,18 @@ const SubmissionModal: React.FC<{
   const [currentFile, setCurrentFile] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Lock body scroll when modal is open to prevent background scrolling
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -153,13 +170,16 @@ const SubmissionModal: React.FC<{
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 flex flex-col max-h-[90vh] border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+  // Use React Portal to render outside the main DOM hierarchy
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[9999] overflow-y-auto bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+      {/* Backdrop click handler */}
+      <div className="absolute inset-0" onClick={onClose}></div>
+
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 flex flex-col border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors duration-300 max-h-[90vh]">
 
         {/* Modal Header */}
-        <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-start bg-indigo-50/30 dark:bg-indigo-500/5 rounded-t-2xl">
+        <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-start bg-indigo-50/30 dark:bg-indigo-500/5 rounded-t-2xl shrink-0">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">{assignment.lesson_topic} {t('assignment')}</h2>
             <p className="text-sm text-red-500 dark:text-red-400 font-medium mt-1">{t('due')}: {new Date(assignment.deadline).toLocaleString()}</p>
@@ -169,7 +189,7 @@ const SubmissionModal: React.FC<{
           </button>
         </div>
 
-        {/* Modal Body (Scrollable) */}
+        {/* Modal Body (Scrollable independent of page) */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
 
           {/* Comment Field */}
@@ -179,7 +199,8 @@ const SubmissionModal: React.FC<{
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder={t('anyNotes')}
-              className="w-full rounded-2xl border-2 border-gray-300 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 p-5 text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none dark:text-white min-h-[120px] transition-all"
+              rows={2}
+              className="w-full rounded-2xl border-2 border-gray-300 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 p-5 text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none dark:text-white min-h-[60px] transition-all"
             ></textarea>
           </div>
 
@@ -274,7 +295,7 @@ const SubmissionModal: React.FC<{
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3 rounded-b-2xl bg-gray-50 dark:bg-slate-800 transition-colors">
+        <div className="p-6 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3 rounded-b-2xl bg-gray-50 dark:bg-slate-800 transition-colors shrink-0">
           <button
             onClick={onClose}
             className="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
@@ -289,7 +310,8 @@ const SubmissionModal: React.FC<{
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
@@ -388,7 +410,7 @@ const LessonsContent: React.FC = () => {
   const previousLessons = lessonsData?.previous || [];
 
   return (
-    <div className="space-y-8 md:space-y-12 animate-in fade-in duration-700 px-1 relative">
+    <div className="space-y-8 md:space-y-12 px-1 relative">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Attendance Section */}

@@ -114,14 +114,36 @@ const AppContent: React.FC<{
 }> = ({ currentView, setCurrentView, isDark, toggleTheme, handleLogout }) => {
   const { t } = useLanguage();
   const { user } = useDashboard();
+  const mainRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    // Scroll reset with multiple fallback timings to handle mobile rendering and reflows
+    const resetScroll = () => {
+      if (mainRef.current) {
+        mainRef.current.scrollTop = 0;
+        mainRef.current.scrollTo({ top: 0, behavior: 'auto' });
+      }
+    };
+
+    resetScroll();
+
+    // Fallback for async renders
+    const t1 = setTimeout(resetScroll, 10);
+    const t2 = setTimeout(resetScroll, 50);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [currentView]);
 
   const renderView = () => {
     switch (currentView) {
-      case 'dashboard': return <Dashboard />;
-      case 'leaderboard': return <Leaderboard />;
-      case 'lessons': return <Lessons />;
-      case 'rewards': return <Rewards />;
-      default: return <Dashboard />;
+      case 'dashboard': return <Dashboard key="dashboard" />;
+      case 'leaderboard': return <Leaderboard key="leaderboard" />;
+      case 'lessons': return <Lessons key="lessons" />;
+      case 'rewards': return <Rewards key="rewards" />;
+      default: return <Dashboard key="dashboard-default" />;
     }
   };
 
@@ -184,7 +206,7 @@ const AppContent: React.FC<{
   return (
     <LeaderboardProvider accessCode={user?.accessCode} enrollmentId={user?.id}>
       <LoadingScreen />
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col md:flex-row font-sans text-gray-900 dark:text-slate-100 transition-colors duration-300">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col md:flex-row font-sans text-gray-900 dark:text-slate-100">
         {/* Sidebar (Desktop) */}
         <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white dark:bg-slate-900 border-r border-gray-100 dark:border-slate-800 h-screen sticky top-0 z-40 p-4 lg:p-6">
           <div className="px-2 py-4 mb-8 flex items-center justify-center">
@@ -219,7 +241,7 @@ const AppContent: React.FC<{
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <Header isDark={isDark} toggleTheme={toggleTheme} onLogout={handleLogout} />
 
-          <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-20 md:pt-8 pb-32 md:pb-8 custom-scrollbar scroll-smooth bg-gray-50 dark:bg-slate-950 transition-colors duration-300 flex flex-col">
+          <main id="main-scroll-container" ref={mainRef} className="flex-1 overflow-y-auto p-4 md:p-8 pt-20 md:pt-8 pb-32 md:pb-8 custom-scrollbar bg-gray-50 dark:bg-slate-950 flex flex-col">
             <div className="max-w-5xl mx-auto w-full flex-1">
               {renderView()}
             </div>

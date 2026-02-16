@@ -17,6 +17,14 @@ const Dashboard: React.FC = () => {
   });
 
   React.useEffect(() => {
+    // Force scroll to top on mount
+    const mainContainer = document.getElementById('main-scroll-container');
+    if (mainContainer) {
+      mainContainer.scrollTop = 0;
+    }
+  }, []);
+
+  React.useEffect(() => {
     let deadline: Date;
 
     if (upcomingLesson?.starts) {

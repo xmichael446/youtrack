@@ -130,7 +130,25 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
                                             placeholder={t('enterStudentCode')}
                                             value={studentCode}
                                             onChange={(e) => {
-                                                setStudentCode(e.target.value);
+                                                const rawVal = e.target.value;
+                                                if (!rawVal) {
+                                                    setStudentCode('');
+                                                    return;
+                                                }
+
+                                                const numbersOnly = rawVal.replace(/[^0-9]/g, '');
+
+                                                if (numbersOnly) {
+                                                    setStudentCode('YT-E' + numbersOnly.slice(0, 6));
+                                                } else {
+                                                    if (rawVal === 'YT-E') {
+                                                        setStudentCode('YT-E');
+                                                    } else if (rawVal.startsWith('YT-E') && rawVal.length > 4) {
+                                                        setStudentCode('YT-E');
+                                                    } else {
+                                                        setStudentCode('YT-E');
+                                                    }
+                                                }
                                             }}
                                             className={`w-full border-2 text-sm md:text-base font-bold rounded-xl md:rounded-2xl pl-12 pr-4 py-3 md:py-4 focus:outline-none transition-all duration-300 ${isDark
                                                 ? 'bg-slate-950/50 border-white/5 text-white placeholder:text-slate-700 focus:border-brand-primary focus:bg-slate-900'
@@ -170,7 +188,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
 
                             {/* Support Link */}
                             <div className="mt-6 md:mt-8 text-center relative z-10">
-                                <a href="https://t.me/lr_intensive_admin" target="_blank" rel="noopener noreferrer" className={`text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:tracking-[0.3em] ${isDark ? 'text-slate-600 hover:text-brand-primary' : 'text-slate-400 hover:text-brand-primary'}`}>
+                                <a href="https://t.me/lr_intensive_admin" target="_blank" rel="noopener noreferrer" className={`text-[10px] whitespace-pre-line font-bold uppercase tracking-[0.25em] transition-all hover:tracking-[0.3em] ${isDark ? 'text-slate-600 hover:text-brand-primary' : 'text-slate-400 hover:text-brand-primary'}`}>
                                     {t('helpSupport')}
                                 </a>
                             </div>
