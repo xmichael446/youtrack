@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, Coins, Zap, Sun, Moon, User as UserIcon, LogOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bell, Coins, Zap, Sun, Moon, LogOut } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -15,7 +15,6 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const { user } = useDashboard();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showCoinsHistory, setShowCoinsHistory] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const getNotificationTypeInfo = (type: string) => {
@@ -51,11 +50,10 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const handleOpenNotifications = () => {
     const newState = !showNotifications;
     setShowNotifications(newState);
-    setShowCoinsHistory(false);
     setShowProfileMenu(false);
 
     if (newState && unreadCount > 0) {
-      markAllAsRead();
+      markAllAsRead().then(r => {console.log(r)});
     }
   };
 
@@ -158,7 +156,6 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
               onClick={() => {
                 setShowProfileMenu(!showProfileMenu);
                 setShowNotifications(false);
-                setShowCoinsHistory(false);
               }}
               className={`flex items-center pl-2 sm:pl-4 border-l-2 border-gray-300 dark:border-slate-800 group transition-all active:scale-95 ${showProfileMenu ? 'opacity-70' : ''}`}
             >
