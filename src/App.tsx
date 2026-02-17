@@ -214,10 +214,6 @@ const AppContent: React.FC<{
               src={isDark ? "/logo-dark.png" : "/logo-light.png"}
               alt="YouTrack Logo"
               className="w-48 h-16 object-contain"
-              onError={(e) => {
-                // Fallback to generic logo
-                (e.target as HTMLImageElement).src = '/logo.png';
-              }}
             />
           </div>
 

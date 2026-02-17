@@ -82,13 +82,13 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
 
     const submitAssignment = async (data: Omit<HomeworkSubmissionData, 'assignment_id' | 'student_code'>) => {
-        if (!studentCode || !lessonsData?.assignment) {
+        if (!studentCode || !lessonsData?.assignments?.current) {
             throw new Error("Missing student code or assignment data");
         }
 
         try {
             await apiService.submitHomework({
-                assignment_id: lessonsData.assignment.id,
+                assignment_id: lessonsData.assignments.current.id,
                 student_code: studentCode,
                 ...data
             });

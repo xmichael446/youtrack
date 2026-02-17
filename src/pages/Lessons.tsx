@@ -8,7 +8,9 @@ import {
   X,
   Link as LinkIcon,
   AlertCircle,
-  Calendar
+  Calendar,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
@@ -315,12 +317,185 @@ const SubmissionModal: React.FC<{
   );
 };
 
+const AssignmentCard: React.FC<{
+  assignment: AssignmentData;
+  isCurrent?: boolean;
+  onExpand: () => void;
+  isExpanded: boolean;
+  onSubmit?: () => void;
+}> = ({ assignment, isCurrent, onExpand, isExpanded, onSubmit }) => {
+  const { t } = useLanguage();
+
+  const getStatusColor = (status: string | null) => {
+    if (!status) return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20';
+    const s = status.toLowerCase();
+    if (s === 'approved' || s === 'attended' || s === 'submitted') return 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20';
+    if (s === 'rejected' || s === 'absent' || s === 'missed') return 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20';
+    return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20';
+  };
+
+  const latestSubmission = assignment.submissions && assignment.submissions.length > 0 ? assignment.submissions[0] : null;
+
+  // Determine status label to show in collapsed row
+  let statusLabel = "Pending";
+  if (latestSubmission) {
+    statusLabel = latestSubmission.status;
+  } else {
+    const deadline = new Date(assignment.deadline).getTime();
+    const now = new Date().getTime();
+    if (deadline < now) statusLabel = "Missed";
+  }
+
+  // Check if we should show submit button: only if status is not "approved"
+  const showSubmitButton = isCurrent && (!latestSubmission || latestSubmission.status.toLowerCase() !== 'approved');
+
+  return (
+    <div className={`bg-white dark:bg-slate-900 rounded-2xl border-2 transition-all ${isExpanded ? 'border-brand-primary shadow-lg' : 'border-gray-100 dark:border-slate-800 hover:border-brand-primary/30'}`}>
+      {/* Card Header - Always visible */}
+      <div
+        onClick={onExpand}
+        className="p-4 md:p-6 cursor-pointer"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              {isCurrent && <div className="w-2 h-2 rounded-full bg-brand-primary animate-pulse flex-shrink-0"></div>}
+              <h3 className={`text-sm md:text-base font-black truncate ${isCurrent ? 'text-brand-dark dark:text-white' : 'text-gray-600 dark:text-slate-400'}`}>
+                {assignment.lesson_topic}
+              </h3>
+              {isCurrent && <span className="inline-flex px-2 py-0.5 bg-brand-primary/10 text-brand-primary text-[9px] font-bold rounded uppercase tracking-wider flex-shrink-0">{t("current")}</span>}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-slate-500">
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                {new Date(assignment.start_datetime).toLocaleDateString()}
+              </span>
+              {isCurrent && (
+                <span className="flex items-center gap-1 text-red-400 font-bold">
+                  <Clock className="w-3 h-3" />
+                  {t("due")}: {new Date(assignment.deadline).toLocaleDateString()} {new Date(assignment.deadline).toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" })}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-wider border ${getStatusColor(statusLabel)}`}>
+              {statusLabel}
+            </span>
+            {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+          </div>
+        </div>
+      </div>
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="border-t border-gray-100 dark:border-slate-800 p-4 md:p-6 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+          {/* Description */}
+          <div className="bg-gray-50 dark:bg-slate-800/50 rounded-xl p-4 border-l-4 border-brand-primary">
+            <h4 className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-2">
+              {t('homeworkDescription')}
+            </h4>
+            <p className="text-sm font-bold text-gray-700 dark:text-slate-300 italic leading-relaxed">
+              "{assignment.description}"
+            </p>
+          </div>
+
+          {/* Resources */}
+          {assignment.attachments && assignment.attachments.length > 0 && (
+            <div>
+              <h4 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-3">
+                {t('homeworkResources')}
+              </h4>
+              <div className="space-y-2">
+                {assignment.attachments.map((item, idx) => (
+                  <a
+                    key={idx}
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-brand-primary/40 hover:bg-brand-primary/5 transition-all group"
+                  >
+                    <div className="bg-white dark:bg-slate-800 p-2 rounded-lg mr-3 group-hover:bg-brand-primary/10 transition-colors">
+                      <FileText className="w-4 h-4 text-gray-400 group-hover:text-brand-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-gray-700 dark:text-slate-300 truncate group-hover:text-brand-dark dark:group-hover:text-white">
+                        {item.name}
+                      </p>
+                      <p className="text-[10px] font-bold text-gray-400">
+                        {item.extension ? item.extension.toUpperCase() : 'FILE'}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Submission History - for ALL assignments with submissions */}
+          {assignment.submissions && assignment.submissions.length > 0 && (
+            <div>
+              <h4 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-3">
+                {t('submissionHistory')}
+              </h4>
+              <div className="space-y-2">
+                {assignment.submissions.map((sub, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-gray-200 dark:border-slate-700"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-gray-600 dark:text-slate-400">
+                        {new Date(sub.created_at).toLocaleDateString()} {new Date(sub.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border ${getStatusColor(sub.status)}`}>
+                        {sub.status}
+                      </span>
+                    </div>
+                    {sub.teacher_comment && (
+                      <p className="text-xs text-gray-600 dark:text-slate-400 italic mt-2 pl-3 border-l-2 border-gray-300 dark:border-slate-600">
+                        "{sub.teacher_comment}"
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Submit Button - for current assignment if not approved */}
+          {showSubmitButton && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSubmit && onSubmit();
+              }}
+              className="w-full bg-slate-900 dark:bg-brand-primary text-white py-3 md:py-4 rounded-xl font-black hover:bg-black dark:hover:bg-brand-accent transition-all shadow-xl shadow-slate-900/10 dark:shadow-brand-primary/20 hover:scale-[1.02] active:scale-95 text-sm flex items-center justify-center gap-2 group"
+            >
+              <UploadCloud className="w-4 h-4 group-hover:translate-y-[-2px] transition-transform" />
+              {latestSubmission ? t('resubmit') : t('startSubmission')}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LessonsContent: React.FC = () => {
   const { t } = useLanguage();
   const { refetch } = useDashboard();
   const { lessonsData, loading, error, markAttendance, submitAssignment } = useLessons();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Track expanded rows by ID
+  const [expandedRowIds, setExpandedRowIds] = useState<number[]>([]);
+
+  const toggleRow = (id: number) => {
+    setExpandedRowIds(prev =>
+      prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
+    );
+  };
 
   // Attendance State
   const [attendanceCode, setAttendanceCode] = useState('');
@@ -381,14 +556,6 @@ const LessonsContent: React.FC = () => {
     }
   };
 
-  // Helper to check if urgent (within 6 hours)
-  const isUrgent = (deadlineStr: string) => {
-    const deadline = new Date(deadlineStr).getTime();
-    const now = new Date().getTime();
-    const diffHours = (deadline - now) / (1000 * 60 * 60);
-    return diffHours > 0 && diffHours <= 6;
-  };
-
   // Helper to format deadline
   const formatDeadline = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -402,12 +569,22 @@ const LessonsContent: React.FC = () => {
     return `${hours}h ${minutes}m`;
   };
 
+  // Helper to get status color (for attendance only now)
+  const getStatusColor = (status: string | null) => {
+    if (!status) return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20';
+    const s = status.toLowerCase();
+    if (s === 'approved' || s === 'attended') return 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20';
+    if (s === 'rejected' || s === 'absent' || s === 'missed') return 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20';
+    return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20';
+  };
+
   if (loading) return <div className="flex justify-center items-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div></div>;
   if (error) return <div className="text-center py-20 text-red-500 font-bold">{error}</div>;
 
   const attendance = lessonsData?.attendance;
-  const assignment = lessonsData?.assignment;
-  const previousLessons = lessonsData?.previous || [];
+  const assignments = lessonsData?.assignments;
+  const currentAssignment = assignments?.current;
+  const previousAssignments = assignments?.previous || [];
 
   return (
     <div className="space-y-8 md:space-y-12 px-1 relative">
@@ -499,182 +676,44 @@ const LessonsContent: React.FC = () => {
         </section>
       )}
 
-      {/* Upcoming Assignments */}
-      {assignment && (
+      {/* Assignments Section */}
+      {assignments && (
         <section>
           <div className="flex items-center justify-between mb-6 px-1">
-            <h2 className="text-2xl font-black text-brand-dark dark:text-white flex items-center tracking-tight">
-              {t('assignment')}
-              {isUrgent(assignment.deadline) && (
-                <span className="hidden sm:inline-flex ml-4 px-3 py-1 bg-red-500 text-white text-[10px] font-black rounded-full shadow-lg shadow-red-500/20 animate-pulse uppercase tracking-wider">{t('urgent')}</span>
-              )}
-            </h2>
+            <h2 className="text-xl font-black text-brand-dark dark:text-white tracking-tight">{t('assignments')}</h2>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-[32px] shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-brand-primary/10 group">
-            <div className="p-6 md:p-10 border-b border-gray-50 dark:border-slate-800 flex flex-col lg:flex-row justify-between lg:items-center gap-8">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest border border-indigo-100 dark:border-indigo-500/20">
-                    Lesson {assignment.number}
-                  </span>
-                  <span className="text-xs font-bold text-gray-400 dark:text-slate-600 flex items-center">
-                    <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                    {new Date(assignment.start_datetime).toLocaleDateString()}
-                  </span>
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black text-brand-dark dark:text-white leading-tight mb-3">
-                  {assignment.lesson_topic}
-                </h3>
-                <p className="text-red-500 dark:text-red-400 text-sm font-black flex items-center bg-red-50 dark:bg-red-500/5 w-fit px-3 py-1.5 rounded-xl border border-red-100 dark:border-red-500/10">
-                  <Clock className="w-4 h-4 mr-2" /> {t('expiresIn')} {formatDeadline(assignment.deadline)}
-                </p>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="lg:w-auto bg-slate-900 dark:bg-brand-primary text-white px-12 py-5 rounded-[20px] font-black hover:bg-black dark:hover:bg-brand-accent transition-all shadow-xl shadow-slate-900/10 dark:shadow-brand-primary/20 hover:scale-[1.05] active:scale-95 text-lg"
-              >
-                {t('startSubmission')}
-              </button>
-            </div>
+          <div className="space-y-4">
+            {/* Current Assignment First */}
+            {currentAssignment && (
+              <AssignmentCard
+                assignment={currentAssignment}
+                isCurrent={true}
+                isExpanded={expandedRowIds.includes(currentAssignment.id)}
+                onExpand={() => toggleRow(currentAssignment.id)}
+                onSubmit={() => setIsModalOpen(true)}
+              />
+            )}
 
-
-            {/* Homework Description */}
-            <div className="p-6 md:p-10 border-b border-gray-50 dark:border-slate-800 bg-gray-50/40 dark:bg-slate-800/10">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary"></div>
-                <h4 className="flex items-center text-[10px] font-black text-brand-primary uppercase tracking-[0.25em] mb-4">
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  {t('homeworkDescription')}
-                </h4>
-                <p className="text-sm md:text-base font-bold text-gray-700 dark:text-slate-300 italic leading-relaxed relative z-10">
-                  "{assignment.description}"
-                </p>
-              </div>
-            </div>
-
-            <div className="p-6 md:p-10 bg-gray-50/40 dark:bg-slate-800/10">
-              <h4 className="text-[11px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.25em] mb-6 ml-1">{t('homeworkResources')}</h4>
-
-              {assignment.attachments && assignment.attachments.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {assignment.attachments.map((item, idx) => (
-                    <a key={idx} href={item.link} target="_blank" rel="noopener noreferrer" className="flex items-center p-5 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl hover:border-brand-primary/40 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group/item ring-1 ring-transparent hover:ring-brand-primary/10">
-                      <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl mr-5 group-hover/item:bg-brand-primary/10 transition-colors">
-                        <FileText className="w-6 h-6 text-gray-400 dark:text-slate-500 group-hover/item:text-brand-primary" />
-                      </div>
-                      <div>
-                        <span className="block text-sm font-black text-gray-700 dark:text-slate-300 group-hover/item:text-brand-dark dark:group-hover/item:text-white transition-colors">{item.name}</span>
-                        <span className="text-[10px] font-bold text-gray-400 flex items-center mt-1">
-                          <Clock className="w-3 h-3 mr-1" /> {item.extension ? item.extension.toUpperCase() : 'FILE'} • {(item.size ? (item.size / 1024).toFixed(0) + ' KB' : 'N/A')}
-                        </span>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500 italic">No resources attached.</p>
-              )}
-            </div>
+            {/* Previous Assignments (Latest to Earliest) */}
+            {previousAssignments.map((prev) => (
+              <AssignmentCard
+                key={prev.id}
+                assignment={prev}
+                isExpanded={expandedRowIds.includes(prev.id)}
+                onExpand={() => toggleRow(prev.id)}
+              />
+            ))}
           </div>
         </section>
       )}
 
-      {/* Submission History */}
-      <section>
-        <div className="flex items-center justify-between mb-6 px-1">
-          <h2 className="text-xl font-black text-brand-dark dark:text-white tracking-tight">{t('portfolioHistory')}</h2>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[24px] shadow-sm transition-all overflow-hidden">
-          {previousLessons.length === 0 ? (
-            <div className="p-8 text-center text-gray-500 dark:text-slate-400 italic">
-              No submission history found.
-            </div>
-          ) : (
-            <>
-              {/* Desktop View (Table) */}
-              <div className="hidden md:block overflow-x-auto custom-scrollbar">
-                <table className="min-w-full divide-y divide-gray-50 dark:divide-slate-800">
-                  <thead className="bg-gray-50/50 dark:bg-slate-800/30">
-                    <tr>
-                      <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('assignment')}</th>
-                      <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('submitted')}</th>
-                      <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('grade')}</th>
-                      <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('teacherComment')}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-50 dark:divide-slate-800/50">
-                    {previousLessons.map((sub, idx) => (
-                      <tr key={idx} className="hover:bg-brand-primary/5 dark:hover:bg-brand-primary/5 transition-colors group/row">
-                        <td className="px-8 py-6">
-                          <div className="flex items-center">
-                            <div className="w-2 h-2 rounded-full bg-brand-primary mr-3 opacity-0 group-hover/row:opacity-100 transition-opacity"></div>
-                            <span className="text-sm font-black text-brand-dark dark:text-white">{sub.lesson_name}</span>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <span className="text-xs font-bold text-gray-500 dark:text-slate-500">{new Date(sub.created_at).toLocaleDateString()}</span>
-                        </td>
-                        <td className="px-8 py-6">
-                          <span className={`inline-flex items-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border
-                                ${sub.status === 'approved' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20' :
-                              sub.status === 'rejected' ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20' :
-                                'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20'}`}>
-                            {sub.status || "Pending"}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 text-xs text-gray-500 dark:text-slate-400 italic max-w-xs truncate font-semibold">
-                          {sub.teacher_comment || t('noFeedback')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile View (Card List) */}
-              <div className="md:hidden divide-y divide-gray-50 dark:divide-slate-800">
-                {previousLessons.map((sub, idx) => (
-                  <div key={idx} className="p-5 active:bg-gray-50 dark:active:bg-slate-800/50 transition-colors">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full bg-brand-primary mr-2"></div>
-                        <span className="text-sm font-black text-brand-dark dark:text-white">{sub.lesson_name}</span>
-                      </div>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border
-                            ${sub.status === 'approved' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20' :
-                          sub.status === 'rejected' ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20' :
-                            'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20'}`}>
-                        {sub.status || "Pending"}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col space-y-2">
-                      <div className="flex items-center text-[10px] font-bold text-gray-400 dark:text-slate-500">
-                        <Clock className="w-3 h-3 mr-1.5" />
-                        {new Date(sub.created_at).toLocaleDateString()}
-                      </div>
-                      {sub.teacher_comment && (
-                        <div className="text-[11px] text-gray-500 dark:text-slate-400 italic font-semibold border-l-2 border-gray-100 dark:border-slate-800 pl-3 py-1">
-                          {sub.teacher_comment}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
       {/* Submission Modal */}
-      {assignment && (
+      {currentAssignment && (
         <SubmissionModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          assignment={assignment}
+          assignment={currentAssignment}
           onSubmit={submitAssignment}
           showToast={showToast}
         />

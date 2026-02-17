@@ -58,30 +58,43 @@ export interface AssignmentAttachment {
     type?: 'file' | 'link' | 'image'; // adjusting based on usage
 }
 
+export interface SubmissionAttachment {
+    name: string;
+    link: string;
+    size?: number;
+    extension?: string;
+}
+
+export interface Submission {
+    id: number;
+    status: 'approved' | 'rejected' | 'pending' | 'submitted';
+    student_comment?: string;
+    teacher_comment?: string;
+    created_at: string;
+    attachments: SubmissionAttachment[];
+}
+
 export interface AssignmentData {
     id: number;
-    number: number;
+    number: number | string;
     description: string;
     lesson_topic: string;
     start_datetime: string;
     deadline: string;
     attachments: AssignmentAttachment[];
+    submissions: Submission[];
 }
 
-export interface PreviousLesson {
-    lesson_name: string;
-    lesson_date: string;
-    created_at: string;
-    status: 'approved' | 'rejected' | 'awaiting_approval' | 'approval_time_exceeded' | null;
-    teacher_comment?: string;
+export interface AssignmentsData {
+    current: AssignmentData | null;
+    previous: AssignmentData[];
 }
 
 export interface LessonsResponse {
     success: boolean;
     data: {
         attendance: AttendanceData;
-        assignment: AssignmentData | null;
-        previous: PreviousLesson[];
+        assignments: AssignmentsData;
     };
 }
 
