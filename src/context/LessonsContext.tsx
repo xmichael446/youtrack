@@ -24,19 +24,13 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Get student code from local storage
-    const studentCode = localStorage.getItem('studentCode') || '';
+
 
     const fetchLessons = async () => {
-        if (!studentCode) {
-            setError("Student code not found");
-            return;
-        }
-
         try {
             setLoading(true);
             setError(null);
-            const response = await apiService.getLessons(studentCode);
+            const response = await apiService.getLessons();
             if (response.success && response.data) {
                 setLessonsData(response.data);
             } else {
@@ -52,19 +46,16 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Initial fetch
     useEffect(() => {
-        if (studentCode) {
-            fetchLessons();
-        }
-    }, [studentCode]);
+        fetchLessons();
+    }, []);
 
     const markAttendance = async (keyword: string): Promise<MarkAttendanceResponse> => {
-        if (!studentCode || !lessonsData?.attendance) {
-            throw new Error("Missing student code or attendance data");
+        if (!lessonsData?.attendance) {
+            throw new Error("Missing attendance data");
         }
 
         try {
             const response = await apiService.markAttendance({
-                student_code: studentCode,
                 track_id: lessonsData.attendance.track_id,
                 keyword
             });
@@ -81,15 +72,14 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    const submitAssignment = async (data: Omit<HomeworkSubmissionData, 'assignment_id' | 'student_code'>) => {
-        if (!studentCode || !lessonsData?.assignments?.current) {
-            throw new Error("Missing student code or assignment data");
+    const submitAssignment = async (data: Omit<HomeworkSubmissionData, 'assignment_id'>) => {
+        if (!lessonsData?.assignments?.current) {
+            throw new Error("Missing assignment data");
         }
 
         try {
             await apiService.submitHomework({
                 assignment_id: lessonsData.assignments.current.id,
-                student_code: studentCode,
                 ...data
             });
 

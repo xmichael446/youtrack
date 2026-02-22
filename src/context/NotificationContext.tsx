@@ -19,19 +19,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // We get studentCode from localStorage as it's the most reliable source for the logged-in user identifier
-    const studentCode = localStorage.getItem('studentCode');
+
 
     const fetchNotifications = useCallback(async () => {
-        if (!studentCode) return;
-
         // Don't set loading to true if we already have notifications (background refresh)
         if (notifications.length === 0) {
             setLoading(true);
         }
 
         try {
-            const data = await apiService.getNotifications(studentCode);
+            const data = await apiService.getNotifications();
             // Ensure data is array
             if (Array.isArray(data)) {
                 // Sort by ID descending (newest first) or date? 
@@ -53,7 +50,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } finally {
             setLoading(false);
         }
-    }, [studentCode]);
+    }, []);
 
     useEffect(() => {
         fetchNotifications();

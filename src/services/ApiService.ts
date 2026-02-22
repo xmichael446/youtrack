@@ -24,6 +24,10 @@ class ApiService {
         this.defaultHeaders = {
             'Content-Type': 'application/json',
         };
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            this.defaultHeaders['Authorization'] = `Bearer ${token}`;
+        }
         this.states = new Map();
         this.listeners = new Map();
     }
@@ -121,7 +125,43 @@ class ApiService {
         }
 
         try {
-            const response = await fetch(url, requestInit);
+            let response = await fetch(url, requestInit);
+
+            if (response.status === 401) {
+                const refreshToken = localStorage.getItem('refreshToken');
+                if (refreshToken) {
+                    try {
+                        const refreshRes = await fetch(this.buildURL('/api/auth/token/refresh/'), {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ refresh: refreshToken })
+                        });
+                        if (refreshRes.ok) {
+                            const refreshData = await refreshRes.json();
+                            this.setAuthToken(refreshData.access);
+                            localStorage.setItem('authToken', refreshData.access);
+
+                            // Retry original request
+                            requestHeaders['Authorization'] = `Bearer ${refreshData.access}`;
+                            requestInit.headers = requestHeaders;
+                            response = await fetch(url, requestInit);
+                        } else {
+                            this.clearAuthToken();
+                            localStorage.removeItem('authToken');
+                            localStorage.removeItem('refreshToken');
+                            localStorage.setItem('isLogged', 'false');
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        // Let it fail normally
+                    }
+                } else {
+                    this.clearAuthToken();
+                    localStorage.removeItem('authToken');
+                    localStorage.setItem('isLogged', 'false');
+                    window.location.reload();
+                }
+            }
 
             // Parse response
             let responseData: T;
@@ -365,21 +405,21 @@ class ApiService {
     /**
      * Get Lessons Data
      */
-    async getLessons(studentCode: string): Promise<LessonsResponse> {
-        return (await this.post<LessonsResponse>('/api/lessons/', { student_code: studentCode })).data;
+    async getLessons(): Promise<LessonsResponse> {
+        return (await this.post<LessonsResponse>('/api/lessons/')).data;
     }
 
     /**
      * Get Lessons Data and store in state
      */
-    async getLessonsAndStore(key: string, studentCode: string): Promise<LessonsResponse> {
-        return this.postAndStore<LessonsResponse>(key, '/api/lessons/', { student_code: studentCode });
+    async getLessonsAndStore(key: string): Promise<LessonsResponse> {
+        return this.postAndStore<LessonsResponse>(key, '/api/lessons/');
     }
 
     /**
      * Mark Attendance
      */
-    async markAttendance(data: { student_code: string; track_id: number; keyword: string }): Promise<MarkAttendanceResponse> {
+    async markAttendance(data: { track_id: number; keyword: string }): Promise<MarkAttendanceResponse> {
         return (await this.post<MarkAttendanceResponse>('/api/attendance/mark/', data)).data;
     }
 
@@ -435,22 +475,22 @@ class ApiService {
     /**
      * Get Shop Data
      */
-    async getShop(studentCode: string): Promise<ShopResponse> {
-        return (await this.post<ShopResponse>('/api/shop/', { student_code: studentCode })).data;
+    async getShop(): Promise<ShopResponse> {
+        return (await this.post<ShopResponse>('/api/shop/')).data;
     }
 
     /**
      * Claim Reward
      */
-    async claimReward(studentCode: string, rewardId: number): Promise<ClaimRewardResponse> {
-        return (await this.post<ClaimRewardResponse>('/api/claim-reward/', { student_code: studentCode, reward_id: rewardId })).data;
+    async claimReward(rewardId: number): Promise<ClaimRewardResponse> {
+        return (await this.post<ClaimRewardResponse>('/api/claim-reward/', { reward_id: rewardId })).data;
     }
 
     /**
      * Get Notifications
      */
-    async getNotifications(studentCode: string): Promise<NotificationsResponse> {
-        return (await this.post<NotificationsResponse>('/api/notifications/', { student_code: studentCode })).data;
+    async getNotifications(): Promise<NotificationsResponse> {
+        return (await this.post<NotificationsResponse>('/api/notifications/')).data;
     }
 
     /**

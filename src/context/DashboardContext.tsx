@@ -117,10 +117,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     // Trigger POST request on mount
     useEffect(() => {
-        if (studentCode) {
-            post({ student_code: studentCode });
-        }
-    }, [studentCode, post]);
+        post();
+    }, [post]);
 
     // Extract enrollment data
     const enrollment = dashboardData?.data?.enrollment || null;
@@ -163,9 +161,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     // Refetch function
     const refetch = () => {
-        if (studentCode) {
-            post({ student_code: studentCode });
-        }
+        post();
     };
 
     const value: DashboardContextType = {

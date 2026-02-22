@@ -114,10 +114,10 @@ export function useHomeworkSubmission(key: string = 'homework-submission') {
     const state = useApiState(key, null);
 
     const submit = useCallback(
-        async (lessonId: number, comment?: string, files?: File[]) => {
+        async (assignment_id: number, comment?: string, files?: File[]) => {
             try {
                 const result = await apiService.submitHomeworkAndStore(key, {
-                    lessonId,
+                    assignment_id,
                     comment,
                     files,
                 });

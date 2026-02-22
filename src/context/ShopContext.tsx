@@ -19,21 +19,13 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const getStudentCode = () => {
-        return localStorage.getItem('studentCode');
-    };
+
 
     const fetchShopData = useCallback(async () => {
-        const studentCode = getStudentCode();
-        if (!studentCode) {
-            setError("No student code found");
-            return;
-        }
-
         setLoading(true);
         setError(null);
         try {
-            const response = await apiService.getShop(studentCode);
+            const response = await apiService.getShop();
             if (response.success) {
                 setData(response.data);
             } else {
@@ -51,11 +43,8 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [fetchShopData]);
 
     const claimReward = async (rewardId: number) => {
-        const studentCode = getStudentCode();
-        if (!studentCode) throw new Error("No student code found");
-
         try {
-            const response = await apiService.claimReward(studentCode, rewardId);
+            const response = await apiService.claimReward(rewardId);
             if (response.success) {
                 await fetchShopData(); // Refresh data to update claimed status
             } else {

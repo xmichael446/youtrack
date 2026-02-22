@@ -54,12 +54,10 @@ export const LeaderboardProvider: React.FC<{
         'api/leaderboard/'
     );
 
-    // Trigger POST request when access code is available
+    // Trigger POST request when component mounts
     useEffect(() => {
-        if (accessCode) {
-            post({ student_code: accessCode });
-        }
-    }, [accessCode, post]);
+        post();
+    }, [post]);
 
     // Extract leaderboard data
     const data = leaderboardData?.data || null;
@@ -73,9 +71,7 @@ export const LeaderboardProvider: React.FC<{
 
     // Refetch function
     const refetch = () => {
-        if (accessCode) {
-            post({ student_code: accessCode });
-        }
+        post();
     };
 
     const value: LeaderboardContextType = {

@@ -117,7 +117,6 @@ export interface AttachmentSubmission {
 
 export interface HomeworkSubmissionData {
     assignment_id: number;
-    student_code: string;
     comment?: string;
     attachments?: AttachmentSubmission[];
     files?: File[];

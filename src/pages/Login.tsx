@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, LogIn } from 'lucide-react';
 import Footer from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
@@ -14,7 +14,73 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
     const { t, language, setLanguage } = useLanguage();
     const [studentCode, setStudentCode] = useState('');
-    const { mutate: loginMutation, loading: isLoading, error: apiError } = useMutation<{ token: string; user: any }>('api/login/', 'POST');
+    const [authStep, setAuthStep] = useState<'login' | 'polling'>('login');
+    const [authData, setAuthData] = useState<{ start_param: string, access_code: string, deep_link: string } | null>(null);
+
+    const { mutate: loginMutation, loading: isLoginLoading, error: loginError } = useMutation<any>('api/login/', 'POST');
+    const { mutate: initMutation, loading: isInitLoading, error: initError } = useMutation<any>('api/auth/init/', 'POST');
+
+    const isLoading = isLoginLoading || isInitLoading;
+    const apiError = loginError || initError;
+
+    const startPolling = async (start_param: string, access_code: string) => {
+        let isPolling = true;
+
+        const poll = async () => {
+            if (!isPolling) return;
+
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/auth/verify/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ start_param, access_code })
+                });
+
+                if (response.status === 408) {
+                    // Timeout, keep polling
+                    if (isPolling) setTimeout(poll, 1000);
+                    return;
+                }
+
+                if (!response.ok) {
+                    // Other error, restart
+                    setAuthStep('login');
+                    setAuthData(null);
+                    return;
+                }
+
+                const data = await response.json();
+                if (data.success && isPolling) {
+                    apiService.setAuthToken(data.access);
+                    localStorage.setItem('authToken', data.access);
+                    localStorage.setItem('refreshToken', data.refresh);
+                    localStorage.setItem('studentCode', access_code);
+                    onLogin(access_code);
+                }
+            } catch (err) {
+                // If network error, might want to stop or retry
+                if (isPolling) setTimeout(poll, 2000);
+            }
+        };
+
+        poll();
+
+        return () => { isPolling = false; };
+    };
+
+    useEffect(() => {
+        let cleanup: (() => void) | undefined;
+        if (authStep === 'polling' && authData) {
+            const cleanupFn = startPolling(authData.start_param, authData.access_code);
+            cleanup = () => {
+                cleanupFn.then(fn => fn && fn());
+            };
+        }
+        return () => {
+            if (cleanup) cleanup();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authStep, authData]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,19 +89,20 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
         }
 
         try {
-            const response = await loginMutation({ student_code: studentCode });
+            await loginMutation({ student_code: studentCode });
 
-            // Store the auth token and student code
-            if (response?.token) {
-                apiService.setAuthToken(response.token);
-                localStorage.setItem('authToken', response.token);
+            const initResponse = await initMutation({ access_code: studentCode });
+
+            if (initResponse?.success) {
+                setAuthData({
+                    start_param: initResponse.start_param,
+                    access_code: studentCode,
+                    deep_link: initResponse.deep_link
+                });
+                setAuthStep('polling');
+                window.open(initResponse.deep_link, '_blank');
             }
-            localStorage.setItem('studentCode', studentCode);
-
-            // Call the onLogin callback
-            onLogin(studentCode);
         } catch (error: any) {
-            // Error is already handled by useMutation and stored in apiError
             console.error('Login failed:', error);
         }
     };
@@ -115,76 +182,99 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
 
                         {/* Login Forms Section (Right/Bottom) */}
                         <div className="p-6 md:p-12 md:w-1/2 flex flex-col justify-center bg-white/5 dark:bg-black/20">
-                            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                                <div>
-                                    <label className={`block text-[11px] font-bold uppercase tracking-[0.2em] mb-3 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                                        {t('studentAccess')}
-                                    </label>
+                            {authStep === 'login' && (
+                                <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                                    <div>
+                                        <label className={`block text-[11px] font-bold uppercase tracking-[0.2em] mb-3 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                            {t('studentAccess')}
+                                        </label>
 
-                                    <div className="relative group/input">
-                                        <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                            <User className={`w-5 h-5 transition-all duration-300 ${isDark ? 'text-slate-600 group-focus-within/input:text-brand-primary' : 'text-slate-400 group-focus-within/input:text-brand-primary'}`} />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            placeholder={t('enterStudentCode')}
-                                            value={studentCode}
-                                            onChange={(e) => {
-                                                const rawVal = e.target.value;
-                                                if (!rawVal) {
-                                                    setStudentCode('');
-                                                    return;
-                                                }
-
-                                                const numbersOnly = rawVal.replace(/[^0-9]/g, '');
-
-                                                if (numbersOnly) {
-                                                    setStudentCode('YT-E' + numbersOnly.slice(0, 6));
-                                                } else {
-                                                    if (rawVal === 'YT-E') {
-                                                        setStudentCode('YT-E');
-                                                    } else if (rawVal.startsWith('YT-E') && rawVal.length > 4) {
-                                                        setStudentCode('YT-E');
-                                                    } else {
-                                                        setStudentCode('YT-E');
+                                        <div className="relative group/input">
+                                            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                                <User className={`w-5 h-5 transition-all duration-300 ${isDark ? 'text-slate-600 group-focus-within/input:text-brand-primary' : 'text-slate-400 group-focus-within/input:text-brand-primary'}`} />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder={t('enterStudentCode')}
+                                                value={studentCode}
+                                                onChange={(e) => {
+                                                    const rawVal = e.target.value;
+                                                    if (!rawVal) {
+                                                        setStudentCode('');
+                                                        return;
                                                     }
-                                                }
-                                            }}
-                                            className={`w-full border-2 text-sm md:text-base font-bold rounded-xl md:rounded-2xl pl-12 pr-4 py-3 md:py-4 focus:outline-none transition-all duration-300 ${isDark
-                                                ? 'bg-slate-950/50 border-white/5 text-white placeholder:text-slate-700 focus:border-brand-primary focus:bg-slate-900'
-                                                : 'bg-white border-gray-100 text-slate-950 placeholder:text-gray-400 focus:border-brand-primary focus:bg-white'
-                                                }`}
-                                        />
-                                    </div>
-                                </div>
 
-                                {apiError && (
-                                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <p className="text-red-500 text-[11px] font-bold uppercase tracking-widest flex items-center bg-red-500/10 py-2 px-3 rounded-lg border border-red-500/20">
-                                            <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
-                                            {apiError.data?.message || apiError.message || t('pleaseEnterCode')}
-                                        </p>
-                                    </div>
-                                )}
+                                                    const numbersOnly = rawVal.replace(/[^0-9]/g, '');
 
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="w-full bg-brand-primary text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg shadow-lg shadow-brand-primary/20 hover:bg-brand-accent hover:shadow-brand-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center justify-center group disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
-                                >
-                                    {isLoading ? (
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                            <span className="text-sm uppercase tracking-widest font-bold">{t('verifying')}</span>
+                                                    if (numbersOnly) {
+                                                        setStudentCode('YT-E' + numbersOnly.slice(0, 6));
+                                                    } else {
+                                                        if (rawVal === 'YT-E') {
+                                                            setStudentCode('YT-E');
+                                                        } else if (rawVal.startsWith('YT-E') && rawVal.length > 4) {
+                                                            setStudentCode('YT-E');
+                                                        } else {
+                                                            setStudentCode('YT-E');
+                                                        }
+                                                    }
+                                                }}
+                                                className={`w-full border-2 text-sm md:text-base font-bold rounded-xl md:rounded-2xl pl-12 pr-4 py-3 md:py-4 focus:outline-none transition-all duration-300 ${isDark
+                                                    ? 'bg-slate-950/50 border-white/5 text-white placeholder:text-slate-700 focus:border-brand-primary focus:bg-slate-900'
+                                                    : 'bg-white border-gray-100 text-slate-950 placeholder:text-gray-400 focus:border-brand-primary focus:bg-white'
+                                                    }`}
+                                            />
                                         </div>
-                                    ) : (
-                                        <>
-                                            <span className="drop-shadow-sm">{t('enterDashboard')}</span>
-                                            <LogIn className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                                        </>
+                                    </div>
+
+                                    {apiError && (
+                                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <p className="text-red-500 text-[11px] font-bold uppercase tracking-widest flex items-center bg-red-500/10 py-2 px-3 rounded-lg border border-red-500/20">
+                                                <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
+                                                {apiError.data?.message || apiError.message || t('pleaseEnterCode')}
+                                            </p>
+                                        </div>
                                     )}
-                                </button>
-                            </form>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full bg-brand-primary text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg shadow-lg shadow-brand-primary/20 hover:bg-brand-accent hover:shadow-brand-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center justify-center group disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
+                                    >
+                                        {isLoading ? (
+                                            <div className="flex items-center space-x-3">
+                                                <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                <span className="text-sm uppercase tracking-widest font-bold">{t('verifying')}</span>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span className="drop-shadow-sm">{t('enterDashboard')}</span>
+                                                <LogIn className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                                            </>
+                                        )}
+                                    </button>
+                                </form>
+                            )}
+
+                            {authStep === 'polling' && authData && (
+                                <div className="space-y-6 relative z-10 flex flex-col items-center">
+                                    <div className="w-16 h-16 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin mx-auto mb-4"></div>
+                                    <p className={`text-center font-bold px-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                        {language === 'uz' ? 'Tasdiqlash kutilmoqda...' : 'Waiting for confirmation...'}
+                                    </p>
+                                    <p className={`text-center text-sm px-4 mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        {language === 'uz' ? 'Agarda bot avtomatik ochilmasa quyidagi o\'tish tugmasini bosing' : 'If the bot didn\'t open automatically, click the button below'}
+                                    </p>
+                                    <a
+                                        href={authData.deep_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full bg-[#2AABEE] text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-base shadow-lg shadow-[#2AABEE]/20 hover:bg-[#229ED9] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center uppercase tracking-wide"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>
+                                        Open Telegram
+                                    </a>
+                                </div>
+                            )}
 
                             {/* Support Link */}
                             <div className="mt-6 md:mt-8 text-center relative z-10">
