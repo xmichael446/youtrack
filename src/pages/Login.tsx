@@ -30,7 +30,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
             if (!isPolling) return;
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/auth/verify/`, {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/'}api/auth/verify/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ start_param, access_code })
