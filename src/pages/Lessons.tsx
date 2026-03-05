@@ -10,7 +10,9 @@ import {
   AlertCircle,
   Calendar,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  BookOpen,
+  ClipboardList
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
@@ -586,9 +588,36 @@ const LessonsContent: React.FC = () => {
   const currentAssignment = assignments?.current;
   const previousAssignments = assignments?.previous || [];
 
+  const hasNoContent = !attendance && !assignments;
+
   return (
     <div className="space-y-8 md:space-y-12 px-1 relative">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* Full Empty State — no lesson, no assignments */}
+      {hasNoContent && (
+        <div className="flex flex-col items-center justify-center py-20 md:py-32 px-4">
+          <div className="relative mb-8">
+            {/* Glow ring */}
+            <div className="absolute inset-0 rounded-full bg-brand-primary/10 blur-2xl scale-150 animate-pulse" />
+            <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-primary/20 to-indigo-500/10 dark:from-brand-primary/30 dark:to-indigo-500/20 flex items-center justify-center border border-brand-primary/20 dark:border-brand-primary/30 shadow-xl">
+              <BookOpen className="w-12 h-12 text-brand-primary" strokeWidth={1.5} />
+            </div>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-black text-brand-dark dark:text-white tracking-tight text-center mb-3">
+            {t('noLessonsTitle')}
+          </h2>
+          <p className="text-sm md:text-base font-medium text-gray-500 dark:text-slate-400 text-center max-w-md leading-relaxed">
+            {t('noLessonsSubtitle')}
+          </p>
+          {/* Decorative dots */}
+          <div className="flex gap-2 mt-8">
+            <span className="w-2 h-2 rounded-full bg-brand-primary/30 animate-bounce" style={{ animationDelay: '0ms' }} />
+            <span className="w-2 h-2 rounded-full bg-brand-primary/50 animate-bounce" style={{ animationDelay: '150ms' }} />
+            <span className="w-2 h-2 rounded-full bg-brand-primary/30 animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      )}
 
       {/* Attendance Section */}
       {attendance && (
@@ -677,34 +706,52 @@ const LessonsContent: React.FC = () => {
       )}
 
       {/* Assignments Section */}
-      {assignments && (
+      {!hasNoContent && (
         <section>
           <div className="flex items-center justify-between mb-6 px-1">
             <h2 className="text-xl font-black text-brand-dark dark:text-white tracking-tight">{t('assignments')}</h2>
           </div>
 
-          <div className="space-y-4">
-            {/* Current Assignment First */}
-            {currentAssignment && (
-              <AssignmentCard
-                assignment={currentAssignment}
-                isCurrent={true}
-                isExpanded={expandedRowIds.includes(currentAssignment.id)}
-                onExpand={() => toggleRow(currentAssignment.id)}
-                onSubmit={() => setIsModalOpen(true)}
-              />
-            )}
+          {assignments ? (
+            <div className="space-y-4">
+              {/* Current Assignment First */}
+              {currentAssignment && (
+                <AssignmentCard
+                  assignment={currentAssignment}
+                  isCurrent={true}
+                  isExpanded={expandedRowIds.includes(currentAssignment.id)}
+                  onExpand={() => toggleRow(currentAssignment.id)}
+                  onSubmit={() => setIsModalOpen(true)}
+                />
+              )}
 
-            {/* Previous Assignments (Latest to Earliest) */}
-            {previousAssignments.map((prev) => (
-              <AssignmentCard
-                key={prev.id}
-                assignment={prev}
-                isExpanded={expandedRowIds.includes(prev.id)}
-                onExpand={() => toggleRow(prev.id)}
-              />
-            ))}
-          </div>
+              {/* Previous Assignments (Latest to Earliest) */}
+              {previousAssignments.map((prev) => (
+                <AssignmentCard
+                  key={prev.id}
+                  assignment={prev}
+                  isExpanded={expandedRowIds.includes(prev.id)}
+                  onExpand={() => toggleRow(prev.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            /* Assignments Empty State */
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-gray-200 dark:border-slate-700 p-10 md:p-14 flex flex-col items-center text-center transition-colors">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 rounded-full bg-indigo-500/10 blur-xl scale-150" />
+                <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-500/20 dark:to-indigo-500/10 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/30 shadow-md">
+                  <ClipboardList className="w-8 h-8 text-indigo-500 dark:text-indigo-400" strokeWidth={1.5} />
+                </div>
+              </div>
+              <h3 className="text-lg font-black text-brand-dark dark:text-white mb-2">
+                {t('noAssignmentsTitle')}
+              </h3>
+              <p className="text-sm font-medium text-gray-400 dark:text-slate-500 max-w-xs leading-relaxed">
+                {t('noAssignmentsSubtitle')}
+              </p>
+            </div>
+          )}
         </section>
       )}
 

@@ -36,7 +36,7 @@ const RewardsContent: React.FC = () => {
   const handleClaim = async (reward: Reward) => {
     if (reward.claimed) {
       // Open Telegram link
-      window.open(`https://t.me/ytrck_bot?start=reward${reward.id}`, '_blank');
+      window.open(`https://t.me/ytrck_bot?start=reward_${reward.id}`, '_blank');
       return;
     }
 
