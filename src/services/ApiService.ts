@@ -127,41 +127,41 @@ class ApiService {
         try {
             let response = await fetch(url, requestInit);
 
+            // ── Token refresh interceptor ────────────────────────────────────
             if (response.status === 401) {
-                const refreshToken = localStorage.getItem('refreshToken');
-                if (refreshToken) {
-                    try {
-                        const refreshRes = await fetch(this.buildURL('/api/auth/token/refresh/'), {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ refresh: refreshToken })
-                        });
-                        if (refreshRes.ok) {
-                            const refreshData = await refreshRes.json();
-                            this.setAuthToken(refreshData.access);
-                            localStorage.setItem('authToken', refreshData.access);
+                const refreshed = await this.tryRefreshToken();
 
-                            // Retry original request
-                            requestHeaders['Authorization'] = `Bearer ${refreshData.access}`;
-                            requestInit.headers = requestHeaders;
-                            response = await fetch(url, requestInit);
-                        } else {
-                            this.clearAuthToken();
-                            localStorage.removeItem('authToken');
-                            localStorage.removeItem('refreshToken');
-                            localStorage.setItem('isLogged', 'false');
-                            window.location.reload();
-                        }
-                    } catch (e) {
-                        // Let it fail normally
+                if (refreshed) {
+                    // Rebuild headers with the new access token
+                    const retryHeaders = { ...this.defaultHeaders, ...headers };
+                    if (hasFiles) delete retryHeaders['Content-Type'];
+
+                    // Rebuild body — FormData must be recreated because the
+                    // original stream may have already been consumed.
+                    const retryInit: RequestInit = {
+                        method,
+                        headers: retryHeaders,
+                    };
+                    if (method !== 'GET' && (data || hasFiles)) {
+                        retryInit.body = hasFiles
+                            ? this.createFormData(data, files, fileKey)
+                            : JSON.stringify(data);
                     }
+
+                    response = await fetch(url, retryInit);
                 } else {
-                    this.clearAuthToken();
-                    localStorage.removeItem('authToken');
-                    localStorage.setItem('isLogged', 'false');
-                    window.location.reload();
+                    // Refresh failed — force logout
+                    this.forceLogout();
+                    // Return a well-typed rejection so callers get a clean error
+                    const error: ApiError = {
+                        message: 'Session expired. Please log in again.',
+                        status: 401,
+                        statusText: 'Unauthorized',
+                    };
+                    throw error;
                 }
             }
+            // ── End token refresh interceptor ────────────────────────────────
 
             // Parse response
             let responseData: T;
@@ -191,7 +191,7 @@ class ApiService {
                 headers: response.headers,
             };
         } catch (error: any) {
-            // Handle network errors
+            // Handle network errors (no .status means it wasn't an ApiError)
             if (error.message && !error.status) {
                 const apiError: ApiError = {
                     message: error.message || 'Network error occurred',
@@ -202,6 +202,52 @@ class ApiService {
             }
             throw error;
         }
+    }
+
+    /**
+     * Attempt to refresh the access token using the stored refresh token.
+     * Returns true if successful, false otherwise.
+     */
+    private async tryRefreshToken(): Promise<boolean> {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) return false;
+
+        try {
+            const refreshRes = await fetch(this.buildURL('/auth/token/refresh/'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh: refreshToken }),
+            });
+
+            if (!refreshRes.ok) return false;
+
+            const refreshData = await refreshRes.json();
+
+            // Update the stored access token
+            const newAccessToken: string = refreshData.access;
+            this.setAuthToken(newAccessToken);
+            localStorage.setItem('authToken', newAccessToken);
+
+            // DRF SimpleJWT can rotate the refresh token — persist it if returned
+            if (refreshData.refresh) {
+                localStorage.setItem('refreshToken', refreshData.refresh);
+            }
+
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Clear auth state and reload the page to force re-login.
+     */
+    private forceLogout(): void {
+        this.clearAuthToken();
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.setItem('isLogged', 'false');
+        window.location.reload();
     }
 
     /**
