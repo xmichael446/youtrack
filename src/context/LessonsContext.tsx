@@ -31,8 +31,8 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setLoading(true);
             setError(null);
             const response = await apiService.getLessons();
-            if (response.success && response.data) {
-                setLessonsData(response.data);
+            if (response.success) {
+                setLessonsData(response.data ?? { attendance: null as any, assignments: null as any });
             } else {
                 setError("Failed to load lessons data");
             }

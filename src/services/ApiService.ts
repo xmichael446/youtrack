@@ -213,7 +213,7 @@ class ApiService {
         if (!refreshToken) return false;
 
         try {
-            const refreshRes = await fetch(this.buildURL('/auth/token/refresh/'), {
+            const refreshRes = await fetch(this.buildURL('/api/auth/token/refresh/'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ refresh: refreshToken }),

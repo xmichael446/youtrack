@@ -93,8 +93,8 @@ export interface AssignmentsData {
 export interface LessonsResponse {
     success: boolean;
     data: {
-        attendance: AttendanceData;
-        assignments: AssignmentsData;
+        attendance: AttendanceData | null;
+        assignments: AssignmentsData | null;
     };
 }
 
