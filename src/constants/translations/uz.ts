@@ -81,7 +81,7 @@ export default {
   "nightMode": "Tungi Rejim",
   "noCoinTransactions": "Hozircha coin operatsiyalari mavjud emas",
   "noFeedback": "Hozircha izoh yo'q",
-  "noLessonsTitle": "Faol Dars Yo'q",
+  "noLessonsTitle": "Bugunga Dars Yo'q",
   "noLessonsSubtitle": "Bugun rejalashtirilgan dars mavjud emas. Keyinroq qaytib keling yoki o'qituvchingiz bilan bog'laning.",
   "noAssignmentsTitle": "Topshiriqlar Yo'q",
   "noAssignmentsSubtitle": "Hozircha topshiriqlaringiz yo'q. Dam oling — yangi topshiriqlar tez orada bu yerda paydo bo'ladi!",

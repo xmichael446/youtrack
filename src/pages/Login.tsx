@@ -17,8 +17,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
     const [authStep, setAuthStep] = useState<'login' | 'polling'>('login');
     const [authData, setAuthData] = useState<{ start_param: string, access_code: string, deep_link: string } | null>(null);
 
-    const { mutate: loginMutation, loading: isLoginLoading, error: loginError } = useMutation<any>('api/login/', 'POST');
-    const { mutate: initMutation, loading: isInitLoading, error: initError } = useMutation<any>('api/auth/init/', 'POST');
+    const { mutate: loginMutation, loading: isLoginLoading, error: loginError } = useMutation<any>('/api/login/', 'POST');
+    const { mutate: initMutation, loading: isInitLoading, error: initError } = useMutation<any>('/api/auth/init/', 'POST');
 
     const isLoading = isLoginLoading || isInitLoading;
     const apiError = loginError || initError;
@@ -30,7 +30,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
             if (!isPolling) return;
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/'}api/auth/verify/`, {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/auth/verify/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ start_param, access_code })

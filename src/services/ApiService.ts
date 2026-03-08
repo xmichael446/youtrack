@@ -18,6 +18,9 @@ class ApiService {
     private defaultHeaders: Record<string, string>;
     private states: Map<string, ApiState<any>>;
     private listeners: Map<string, Set<StateListener<any>>>;
+    // Shared promise so concurrent 401s share one refresh call instead of
+    // each racing to rotate the refresh token (which invalidates the others).
+    private refreshPromise: Promise<boolean> | null = null;
 
     constructor(baseURL?: string) {
         this.baseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -128,16 +131,18 @@ class ApiService {
             let response = await fetch(url, requestInit);
 
             // ── Token refresh interceptor ────────────────────────────────────
-            if (response.status === 401) {
+            // Checks BOTH status code AND response body, because some DRF
+            // configurations return 401/403 and the body always contains
+            // {"detail": "Token is expired"} or {"detail": "...token_not_valid"}.
+            const isTokenError = await this.isTokenExpiredResponse(response);
+
+            if (isTokenError) {
                 const refreshed = await this.tryRefreshToken();
 
                 if (refreshed) {
-                    // Rebuild headers with the new access token
                     const retryHeaders = { ...this.defaultHeaders, ...headers };
                     if (hasFiles) delete retryHeaders['Content-Type'];
 
-                    // Rebuild body — FormData must be recreated because the
-                    // original stream may have already been consumed.
                     const retryInit: RequestInit = {
                         method,
                         headers: retryHeaders,
@@ -150,9 +155,7 @@ class ApiService {
 
                     response = await fetch(url, retryInit);
                 } else {
-                    // Refresh failed — force logout
                     this.forceLogout();
-                    // Return a well-typed rejection so callers get a clean error
                     const error: ApiError = {
                         message: 'Session expired. Please log in again.',
                         status: 401,
@@ -162,6 +165,7 @@ class ApiService {
                 }
             }
             // ── End token refresh interceptor ────────────────────────────────
+
 
             // Parse response
             let responseData: T;
@@ -205,15 +209,65 @@ class ApiService {
     }
 
     /**
+     * Peek at the response (without consuming the body stream) to decide
+     * whether this is a token-expiry error.  Covers every DRF + SimpleJWT
+     * variant that may return 401, 403, or even 200 with the error in the body.
+     */
+    private async isTokenExpiredResponse(response: Response): Promise<boolean> {
+        // Fast-path: obvious status codes
+        if (response.status === 401 || response.status === 403) {
+            // Still peek at body to confirm it's a token error and not an
+            // unrelated 401/403 (e.g. permission denied on a valid token).
+            try {
+                const body = await response.clone().json();
+                const detail: string = typeof body?.detail === 'string' ? body.detail : '';
+                // SimpleJWT messages: "Token is expired", "Given token not valid
+                // for any token type", "Authentication credentials were not provided."
+                if (
+                    detail.toLowerCase().includes('token') ||
+                    detail.toLowerCase().includes('expired') ||
+                    detail.toLowerCase().includes('not valid') ||
+                    detail.toLowerCase().includes('credentials were not provided')
+                ) {
+                    return true;
+                }
+            } catch {
+                // Not JSON — treat any 401 as token error
+                if (response.status === 401) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+
      * Attempt to refresh the access token using the stored refresh token.
      * Returns true if successful, false otherwise.
+     *
+     * Uses a shared Promise so that if multiple concurrent requests all hit a
+     * 401 at the same time, only ONE refresh HTTP call is made.  All waiters
+     * share the result, preventing the "second call uses already-rotated
+     * refresh token" race condition.
      */
-    private async tryRefreshToken(): Promise<boolean> {
+    private tryRefreshToken(): Promise<boolean> {
+        if (this.refreshPromise) {
+            // A refresh is already in-flight — reuse it.
+            return this.refreshPromise;
+        }
+
+        this.refreshPromise = this._doRefresh().finally(() => {
+            this.refreshPromise = null;
+        });
+
+        return this.refreshPromise;
+    }
+
+    private async _doRefresh(): Promise<boolean> {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) return false;
 
         try {
-            const refreshRes = await fetch(this.buildURL('/api/auth/token/refresh/'), {
+            const refreshRes = await fetch(`${this.baseURL}/api/auth/token/refresh/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ refresh: refreshToken }),
@@ -223,12 +277,11 @@ class ApiService {
 
             const refreshData = await refreshRes.json();
 
-            // Update the stored access token
             const newAccessToken: string = refreshData.access;
             this.setAuthToken(newAccessToken);
             localStorage.setItem('authToken', newAccessToken);
 
-            // DRF SimpleJWT can rotate the refresh token — persist it if returned
+            // SimpleJWT can rotate the refresh token — persist if returned.
             if (refreshData.refresh) {
                 localStorage.setItem('refreshToken', refreshData.refresh);
             }

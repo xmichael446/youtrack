@@ -588,172 +588,159 @@ const LessonsContent: React.FC = () => {
   const currentAssignment = assignments?.current;
   const previousAssignments = assignments?.previous || [];
 
-  const hasNoContent = !attendance && !assignments;
+  const hasAnyAssignments = !!currentAssignment || previousAssignments.length > 0;
 
   return (
     <div className="space-y-8 md:space-y-12 px-1 relative">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      {/* Full Empty State — no lesson, no assignments */}
-      {hasNoContent && (
-        <div className="flex flex-col items-center justify-center py-20 md:py-32 px-4">
-          <div className="relative mb-8">
-            {/* Glow ring */}
-            <div className="absolute inset-0 rounded-full bg-brand-primary/10 blur-2xl scale-150 animate-pulse" />
-            <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-primary/20 to-indigo-500/10 dark:from-brand-primary/30 dark:to-indigo-500/20 flex items-center justify-center border border-brand-primary/20 dark:border-brand-primary/30 shadow-xl">
-              <BookOpen className="w-12 h-12 text-brand-primary" strokeWidth={1.5} />
+
+      {/* Attendance Section — always visible */}
+      <section className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-all hover:shadow-xl">
+        <h2 className="text-xl font-black text-brand-dark dark:text-white mb-6 flex items-center tracking-tight">
+          <Clock className="w-6 h-6 mr-3 text-brand-primary" />
+          {t('lessonAttendance')}
+        </h2>
+
+        {attendance ? (
+          <>
+            {/* Lesson Details & Timer */}
+            <div className="mb-8 bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-6">
+              <div className="text-center sm:text-left overflow-hidden w-full sm:w-auto">
+                <h3 className="text-base md:text-lg font-black text-brand-dark dark:text-white mb-2 whitespace-nowrap truncate px-2 sm:px-0">
+                  Lesson {attendance.number}: {attendance.lesson_topic}
+                </h3>
+                <div className="flex flex-nowrap items-center justify-center sm:justify-start gap-2 md:gap-4 text-[10px] md:text-xs font-bold text-gray-500 dark:text-slate-400">
+                  <span className="flex items-center bg-white dark:bg-slate-800 px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg border border-gray-100 dark:border-slate-700 shadow-sm whitespace-nowrap">
+                    <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1.5 md:mr-2 text-brand-primary" />
+                    {new Date(attendance.opens_at).toLocaleDateString()}
+                  </span>
+                  <span className="flex items-center bg-white dark:bg-slate-800 px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg border border-gray-100 dark:border-slate-700 shadow-sm whitespace-nowrap">
+                    <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1.5 md:mr-2 text-brand-primary" />
+                    {new Date(attendance.opens_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </div>
+
+              {attendance.status === null && !isExpired && (
+                <div className="flex flex-col items-center sm:items-end">
+                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">{t('timeRemaining')}</p>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
+                    <p className="text-2xl md:text-3xl font-black text-brand-primary tabular-nums tracking-tight drop-shadow-sm">
+                      {timeLeft}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-4 md:gap-5">
+              <div className="flex-1">
+                <label className="block text-[10px] md:text-[11px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-2 md:mb-3 ml-1">
+                  {t('enterKeyword')}
+                </label>
+                {isExpired && attendance.status === null ? (
+                  <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl p-4 text-center w-full animate-in fade-in zoom-in duration-300">
+                    <p className="text-sm font-black text-red-500 dark:text-red-400 uppercase tracking-wide">
+                      {t('expiredMessage')}
+                    </p>
+                  </div>
+                ) : attendance.status === 'attended' ? (
+                  <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl p-4 text-center w-full animate-in fade-in zoom-in duration-300">
+                    <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wide flex items-center justify-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      {t('successMessage')}
+                    </p>
+                  </div>
+                ) : attendance.status === 'absent' ? (
+                  <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl p-4 text-center w-full animate-in fade-in zoom-in duration-300">
+                    <p className="text-sm font-black text-red-600 dark:text-red-400 uppercase tracking-wide flex items-center justify-center gap-2">
+                      <AlertCircle className="w-5 h-5" />
+                      {t('absent') || "ABSENT"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="text"
+                      value={attendanceCode}
+                      onChange={(e) => setAttendanceCode(e.target.value)}
+                      placeholder="e.g. apple"
+                      className="flex-1 rounded-xl md:rounded-2xl border border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all dark:text-white dark:placeholder:text-slate-600"
+                    />
+                    <button
+                      onClick={handleMarkAttendance}
+                      className="h-10 sm:h-14 px-6 sm:px-10 bg-cyan-500 hover:bg-cyan-400 shadow-cyan-500/20 text-white rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all shadow-lg active:scale-95 flex items-center justify-center min-w-[100px] sm:min-w-[160px]"
+                    >
+                      {t('mark')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          /* No lesson today — compact inline empty state */
+          <div className="flex items-center gap-4 bg-gray-50 dark:bg-slate-800/40 rounded-2xl p-5 border border-gray-100 dark:border-slate-700">
+            <div className="w-10 h-10 rounded-xl bg-brand-primary/10 dark:bg-brand-primary/20 flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-5 h-5 text-brand-primary" strokeWidth={1.5} />
+            </div>
+            <div>
+              <p className="text-sm font-black text-brand-dark dark:text-white">{t('noLessonsTitle')}</p>
+              <p className="text-xs font-medium text-gray-400 dark:text-slate-500 mt-0.5">{t('noLessonsSubtitle')}</p>
             </div>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black text-brand-dark dark:text-white tracking-tight text-center mb-3">
-            {t('noLessonsTitle')}
-          </h2>
-          <p className="text-sm md:text-base font-medium text-gray-500 dark:text-slate-400 text-center max-w-md leading-relaxed">
-            {t('noLessonsSubtitle')}
-          </p>
-          {/* Decorative dots */}
-          <div className="flex gap-2 mt-8">
-            <span className="w-2 h-2 rounded-full bg-brand-primary/30 animate-bounce" style={{ animationDelay: '0ms' }} />
-            <span className="w-2 h-2 rounded-full bg-brand-primary/50 animate-bounce" style={{ animationDelay: '150ms' }} />
-            <span className="w-2 h-2 rounded-full bg-brand-primary/30 animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
+        )}
+      </section>
+
+      {/* Assignments Section — always visible */}
+      <section>
+        <div className="flex items-center justify-between mb-6 px-1">
+          <h2 className="text-xl font-black text-brand-dark dark:text-white tracking-tight">{t('assignments')}</h2>
         </div>
-      )}
 
-      {/* Attendance Section */}
-      {attendance && (
-        <section className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-all hover:shadow-xl">
-          <h2 className="text-xl font-black text-brand-dark dark:text-white mb-6 flex items-center tracking-tight">
-            <Clock className="w-6 h-6 mr-3 text-brand-primary" />
-            {t('lessonAttendance')}
-          </h2>
-
-          {/* Lesson Details & Timer */}
-          <div className="mb-8 bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-6">
-            <div className="text-center sm:text-left overflow-hidden w-full sm:w-auto">
-              <h3 className="text-base md:text-lg font-black text-brand-dark dark:text-white mb-2 whitespace-nowrap truncate px-2 sm:px-0">
-                Lesson {attendance.number}: {attendance.lesson_topic}
-              </h3>
-              <div className="flex flex-nowrap items-center justify-center sm:justify-start gap-2 md:gap-4 text-[10px] md:text-xs font-bold text-gray-500 dark:text-slate-400">
-                <span className="flex items-center bg-white dark:bg-slate-800 px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg border border-gray-100 dark:border-slate-700 shadow-sm whitespace-nowrap">
-                  <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1.5 md:mr-2 text-brand-primary" />
-                  {new Date(attendance.opens_at).toLocaleDateString()}
-                </span>
-                <span className="flex items-center bg-white dark:bg-slate-800 px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg border border-gray-100 dark:border-slate-700 shadow-sm whitespace-nowrap">
-                  <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1.5 md:mr-2 text-brand-primary" />
-                  {new Date(attendance.opens_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-            </div>
-
-            {attendance.status === null && !isExpired && (
-              <div className="flex flex-col items-center sm:items-end">
-                <p className="text-[9px] md:text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">{t('timeRemaining')}</p>
-                <div className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
-                  <p className="text-2xl md:text-3xl font-black text-brand-primary tabular-nums tracking-tight drop-shadow-sm">
-                    {timeLeft}
-                  </p>
-                </div>
-              </div>
+        {hasAnyAssignments ? (
+          <div className="space-y-4">
+            {/* Current Assignment First */}
+            {currentAssignment && (
+              <AssignmentCard
+                assignment={currentAssignment}
+                isCurrent={true}
+                isExpanded={expandedRowIds.includes(currentAssignment.id)}
+                onExpand={() => toggleRow(currentAssignment.id)}
+                onSubmit={() => setIsModalOpen(true)}
+              />
             )}
+
+            {/* Previous Assignments (Latest to Earliest) */}
+            {previousAssignments.map((prev) => (
+              <AssignmentCard
+                key={prev.id}
+                assignment={prev}
+                isExpanded={expandedRowIds.includes(prev.id)}
+                onExpand={() => toggleRow(prev.id)}
+              />
+            ))}
           </div>
-
-          <div className="flex flex-col md:flex-row gap-4 md:gap-5">
-            <div className="flex-1">
-              <label className="block text-[10px] md:text-[11px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-2 md:mb-3 ml-1">
-                {t('enterKeyword')}
-              </label>
-              {isExpired && attendance.status === null ? (
-                <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl p-4 text-center w-full animate-in fade-in zoom-in duration-300">
-                  <p className="text-sm font-black text-red-500 dark:text-red-400 uppercase tracking-wide">
-                    {t('expiredMessage')}
-                  </p>
-                </div>
-              ) : attendance.status === 'attended' ? (
-                <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-xl p-4 text-center w-full animate-in fade-in zoom-in duration-300">
-                  <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wide flex items-center justify-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
-                    {t('successMessage')}
-                  </p>
-                </div>
-              ) : attendance.status === 'absent' ? (
-                <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl p-4 text-center w-full animate-in fade-in zoom-in duration-300">
-                  <p className="text-sm font-black text-red-600 dark:text-red-400 uppercase tracking-wide flex items-center justify-center gap-2">
-                    <AlertCircle className="w-5 h-5" />
-                    {t('absent') || "ABSENT"}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input
-                    type="text"
-                    value={attendanceCode}
-                    onChange={(e) => setAttendanceCode(e.target.value)}
-                    placeholder="e.g. apple"
-                    className="flex-1 rounded-xl md:rounded-2xl border border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all dark:text-white dark:placeholder:text-slate-600"
-                  />
-                  <button
-                    onClick={handleMarkAttendance}
-                    className="h-10 sm:h-14 px-6 sm:px-10 bg-cyan-500 hover:bg-cyan-400 shadow-cyan-500/20 text-white rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all shadow-lg active:scale-95 flex items-center justify-center min-w-[100px] sm:min-w-[160px]"
-                  >
-                    {t('mark')}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Assignments Section */}
-      {!hasNoContent && (
-        <section>
-          <div className="flex items-center justify-between mb-6 px-1">
-            <h2 className="text-xl font-black text-brand-dark dark:text-white tracking-tight">{t('assignments')}</h2>
-          </div>
-
-          {assignments ? (
-            <div className="space-y-4">
-              {/* Current Assignment First */}
-              {currentAssignment && (
-                <AssignmentCard
-                  assignment={currentAssignment}
-                  isCurrent={true}
-                  isExpanded={expandedRowIds.includes(currentAssignment.id)}
-                  onExpand={() => toggleRow(currentAssignment.id)}
-                  onSubmit={() => setIsModalOpen(true)}
-                />
-              )}
-
-              {/* Previous Assignments (Latest to Earliest) */}
-              {previousAssignments.map((prev) => (
-                <AssignmentCard
-                  key={prev.id}
-                  assignment={prev}
-                  isExpanded={expandedRowIds.includes(prev.id)}
-                  onExpand={() => toggleRow(prev.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            /* Assignments Empty State */
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-gray-200 dark:border-slate-700 p-10 md:p-14 flex flex-col items-center text-center transition-colors">
-              <div className="relative mb-6">
-                <div className="absolute inset-0 rounded-full bg-indigo-500/10 blur-xl scale-150" />
-                <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-500/20 dark:to-indigo-500/10 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/30 shadow-md">
-                  <ClipboardList className="w-8 h-8 text-indigo-500 dark:text-indigo-400" strokeWidth={1.5} />
-                </div>
+        ) : (
+          /* Assignments Empty State */
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-gray-200 dark:border-slate-700 p-10 md:p-14 flex flex-col items-center text-center transition-colors">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 rounded-full bg-indigo-500/10 blur-xl scale-150" />
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-500/20 dark:to-indigo-500/10 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/30 shadow-md">
+                <ClipboardList className="w-8 h-8 text-indigo-500 dark:text-indigo-400" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-black text-brand-dark dark:text-white mb-2">
-                {t('noAssignmentsTitle')}
-              </h3>
-              <p className="text-sm font-medium text-gray-400 dark:text-slate-500 max-w-xs leading-relaxed">
-                {t('noAssignmentsSubtitle')}
-              </p>
             </div>
-          )}
-        </section>
-      )}
+            <h3 className="text-lg font-black text-brand-dark dark:text-white mb-2">
+              {t('noAssignmentsTitle')}
+            </h3>
+            <p className="text-sm font-medium text-gray-400 dark:text-slate-500 max-w-xs leading-relaxed">
+              {t('noAssignmentsSubtitle')}
+            </p>
+          </div>
+        )}
+      </section>
 
       {/* Submission Modal */}
       {currentAssignment && (
