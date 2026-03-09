@@ -15,28 +15,20 @@ import { NotificationProvider } from './context/NotificationContext';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
-  const [isDark, setIsDark] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('isLogged') === 'true';
   });
 
-  React.useEffect(() => {
-    // Initialize theme from localStorage or system preference
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-      setIsDark(true);
-      document.documentElement.classList.add('dark');
-    } else {
-      setIsDark(false);
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
+  const [isDark, setIsDark] = useState(() => {
+    // Synchronous initialization from document class set in index.html
+    return document.documentElement.classList.contains('dark');
+  });
 
   const toggleTheme = () => {
     const newTheme = !isDark;
     setIsDark(newTheme);
+
+    // Apply class immediately for faster response
     if (newTheme) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -62,30 +54,32 @@ const App: React.FC = () => {
     localStorage.removeItem('studentCode');
   };
 
+  // Efficient Favicon Management
   React.useEffect(() => {
-    // Dynamic Favicon Management
-    const setFavicon = (mode: 'light' | 'dark') => {
-      const links = [
-        { rel: 'apple-touch-icon', sizes: '180x180', href: `/favicon/${mode}/apple-touch-icon.png` },
-        { rel: 'icon', type: 'image/png', sizes: '32x32', href: `/favicon/${mode}/favicon-32x32.png` },
-        { rel: 'icon', type: 'image/png', sizes: '16x16', href: `/favicon/${mode}/favicon-16x16.png` },
-        { rel: 'manifest', href: `/favicon/${mode}/site.webmanifest` }
-      ];
+    const mode = isDark ? 'dark' : 'light';
+    const baseUrl = `/favicon/${mode}/`;
 
-      links.forEach(linkDef => {
-        let link = document.querySelector(`link[rel="${linkDef.rel}"]${linkDef.sizes ? `[sizes="${linkDef.sizes}"]` : ''}`) as HTMLLinkElement;
-        if (!link) {
-          link = document.createElement('link');
-          link.rel = linkDef.rel;
-          if (linkDef.sizes) link.sizes = linkDef.sizes;
-          if (linkDef.type) link.type = linkDef.type;
-          document.head.appendChild(link);
-        }
+    // Query once and update in batch
+    const iconLinks = [
+      { rel: 'apple-touch-icon', href: `${baseUrl}apple-touch-icon.png`, sizes: '180x180' },
+      { rel: 'icon', href: `${baseUrl}favicon-32x32.png`, sizes: '32x32', type: 'image/png' },
+      { rel: 'icon', href: `${baseUrl}favicon-16x16.png`, sizes: '16x16', type: 'image/png' },
+      { rel: 'manifest', href: `${baseUrl}site.webmanifest` }
+    ];
+
+    iconLinks.forEach(linkDef => {
+      let link = document.querySelector(`link[rel="${linkDef.rel}"]${linkDef.sizes ? `[sizes="${linkDef.sizes}"]` : ''}`) as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = linkDef.rel;
+        if (linkDef.sizes) link.sizes = linkDef.sizes;
+        if (linkDef.type) link.type = linkDef.type;
+        document.head.appendChild(link);
+      }
+      if (link.href !== linkDef.href) {
         link.href = linkDef.href;
-      });
-    };
-
-    setFavicon(isDark ? 'dark' : 'light');
+      }
+    });
   }, [isDark]);
 
   if (!isAuthenticated) {
@@ -141,13 +135,21 @@ const AppContent: React.FC<{
   }, [currentView]);
 
   const renderView = () => {
-    switch (currentView) {
-      case 'dashboard': return <Dashboard key="dashboard" />;
-      case 'leaderboard': return <Leaderboard key="leaderboard" />;
-      case 'lessons': return <Lessons key="lessons" />;
-      case 'rewards': return <Rewards key="rewards" />;
-      default: return <Dashboard key="dashboard-default" />;
-    }
+    const View = (() => {
+      switch (currentView) {
+        case 'dashboard': return <Dashboard />;
+        case 'leaderboard': return <Leaderboard />;
+        case 'lessons': return <Lessons />;
+        case 'rewards': return <Rewards />;
+        default: return <Dashboard />;
+      }
+    })();
+
+    return (
+      <div key={currentView} className="animate-view-entry w-full">
+        {View}
+      </div>
+    );
   };
 
   const NavItem = ({ view, icon: Icon, label }: { view: ViewState; icon: React.ElementType; label: string }) => (

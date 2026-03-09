@@ -30,26 +30,11 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
             if (!isPolling) return;
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/auth/verify/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ start_param, access_code })
-                });
+                // Using apiService.post directly to ensure consistent URL handling
+                // We don't need auth token for this verify call
+                const response = await apiService.post<any>('/api/auth/verify/', { start_param, access_code }, undefined, undefined);
 
-                if (response.status === 408) {
-                    // Timeout, keep polling
-                    if (isPolling) setTimeout(poll, 1000);
-                    return;
-                }
-
-                if (!response.ok) {
-                    // Other error, restart
-                    setAuthStep('login');
-                    setAuthData(null);
-                    return;
-                }
-
-                const data = await response.json();
+                const data = response.data;
                 if (data.success && isPolling) {
                     apiService.setAuthToken(data.access);
                     localStorage.setItem('authToken', data.access);
@@ -57,9 +42,16 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
                     localStorage.setItem('studentCode', access_code);
                     onLogin(access_code);
                 }
-            } catch (err) {
-                // If network error, might want to stop or retry
-                if (isPolling) setTimeout(poll, 2000);
+            } catch (err: any) {
+                if (err.status === 408) {
+                    // Timeout, keep polling
+                    if (isPolling) setTimeout(poll, 1000);
+                    return;
+                }
+
+                // Other error, restart
+                setAuthStep('login');
+                setAuthData(null);
             }
         };
 

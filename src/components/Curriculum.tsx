@@ -108,12 +108,13 @@ const Curriculum: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
-                            {curriculum.map((item) => {
+                            {curriculum.map((item, index) => {
                                 const { date, time, fullDate } = parseDateTime(item.start_datetime);
                                 const isUpcoming = item.status === null;
+                                const delayClass = index < 10 ? `delay-${index * 100}` : '';
 
                                 return (
-                                    <tr key={item.id} className={`transition-colors group/row ${isUpcoming ? 'hover:bg-brand-primary/5' : 'opacity-70 grayscale-[0.5]'}`}>
+                                    <tr key={item.id} className={`transition-all duration-300 group/row animate-in fade-in slide-in-from-left-4 fill-mode-both ${delayClass} ${isUpcoming ? 'hover:bg-brand-primary/5 hover:translate-x-1' : 'opacity-70 grayscale-[0.5]'}`}>
                                         <td className="px-8 py-6 whitespace-nowrap">
                                             <span className="text-sm font-black text-gray-300 dark:text-slate-700 tabular-nums">
                                                 {item.number.toString().padStart(2, '0')}

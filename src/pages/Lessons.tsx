@@ -12,15 +12,27 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
-  ClipboardList
+  ClipboardList,
+  HelpCircle,
+  Brain,
+  Award,
+  ChevronRight,
+  Trophy,
+  CheckCircle2,
+  XCircle,
+  Zap,
+  Coins
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 import { useLessons, LessonsProvider } from '../context/LessonsContext';
 import {
   AttachmentSubmission,
-  AssignmentData
+  AssignmentData,
+  QuizSessionData,
+  QuizSubmitResponseData
 } from '../services/apiTypes';
+import ReactDOM from 'react-dom';
 
 // Simple Toast Component
 const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () => void }> = ({ message, type, onClose }) => {
@@ -30,7 +42,7 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () 
   }, [onClose]);
 
   return (
-    <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-bottom-full duration-500 ease-out ${type === 'success' ? 'bg-slate-900 border border-emerald-500/30' : 'bg-slate-900 border border-red-500/30'
+    <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-[10000] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-bottom-full duration-500 ease-out ${type === 'success' ? 'bg-slate-900 border border-emerald-500/30' : 'bg-slate-900 border border-red-500/30'
       }`}>
       <div className={`p-2 rounded-full ${type === 'success' ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
         {type === 'success' ? <CheckCircle className="w-6 h-6 text-emerald-500" /> : <AlertCircle className="w-6 h-6 text-red-500" />}
@@ -47,11 +59,6 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () 
     </div>
   );
 };
-
-// Submission Modal Component
-import ReactDOM from 'react-dom';
-
-// ... (keep Toast component as is)
 
 // Submission Modal Component
 const SubmissionModal: React.FC<{
@@ -484,6 +491,337 @@ const AssignmentCard: React.FC<{
   );
 };
 
+const QuizSection: React.FC<{
+  lessonId: number;
+  showToast: (message: string, type: 'success' | 'error') => void;
+}> = ({ lessonId, showToast }) => {
+  const { t } = useLanguage();
+  const { getQuiz, submitQuiz } = useLessons();
+  const { refetch: refetchDashboard } = useDashboard();
+
+  const [quizData, setQuizData] = useState<QuizSessionData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [mode, setMode] = useState<'info' | 'solving' | 'results'>('info');
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [results, setResults] = useState<QuizSubmitResponseData | null>(null);
+
+  const fetchQuiz = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await getQuiz(lessonId);
+      if (res.success) {
+        setQuizData(res.data);
+      }
+    } catch (err: any) {
+      setError(err.message || "No quiz available");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuiz();
+  }, [lessonId]);
+
+  const startQuiz = () => {
+    setMode('solving');
+    setCurrentQuestionIndex(0);
+    setAnswers({});
+  };
+
+  const handleSelectOption = (questionId: number, option: string) => {
+    setAnswers(prev => ({ ...prev, [questionId]: option }));
+  };
+
+  const goToNextQuestion = () => {
+    if (currentQuestionIndex < quizData.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  const goToPrevQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const handleSubmitQuiz = async () => {
+    if (Object.keys(answers).length < quizData.questions.length) {
+      showToast("Please answer all questions", 'error');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const submission = {
+        session_id: quizData.session_id,
+        answers: Object.entries(answers).map(([id, opt]) => ({
+          question_id: parseInt(id),
+          selected_option: opt
+        }))
+      };
+
+      const res = await submitQuiz(submission);
+      if (res.success) {
+        setResults(res.data);
+        setMode('results');
+        showToast("Quiz submitted successfully!", 'success');
+        refetchDashboard(); // Update coins/XP
+        fetchQuiz(); // Refresh history
+      }
+    } catch (err: any) {
+      showToast(err.message || "Failed to submit quiz", 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) return (
+    <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-slate-800 flex justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+    </div>
+  );
+
+  if (error || !quizData) return null; // Hide section if no quiz
+
+  return (
+    <section className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm border border-gray-100 dark:border-slate-800 transition-all hover:shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="p-6 md:p-8">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-xl font-black text-brand-dark dark:text-white flex items-center tracking-tight">
+            <Brain className="w-6 h-6 mr-3 text-brand-primary" />
+            {t('lessonQuiz') || 'Lesson Quiz'}
+          </h2>
+          <span className="bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+            {quizData.vocab_level} LEVEL
+          </span>
+        </div>
+
+        {mode === 'info' && (
+          <div className="space-y-6">
+            <div className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6">
+              <div className="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <ClipboardList className="w-8 h-8 text-brand-primary" />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="text-lg font-black text-brand-dark dark:text-white mb-1">
+                  Ready to test your knowledge?
+                </h3>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+                  This quiz contains {quizData.question_count} questions based on today's lesson.
+                </p>
+              </div>
+              <button
+                onClick={startQuiz}
+                className="bg-brand-primary text-white px-8 py-3 rounded-xl font-black text-sm shadow-lg shadow-brand-primary/20 hover:bg-brand-accent transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+              >
+                {t('startQuiz') || 'Start Quiz'}
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {quizData.previous_attempts && quizData.previous_attempts.length > 0 && (
+              <div>
+                <h4 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">
+                  {t('previousAttempts') || 'Previous Attempts'}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {quizData.previous_attempts.map((attempt: any) => (
+                    <div key={attempt.id} className="bg-gray-50 dark:bg-slate-800/30 rounded-xl p-4 border border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">
+                          {new Date(attempt.created_at).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm font-black text-brand-dark dark:text-white">
+                          Score: {attempt.score} / {attempt.total}
+                        </p>
+                      </div>
+                      <div className={`p-2 rounded-lg ${attempt.score === attempt.total ? 'bg-emerald-500/10 text-emerald-500' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                        <Trophy className="w-5 h-5" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {mode === 'solving' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">
+                <span>Question {currentQuestionIndex + 1} of {quizData.questions.length}</span>
+                <span>{Math.round(((currentQuestionIndex + 1) / quizData.questions.length) * 100)}% Complete</span>
+              </div>
+              <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-brand-primary transition-all duration-500"
+                  style={{ width: `${((currentQuestionIndex + 1) / quizData.questions.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Question */}
+            <div className="bg-gray-50 dark:bg-slate-800/50 rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-slate-800">
+              <h3 className="text-lg md:text-xl font-black text-brand-dark dark:text-white mb-8 text-center">
+                {quizData.questions[currentQuestionIndex].question_text}
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {['a', 'b', 'c', 'd'].map((opt) => {
+                  const optionKey = `option_${opt}` as keyof typeof quizData.questions[0];
+                  const isSelected = answers[quizData.questions[currentQuestionIndex].id] === opt.toUpperCase();
+
+                  return (
+                    <button
+                      key={opt}
+                      onClick={() => handleSelectOption(quizData.questions[currentQuestionIndex].id, opt.toUpperCase())}
+                      className={`p-5 rounded-2xl border-2 text-left transition-all group flex items-center gap-4 ${isSelected
+                          ? 'border-brand-primary bg-brand-primary/10 shadow-lg shadow-brand-primary/5'
+                          : 'border-white dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-primary/30'
+                        }`}
+                    >
+                      <span className={`w-10 h-10 rounded-xl flex items-center justify-center font-black transition-colors ${isSelected ? 'bg-brand-primary text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 group-hover:bg-brand-primary/20 group-hover:text-brand-primary'
+                        }`}>
+                        {opt.toUpperCase()}
+                      </span>
+                      <span className={`font-bold ${isSelected ? 'text-brand-dark dark:text-white' : 'text-gray-600 dark:text-slate-400'}`}>
+                        {quizData.questions[currentQuestionIndex][optionKey]}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={goToPrevQuestion}
+                disabled={currentQuestionIndex === 0}
+                className="px-6 py-3 rounded-xl font-bold text-sm text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all"
+              >
+                Previous
+              </button>
+
+              {currentQuestionIndex === quizData.questions.length - 1 ? (
+                <button
+                  onClick={handleSubmitQuiz}
+                  disabled={submitting || Object.keys(answers).length < quizData.questions.length}
+                  className="bg-brand-primary text-white px-10 py-3 rounded-xl font-black text-sm shadow-lg shadow-brand-primary/20 hover:bg-brand-accent transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  {submitting ? 'Submitting...' : 'Finish Quiz'}
+                </button>
+              ) : (
+                <button
+                  onClick={goToNextQuestion}
+                  disabled={!answers[quizData.questions[currentQuestionIndex].id]}
+                  className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-xl font-black text-sm hover:scale-105 active:scale-95 transition-all disabled:opacity-30"
+                >
+                  Next Question
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {mode === 'results' && results && (
+          <div className="space-y-8 animate-in zoom-in duration-500">
+            {/* Header Results */}
+            <div className="text-center bg-gray-50 dark:bg-slate-800/50 rounded-3xl p-8 border border-gray-100 dark:border-slate-800 relative overflow-hidden">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-brand-primary/5 rounded-full -mt-32 blur-3xl"></div>
+
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="w-20 h-20 bg-brand-primary rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-brand-primary/40">
+                  <Award className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-3xl font-black text-brand-dark dark:text-white mb-2">Quiz Completed!</h3>
+                <p className="text-lg font-black text-brand-primary mb-6">
+                  Your Score: {results.score} / {results.total}
+                </p>
+
+                {results.points_awarded && (
+                  <div className="flex items-center gap-4 bg-white dark:bg-slate-900 px-6 py-3 rounded-2xl border border-emerald-500/20 shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-brand-primary fill-brand-primary" />
+                      <span className="text-sm font-black text-brand-dark dark:text-white">+{results.xp} XP</span>
+                    </div>
+                    <div className="w-px h-4 bg-gray-200 dark:bg-slate-700"></div>
+                    <div className="flex items-center gap-2">
+                      <Coins className="w-5 h-5 text-amber-500 fill-amber-500" />
+                      <span className="text-sm font-black text-brand-dark dark:text-white">+{results.coins} Coins</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Questions Review */}
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1">
+                Detailed Review
+              </h4>
+              {results.results.map((item: any, idx: number) => (
+                <div key={idx} className={`rounded-2xl border p-5 transition-all ${item.is_correct ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="flex-1">
+                      <p className="text-sm font-black text-brand-dark dark:text-white mb-1">
+                        Question {idx + 1}: <span className="text-brand-primary font-bold italic">{item.word}</span>
+                      </p>
+                    </div>
+                    {item.is_correct ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-4 mb-4">
+                    <div className="text-xs font-bold px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800">
+                      <span className="text-gray-400 mr-2 uppercase tracking-tighter">Your choice:</span>
+                      <span className={item.is_correct ? 'text-emerald-500' : 'text-red-500'}>{item.selected_option}</span>
+                    </div>
+                    {!item.is_correct && (
+                      <div className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+                        <span className="text-emerald-500/60 mr-2 uppercase tracking-tighter">Correct:</span>
+                        {item.correct_option}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white/50 dark:bg-black/20 p-4 rounded-xl">
+                    <div className="flex items-center gap-2 mb-1">
+                      <HelpCircle className="w-3.5 h-3.5 text-brand-primary" />
+                      <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest">Explanation</span>
+                    </div>
+                    <p className="text-xs font-medium text-gray-600 dark:text-slate-400 leading-relaxed">
+                      {item.explanation}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setMode('info')}
+              className="w-full py-4 rounded-2xl font-black text-sm text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all border-2 border-dashed border-gray-200 dark:border-slate-800"
+            >
+              Back to Quiz Overview
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
 const LessonsContent: React.FC = () => {
   const { t } = useLanguage();
   const { refetch } = useDashboard();
@@ -556,28 +894,6 @@ const LessonsContent: React.FC = () => {
     } catch (err: any) {
       showToast(err.message || "Invalid keyword", 'error');
     }
-  };
-
-  // Helper to format deadline
-  const formatDeadline = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = date.getTime() - now.getTime();
-
-    if (diffMs < 0) return "Expired";
-
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
-
-  // Helper to get status color (for attendance only now)
-  const getStatusColor = (status: string | null) => {
-    if (!status) return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20';
-    const s = status.toLowerCase();
-    if (s === 'approved' || s === 'attended') return 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20';
-    if (s === 'rejected' || s === 'absent' || s === 'missed') return 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20';
-    return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20';
   };
 
   if (loading) return <div className="flex justify-center items-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div></div>;
@@ -741,6 +1057,14 @@ const LessonsContent: React.FC = () => {
           </div>
         )}
       </section>
+
+      {/* Quiz Section — integrated below assignments */}
+      {attendance && (
+        <QuizSection
+          lessonId={attendance.track_id}
+          showToast={showToast}
+        />
+      )}
 
       {/* Submission Modal */}
       {currentAssignment && (

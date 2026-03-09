@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 px-1">
       {/* Welcome & Resume Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 dark:border-slate-800 relative overflow-hidden transition-all duration-300">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 dark:border-slate-800 relative overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-left-4 duration-700 fill-mode-both">
           <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
           <div className="relative z-10">
             {/* Course & Instructor Info */}
@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-col gap-6">
 
           {/* Upcoming Event */}
-          <div className="bg-brand-primary rounded-3xl p-6 text-white shadow-xl shadow-brand-primary/25 relative overflow-hidden group flex flex-col gap-4">
+          <div className="bg-brand-primary rounded-3xl p-6 text-white shadow-xl shadow-brand-primary/25 relative overflow-hidden group flex flex-col gap-4 animate-in fade-in slide-in-from-right-4 duration-700 fill-mode-both">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
             <div className="relative z-10">
               <p className="text-xs font-bold text-white/70 uppercase tracking-[0.2em] mb-4">{t('upcomingEvent')}</p>
@@ -156,7 +156,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-gray-50/50 dark:bg-slate-800/30 rounded-3xl p-6 border-2 border-gray-200 dark:border-slate-800/50 flex flex-col items-center justify-center">
+          <div className="bg-gray-50/50 dark:bg-slate-800/30 rounded-3xl p-6 border-2 border-gray-200 dark:border-slate-800/50 flex flex-col items-center justify-center animate-in fade-in slide-in-from-right-4 duration-700 delay-150 fill-mode-both">
             <div className="relative w-28 h-28 mb-4">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                 <path className="text-gray-200 dark:text-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3.5" />
@@ -174,12 +174,12 @@ const Dashboard: React.FC = () => {
       {/* Stats Section with improved readability */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {[
-          { icon: Calendar, label: t('courseDays'), value: course.daysPassed.toString(), suffix: `/ ${course.daysTotal}`, color: 'text-indigo-500' },
-          { icon: TrendingUp, label: t('topicsCovered'), value: course.attendanceDue.toString(), suffix: `/ ${course.attendanceTotal}`, color: 'text-emerald-500' },
-          { icon: Clock, label: t('attendance'), value: Math.round(course.attendancePercentage).toString(), suffix: '%', color: 'text-amber-500' },
-          { icon: PlayCircle, label: t('assignments'), value: course.assignmentsApproved.toString(), suffix: `/ ${course.assignmentsTotal}`, color: 'text-brand-primary' },
+          { icon: Calendar, label: t('courseDays'), value: course.daysPassed.toString(), suffix: `/ ${course.daysTotal}`, color: 'text-indigo-500', delay: 'delay-100' },
+          { icon: TrendingUp, label: t('topicsCovered'), value: course.attendanceDue.toString(), suffix: `/ ${course.attendanceTotal}`, color: 'text-emerald-500', delay: 'delay-200' },
+          { icon: Clock, label: t('attendance'), value: Math.round(course.attendancePercentage).toString(), suffix: '%', color: 'text-amber-500', delay: 'delay-300' },
+          { icon: PlayCircle, label: t('assignments'), value: course.assignmentsApproved.toString(), suffix: `/ ${course.assignmentsTotal}`, color: 'text-brand-primary', delay: 'delay-400' },
         ].map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 p-5 md:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-xl hover:border-brand-primary/20 group">
+          <div key={i} className={`bg-white dark:bg-slate-900 p-5 md:p-7 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-xl hover:border-brand-primary/20 group animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both ${stat.delay}`}>
             <div className={`w-12 h-12 md:w-14 md:h-14 mb-5 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-slate-800/50 group-hover:scale-110 transition-transform duration-500 ${stat.color}`}>
               <stat.icon className="w-6 h-6 md:w-7 md:h-7" />
             </div>
@@ -193,7 +193,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Instructions Banner Refined */}
-      <div className="bg-slate-950 rounded-3xl p-6 md:p-10 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between relative overflow-hidden group border border-white/5">
+      <div className="bg-slate-950 rounded-3xl p-6 md:p-10 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between relative overflow-hidden group border border-white/5 animate-in fade-in zoom-in duration-700 delay-500 fill-mode-both">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-primary/10 to-transparent opacity-30 group-hover:opacity-50 transition-opacity duration-1000"></div>
         <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-brand-primary/20 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000"></div>
 

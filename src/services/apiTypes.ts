@@ -174,3 +174,70 @@ export interface Notification {
 }
 
 export type NotificationsResponse = Notification[];
+
+// --- Quiz Types ---
+
+export interface QuizQuestion {
+    id: number;
+    word: string;
+    question_text: string;
+    option_a: string;
+    option_b: string;
+    option_c: string;
+    option_d: string;
+}
+
+export interface QuizAttempt {
+    id: number;
+    score: number;
+    total: number;
+    created_at: string;
+}
+
+export interface QuizSessionData {
+    session_id: number;
+    vocab_level: string;
+    question_count: number;
+    questions: QuizQuestion[];
+    previous_attempts: QuizAttempt[];
+}
+
+export interface QuizResponse {
+    success: boolean;
+    data: QuizSessionData;
+}
+
+export interface QuizAnswer {
+    question_id: number;
+    selected_option: string;
+}
+
+export interface QuizSubmission {
+    session_id: number;
+    answers: QuizAnswer[];
+}
+
+export interface QuizQuestionResult {
+    question_id: number;
+    word: string;
+    selected_option: string;
+    correct_option: string;
+    is_correct: boolean;
+    explanation: string;
+}
+
+export interface QuizSubmitResponseData {
+    attempt_id: number;
+    score: number;
+    total: number;
+    is_first_attempt: boolean;
+    points_awarded: boolean;
+    xp: number;
+    coins: number;
+    results: QuizQuestionResult[];
+}
+
+export interface QuizSubmitResponse {
+    success: boolean;
+    data: QuizSubmitResponseData;
+}

@@ -5,7 +5,10 @@ import {
     LessonsResponse,
     MarkAttendanceResponse,
     HomeworkSubmissionData,
-    ApiError
+    ApiError,
+    QuizResponse,
+    QuizSubmission,
+    QuizSubmitResponse
 } from '../services/apiTypes';
 
 interface LessonsContextType {
@@ -15,6 +18,8 @@ interface LessonsContextType {
     fetchLessons: () => Promise<void>;
     markAttendance: (keyword: string) => Promise<MarkAttendanceResponse>;
     submitAssignment: (data: Omit<HomeworkSubmissionData, 'assignment_id' | 'student_code'>) => Promise<void>;
+    getQuiz: (lessonId: number) => Promise<QuizResponse>;
+    submitQuiz: (data: QuizSubmission) => Promise<QuizSubmitResponse>;
 }
 
 const LessonsContext = createContext<LessonsContextType | undefined>(undefined);
@@ -91,13 +96,34 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
+    const getQuiz = async (lessonId: number): Promise<QuizResponse> => {
+        try {
+            return await apiService.getQuiz(lessonId);
+        } catch (err: any) {
+            const msg = err.data?.message || err.message || "Failed to load quiz";
+            throw new Error(msg);
+        }
+    };
+
+    const submitQuiz = async (data: QuizSubmission): Promise<QuizSubmitResponse> => {
+        try {
+            const response = await apiService.submitQuiz(data);
+            return response;
+        } catch (err: any) {
+            const msg = err.data?.message || err.message || "Failed to submit quiz";
+            throw new Error(msg);
+        }
+    };
+
     const value: LessonsContextType = {
         lessonsData,
         loading,
         error,
         fetchLessons,
         markAttendance,
-        submitAssignment
+        submitAssignment,
+        getQuiz,
+        submitQuiz
     };
 
     return <LessonsContext.Provider value={value}>{children}</LessonsContext.Provider>;

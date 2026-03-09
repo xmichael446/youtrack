@@ -23,7 +23,10 @@ class ApiService {
     private refreshPromise: Promise<boolean> | null = null;
 
     constructor(baseURL?: string) {
-        this.baseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+        let base = baseURL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+        // Normalize baseURL: remove trailing slashes
+        this.baseURL = base.replace(/\/+$/, '');
+
         this.defaultHeaders = {
             'Content-Type': 'application/json',
         };
@@ -53,22 +56,26 @@ class ApiService {
      * Update base URL
      */
     setBaseURL(url: string) {
-        this.baseURL = url;
+        this.baseURL = url.replace(/\/+$/, '');
     }
 
     /**
      * Build full URL with query parameters
      */
     private buildURL(endpoint: string, params?: Record<string, string | number | boolean>): string {
-        const url = new URL(endpoint, this.baseURL);
+        // Ensure endpoint starts with a slash
+        const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        let urlString = `${this.baseURL}${normalizedEndpoint}`;
 
         if (params) {
+            const url = new URL(urlString);
             Object.entries(params).forEach(([key, value]) => {
                 url.searchParams.append(key, String(value));
             });
+            urlString = url.toString();
         }
 
-        return url.toString();
+        return urlString;
     }
 
     /**
@@ -597,6 +604,20 @@ class ApiService {
      */
     async markNotificationAsRead(notificationId: number): Promise<void> {
         await this.post('/api/notifications/mark-read/', { notification_id: notificationId });
+    }
+
+    /**
+     * Get Quiz for a lesson
+     */
+    async getQuiz(lessonId: number): Promise<QuizResponse> {
+        return (await this.post<QuizResponse>('/api/quiz/get/', { lesson_id: lessonId })).data;
+    }
+
+    /**
+     * Submit Quiz answers
+     */
+    async submitQuiz(data: QuizSubmission): Promise<QuizSubmitResponse> {
+        return (await this.post<QuizSubmitResponse>('/api/quiz/submit/', data)).data;
     }
 
     /**
