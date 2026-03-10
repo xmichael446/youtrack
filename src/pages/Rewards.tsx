@@ -135,9 +135,9 @@ const RewardsContent: React.FC = () => {
                     )}
                   </div>
                   <div className="p-8 flex-1 flex flex-col">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-bold text-brand-dark dark:text-white text-xl leading-tight transition-colors group-hover/reward:text-brand-primary line-clamp-2">{reward.name}</h3>
-                      <span className={`flex-shrink-0 inline-flex items-center px-4 py-2 rounded-xl text-[11px] font-bold border transition-colors tabular-nums ml-2
+                    <div className="flex justify-between items-start mb-4 gap-2">
+                      <h3 className="font-bold text-brand-dark dark:text-white text-xl leading-tight transition-colors group-hover/reward:text-brand-primary break-words flex-1">{reward.name}</h3>
+                      <span className={`flex-shrink-0 inline-flex items-center px-4 py-2 rounded-xl text-[11px] font-bold border transition-colors tabular-nums
                         ${affordable || reward.claimed
                           ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
                           : 'bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-600 border-gray-200 dark:border-slate-700'}`}>
@@ -147,7 +147,7 @@ const RewardsContent: React.FC = () => {
                     </div>
 
                     {reward.description && (
-                      <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4 leading-relaxed line-clamp-3">
+                      <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4 leading-relaxed break-words">
                         {reward.description}
                       </p>
                     )}

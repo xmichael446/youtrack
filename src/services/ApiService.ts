@@ -24,8 +24,11 @@ class ApiService {
 
     constructor(baseURL?: string) {
         let base = baseURL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-        // Normalize baseURL: remove trailing slashes
-        this.baseURL = base.replace(/\/+$/, '');
+        
+        // Normalize baseURL: 
+        // 1. Remove literal quotes if they exist (Vite sometimes passes them literally)
+        // 2. Remove trailing slashes
+        this.baseURL = base.replace(/^["']|["']$/g, '').replace(/\/+$/, '');
 
         this.defaultHeaders = {
             'Content-Type': 'application/json',
@@ -56,23 +59,36 @@ class ApiService {
      * Update base URL
      */
     setBaseURL(url: string) {
-        this.baseURL = url.replace(/\/+$/, '');
+        this.baseURL = url.replace(/^["']|["']$/g, '').replace(/\/+$/, '');
     }
 
     /**
      * Build full URL with query parameters
      */
     private buildURL(endpoint: string, params?: Record<string, string | number | boolean>): string {
-        // Ensure endpoint starts with a slash
-        const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        let urlString = `${this.baseURL}${normalizedEndpoint}`;
+        // Ensure exactly one slash between baseURL and endpoint
+        const cleanBase = this.baseURL.replace(/\/+$/, '');
+        const cleanEndpoint = endpoint.replace(/^\/+/, '');
+        
+        // If baseURL is empty or just a slash, we want to ensure we don't start with //
+        let urlString = cleanBase ? `${cleanBase}/${cleanEndpoint}` : `/${cleanEndpoint}`;
 
         if (params) {
-            const url = new URL(urlString);
-            Object.entries(params).forEach(([key, value]) => {
-                url.searchParams.append(key, String(value));
-            });
-            urlString = url.toString();
+            // Use try-catch because URL constructor requires a valid base if urlString is relative
+            try {
+                const url = new URL(urlString, window.location.origin);
+                Object.entries(params).forEach(([key, value]) => {
+                    url.searchParams.append(key, String(value));
+                });
+                urlString = url.toString();
+            } catch (e) {
+                // Manual append if URL constructor fails
+                const separator = urlString.includes('?') ? '&' : '?';
+                const query = Object.entries(params)
+                    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+                    .join('&');
+                urlString = `${urlString}${separator}${query}`;
+            }
         }
 
         return urlString;
