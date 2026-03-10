@@ -332,7 +332,8 @@ const AssignmentCard: React.FC<{
   onExpand: () => void;
   isExpanded: boolean;
   onSubmit?: () => void;
-}> = ({ assignment, isCurrent, onExpand, isExpanded, onSubmit }) => {
+  showToast: (message: string, type: 'success' | 'error') => void;
+}> = ({ assignment, isCurrent, onExpand, isExpanded, onSubmit, showToast }) => {
   const { t } = useLanguage();
 
   const getStatusColor = (status: string | null) => {
@@ -485,6 +486,14 @@ const AssignmentCard: React.FC<{
               {latestSubmission ? t('resubmit') : t('startSubmission')}
             </button>
           )}
+
+          {/* Quiz Section integrated into each lesson card */}
+          <div className="pt-4 border-t border-gray-100 dark:border-slate-800">
+            <QuizSection
+              lessonId={assignment.id}
+              showToast={showToast}
+            />
+          </div>
         </div>
       )}
     </div>
@@ -1026,6 +1035,7 @@ const LessonsContent: React.FC = () => {
                 isExpanded={expandedRowIds.includes(currentAssignment.id)}
                 onExpand={() => toggleRow(currentAssignment.id)}
                 onSubmit={() => setIsModalOpen(true)}
+                showToast={showToast}
               />
             )}
 
@@ -1036,6 +1046,7 @@ const LessonsContent: React.FC = () => {
                 assignment={prev}
                 isExpanded={expandedRowIds.includes(prev.id)}
                 onExpand={() => toggleRow(prev.id)}
+                showToast={showToast}
               />
             ))}
           </div>
@@ -1057,14 +1068,6 @@ const LessonsContent: React.FC = () => {
           </div>
         )}
       </section>
-
-      {/* Quiz Section — integrated below assignments */}
-      {attendance && (
-        <QuizSection
-          lessonId={attendance.track_id}
-          showToast={showToast}
-        />
-      )}
 
       {/* Submission Modal */}
       {currentAssignment && (
