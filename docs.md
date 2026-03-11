@@ -1,54 +1,37 @@
 # YouTrack API Documentation
 
 **Base URL:** `https://yt-api.xmichael446.com`
-**Auth header (authenticated endpoints):** `Authorization: Bearer <access_token>`
-**Content-Type:** `application/json` for all endpoints
+**Auth:** `Authorization: Bearer <access_token>` on all authenticated endpoints
+**Content-Type:** `application/json`
+
+All authenticated endpoints return `401` on missing/expired token and `403` if the enrollment is inactive.
 
 ---
 
-## Authentication
-
-All student-facing endpoints (except the login/auth flow) require an Enrollment JWT. The JWT carries `enrollment_id`, not `user_id` — no `student_code` is needed in request bodies once authenticated.
-
-**Common errors for all authenticated endpoints:**
-- `401 Unauthorized` — missing, invalid, or expired token
-- `403 Forbidden` — token lacks `enrollment_id` claim or enrollment is inactive
-
----
+## Auth
 
 ### `POST /api/login/`
+Pre-flight check — validates a student code exists before starting the login flow. Public.
 
-Pre-auth check. Validates that a student code exists before initiating the login flow.
-
-**Public — no auth required.**
-
-**Request**
 ```json
+// Request
 { "student_code": "YT-E123456" }
-```
 
-**Response 200**
-```json
+// 200
 { "success": true, "message": "ok" }
 ```
-
-**Errors:** `400` missing field · `404` not found
+Errors: `400` missing field · `404` not found
 
 ---
 
 ### `POST /api/auth/init/`
+Starts a login session. Returns a Telegram deep link for the student to tap. Public.
 
-Starts a login session. Returns a Telegram deep link for the student to tap.
-
-**Public — no auth required.**
-
-**Request**
 ```json
+// Request
 { "access_code": "YT-E123456" }
-```
 
-**Response 200**
-```json
+// 200
 {
   "success": true,
   "start_param": "a4f9b2e1c8d7f6a3b9e2d5c8f1a4b7e9",
@@ -56,32 +39,24 @@ Starts a login session. Returns a Telegram deep link for the student to tap.
   "expires_at": "2026-02-23T10:05:00Z"
 }
 ```
-
-Session expires in **5 minutes**. `start_param` is a cryptographically random 32-char token.
-
-**Errors:** `400` missing field · `404` invalid access code
+Session expires in **5 minutes**. Errors: `400` missing field · `404` invalid code
 
 ---
 
 ### `POST /api/auth/confirm/`
+Called by the Telegram bot after the student taps the deep link. HMAC-protected — bot only.
 
-Called by the Telegram bot when the student taps the deep link. Verifies HMAC signature and marks the session confirmed.
+`verification_hash` = `HMAC-SHA256(BOT_SECRET, start_param + telegram_user_id)`
 
-**Public — bot-only, HMAC-protected.**
-
-**Request**
 ```json
+// Request
 {
   "start_param": "a4f9b2e1c8d7f6a3b9e2d5c8f1a4b7e9",
   "telegram_user_id": "123456789",
-  "verification_hash": "<sha256-hmac>"
+  "verification_hash": "<hmac>"
 }
-```
 
-The `verification_hash` is `HMAC-SHA256(BOT_SECRET, start_param + telegram_user_id)`.
-
-**Response 200**
-```json
+// 200
 {
   "success": true,
   "message": "Authentication confirmed",
@@ -92,71 +67,47 @@ The `verification_hash` is `HMAC-SHA256(BOT_SECRET, start_param + telegram_user_
   }
 }
 ```
-
-**Errors:** `403` bad HMAC / user ID mismatch / no linked account · `404` session or enrollment not found · `400` expired / already used
+Errors: `400` expired/used · `403` bad HMAC or user ID mismatch · `404` session not found
 
 ---
 
 ### `POST /api/auth/verify/`
+Long-polls (up to 30 s) until the bot confirms, then issues JWT tokens. Public.
 
-Long-polls (up to 30 s) until the bot confirms the session, then issues JWT tokens.
-
-**Public — no auth required.**
-
-**Request**
 ```json
-{
-  "start_param": "a4f9b2e1c8d7f6a3b9e2d5c8f1a4b7e9",
-  "access_code": "YT-E123456"
-}
+// Request
+{ "start_param": "a4f9b2e1c8d7f6a3b9e2d5c8f1a4b7e9", "access_code": "YT-E123456" }
+
+// 200
+{ "success": true, "access": "<jwt>", "refresh": "<jwt>" }
 ```
-
-**Response 200**
-```json
-{
-  "success": true,
-  "access": "<jwt-access-token>",
-  "refresh": "<jwt-refresh-token>"
-}
-```
-
-JWT access token claims: `enrollment_id`, `student_code`, `telegram_user_id`, `course_id`.
-Access token lifetime: **4 hours**. Refresh token: **7 days**.
-
-**Errors:** `400` missing fields / expired / already used · `404` session or enrollment not found · `408` bot did not confirm within 30 s
+Access token lifetime: **4 hours**. Refresh: **7 days**.
+Claims: `enrollment_id`, `student_code`, `telegram_user_id`, `course_id`.
+Errors: `400` missing/expired/used · `404` not found · `408` bot timeout (30 s)
 
 ---
 
 ### `POST /api/auth/token/refresh/`
-
-Standard SimpleJWT token refresh.
-
-**Request:** `{ "refresh": "<jwt-refresh-token>" }`
-**Response 200:** `{ "access": "<new-jwt-access-token>" }`
-
----
+```json
+// Request  { "refresh": "<jwt>" }
+// 200      { "access": "<new-jwt>" }
+```
 
 ### `POST /api/auth/token/verify/`
-
-Checks whether an access token is still valid.
-
-**Request:** `{ "token": "<jwt-access-token>" }`
-**Response 200** — empty body (valid) · **401** — invalid or expired
-
----
-
-## Student Views
+```json
+// Request  { "token": "<jwt>" }
+// 200 — empty (valid)  |  401 — invalid or expired
+```
 
 ---
+
+## Student
 
 ### `POST /api/dashboard/`
+Full enrollment profile and course stats. Empty request body.
 
-Returns the student's full enrollment profile and course stats.
-
-**Request** — empty body
-
-**Response 200**
 ```json
+// 200
 {
   "success": true,
   "data": {
@@ -168,6 +119,8 @@ Returns the student's full enrollment profile and course stats.
       "balance": 120,
       "rank": 3,
       "last_rank": 5,
+      "group_rank": 1,
+      "last_group_rank": 2,
       "course": {
         "name": "Python Bootcamp",
         "description": "...",
@@ -187,29 +140,42 @@ Returns the student's full enrollment profile and course stats.
         "starts": "2026-02-24T18:00:00Z"
       },
       "curriculum": [
-        { "id": 10, "number": 10, "topic": "Lesson 10", "start_datetime": "...", "duration": "01:00:00", "status": "attended" }
+        {
+          "id": 10,
+          "number": 10,
+          "topic": "Lesson 10",
+          "start_datetime": "2026-02-23T18:00:00Z",
+          "duration": "01:00:00",
+          "status": "attended"
+        }
       ]
     }
   }
 }
 ```
 
+`curriculum` returns up to 10 lessons centered around the next upcoming lesson (4 past + upcoming + future).
+`curriculum[].status`: `"attended"` · `"absent"` · `null` (future or window still open)
+
 ---
 
 ### `POST /api/leaderboard/`
+Group and course leaderboards plus the student's weekly stats. Empty request body.
 
-Returns group and course leaderboards plus the student's own weekly stats.
-
-**Request** — empty body
-
-**Response 200**
 ```json
+// 200
 {
   "success": true,
   "data": {
-    "enrollment": { "rank": 3, "week_points": 40, "total_points": 350 },
+    "enrollment": {
+      "rank": 3,
+      "group_rank": 1,
+      "last_group_rank": 2,
+      "week_points": 40,
+      "total_points": 350
+    },
     "group": [
-      { "rank": 1, "full_name": "Bobur Yusupov", "total_points": 500, "last_rank": 2 }
+      { "rank": 1, "last_rank": 2, "full_name": "Bobur Yusupov", "total_points": 500 }
     ],
     "course": [
       { "id": 1, "full_name": "Bobur Yusupov", "total_points": 500, "rank": 1, "last_rank": 2 }
@@ -218,19 +184,18 @@ Returns group and course leaderboards plus the student's own weekly stats.
 }
 ```
 
-Group leaderboard: top 20 of the student's own group.
-Course leaderboard: top 20 across all groups in the course.
+- `group` — top 20 of the student's own group by `total_points` desc. Requesting student always included.
+- `course` — top 20 across all groups by stored `rank` asc. Requesting student always included.
+- `week_points` — XP earned in the last 7 days.
+- `*.last_rank` — rank before the last points update. Use to show rank change arrows.
 
 ---
 
 ### `POST /api/lessons/`
+Current attendance track, active assignment, all previous assignments with submission history, and any linked quiz per assignment. Empty request body.
 
-Returns the current attendance track, the active submittable assignment, all previous assignments with submission history, and the vocabulary quiz linked to the current lesson (if one exists).
-
-**Request** — empty body
-
-**Response 200**
 ```json
+// 200
 {
   "success": true,
   "data": {
@@ -251,94 +216,123 @@ Returns the current attendance track, the active submittable assignment, all pre
         "start_datetime": "2026-02-23T18:00:00Z",
         "deadline": "2026-02-24T19:00:00Z",
         "attachments": [],
-        "submissions": []
+        "submissions": [],
+        "quiz": {
+          "session_id": 7,
+          "vocab_level": "B2",
+          "passing_score": 4,
+          "question_count": 5,
+          "already_awarded": false,
+          "has_reviewed": false,
+          "previous_attempts": [
+            {
+              "id": 3,
+              "score": 4,
+              "total": 5,
+              "reviewed": false,
+              "points_awarded": false,
+              "created_at": "2026-03-09T10:00:00+05:00"
+            }
+          ]
+        }
       },
       "previous": []
-    },
-    "quiz": {
-      "session_id": 7,
-      "vocab_level": "advanced",
-      "passing_score": 4,
-      "question_count": 5,
-      "questions": [
-        {
-          "id": 101,
-          "word": "ephemeral",
-          "question_text": "Which word is closest in meaning to 'ephemeral'?",
-          "option_a": "permanent",
-          "option_b": "transient",
-          "option_c": "ancient",
-          "option_d": "joyful"
-        }
-      ],
-      "previous_attempts": [
-        {
-          "id": 3,
-          "score": 4,
-          "total": 5,
-          "created_at": "2026-03-09T10:00:00+05:00"
-        }
-      ]
     }
   }
 }
 ```
 
-`attendance.status` values:
-- `null` — track is open (can still mark) or upcoming
-- `"attended"` — student marked attendance
-- `"absent"` — window closed, student did not attend
+**`attendance.status` values:**
 
-`assignments.current` is `null` when there is no submittable assignment.
+| Value | Meaning |
+|---|---|
+| `null` | Track is open — student has **not** marked yet. Show keyword entry UI. |
+| `"marked"` | Track is open — student **already marked**. Disable entry UI. |
+| `"attended"` | Track closed — student attended. |
+| `"absent"` | Track closed — student missed it. |
 
-`quiz` is `null` when no ready quiz session is linked to the current lesson. The quiz object includes all questions **without** correct answers. Use `passing_score` to show the student what score they need to earn points. `previous_attempts` shows their attempt history so you can conditionally show a retake UI.
+`attendance` is `null` when no track has opened yet. `assignments.current` is `null` when no submittable assignment is open.
 
-The quiz is resolved from the current lesson in this priority order:
-1. The lesson of the active attendance track
-2. The lesson of the nearest submittable assignment
+**`quiz`** (per assignment) is `null` when no session exists for that lesson:
+
+| Field | Description |
+|---|---|
+| `session_id` | Pass to `/api/quiz/questions/` to fetch questions |
+| `passing_score` | Minimum correct answers to earn points (`0` = always eligible) |
+| `already_awarded` | Points already earned for this session — no further awards possible |
+| `has_reviewed` | Student called review — **permanently disqualifies** from future rewards |
+| `previous_attempts` | Past completed attempts with `id`, `score`, `total`, `reviewed`, `points_awarded`, `created_at` |
 
 ---
 
 ### `POST /api/attendance/mark/`
+Marks the student present using the keyword shown in class.
 
-Marks the student present for a session using the keyword shown in class.
-
-**Request**
 ```json
+// Request
 { "track_id": 5, "keyword": "harbor" }
+
+// 200
+{ "success": true, "data": { "xp": 10, "coins": 5, "message": "Attendance marked successfully" } }
 ```
 
-**Response 200**
+The attendance window must be currently open (`opens_at ≤ now ≤ closes_at`). Attempts outside the window are rejected.
+
+Errors: `400` missing fields · `400` window not open · `400` wrong keyword · `400` already marked
+
+---
+
+### `POST /api/quiz/questions/`
+Fetch questions for a quiz session. Call this when the student taps "Take Quiz". Options are randomly shuffled per request. Correct answers are **not** included here.
+
 ```json
+// Request
+{ "session_id": 7 }
+
+// 200
 {
   "success": true,
-  "data": { "xp": 10, "coins": 5, "message": "Attendance marked successfully" }
+  "data": {
+    "session_id": 7,
+    "vocab_level": "B2",
+    "passing_score": 4,
+    "source_text": "The ephemeral beauty of cherry blossoms...",
+    "questions": [
+      {
+        "id": 101,
+        "word": "ephemeral",
+        "question_text": "Which word is closest in meaning to 'ephemeral'?",
+        "options": [
+          { "id": 402, "content": "permanent" },
+          { "id": 401, "content": "transient" },
+          { "id": 403, "content": "ancient" },
+          { "id": 404, "content": "joyful" }
+        ]
+      }
+    ]
+  }
 }
 ```
 
-**Errors:** `400` missing fields / wrong keyword / already marked
+Display `source_text` as the reading passage — questions are generated from it. Show `passing_score` as the student's target before they start.
+
+Errors: `400` missing field · `404` session not found or not ready
 
 ---
 
 ### `POST /api/quiz/submit/`
+Submit answers. Creates a completed attempt and awards points on the first passing attempt (if the student has not yet reviewed this session).
 
-Submit answers for the quiz session received from `/api/lessons/`. Creates a completed `Attempt` with all `UserAnswer` records. Awards a `PointEntry` on the **first attempt where `score >= passing_score`** (using `YTInstance.quiz_reason`). If `passing_score` is `0`, points are always awarded on the first attempt.
-
-**Request**
 ```json
+// Request
 {
   "session_id": 7,
   "answers": [
-    { "question_id": 101, "selected_option": "B" },
-    { "question_id": 102, "selected_option": "A" }
+    { "question_id": 101, "option_id": 401 }
   ]
 }
-```
 
-`selected_option` is one of `"A"`, `"B"`, `"C"`, `"D"` (case-insensitive). Answers with an unrecognized `question_id` or invalid option are silently skipped.
-
-**Response 200**
-```json
+// 200
 {
   "success": true,
   "data": {
@@ -347,16 +341,61 @@ Submit answers for the quiz session received from `/api/lessons/`. Creates a com
     "total": 5,
     "passing_score": 4,
     "passed": true,
-    "is_first_attempt": true,
+    "already_awarded": false,
+    "has_reviewed": false,
     "points_awarded": true,
     "xp": 10,
-    "coins": 5,
-    "results": [
+    "coins": 5
+  }
+}
+```
+
+| Field | Description |
+|---|---|
+| `passed` | `true` if `score >= passing_score` (or `passing_score` is `0`) |
+| `already_awarded` | Prior attempt already earned points — no further awards |
+| `has_reviewed` | Student reviewed — **permanently disqualifies from future rewards** |
+| `points_awarded` | Points awarded in this attempt |
+| `xp` / `coins` | Reward values. Both `0` when not awarded |
+
+Points are awarded when `score >= passing_score` AND `already_awarded = false` AND `has_reviewed = false`. Retakes always create a new attempt. Answers with unrecognized IDs are silently skipped.
+
+Errors: `400` missing field · `404` session not found or not ready
+
+---
+
+### `POST /api/quiz/review/`
+Retrieve full results for a completed attempt — correct answers, explanations, and the student's selected option. Marks the attempt as reviewed.
+
+> **Warning:** calling this permanently disqualifies the enrollment from earning points on this session. Warn the student before they confirm.
+
+```json
+// Request
+{ "attempt_id": 12 }
+
+// 200
+{
+  "success": true,
+  "data": {
+    "attempt_id": 12,
+    "score": 4,
+    "total": 5,
+    "passing_score": 4,
+    "passed": true,
+    "points_awarded": true,
+    "reviewed": true,
+    "answers": [
       {
         "question_id": 101,
         "word": "ephemeral",
-        "selected_option": "B",
-        "correct_option": "B",
+        "question_text": "Which word is closest in meaning to 'ephemeral'?",
+        "options": [
+          { "id": 401, "content": "transient", "is_correct": true },
+          { "id": 402, "content": "permanent", "is_correct": false },
+          { "id": 403, "content": "ancient", "is_correct": false },
+          { "id": 404, "content": "joyful", "is_correct": false }
+        ],
+        "selected_option_id": 401,
         "is_correct": true,
         "explanation": "'Ephemeral' means lasting for a very short time, making 'transient' the closest synonym."
       }
@@ -365,48 +404,25 @@ Submit answers for the quiz session received from `/api/lessons/`. Creates a com
 }
 ```
 
-| Field | Description |
-|---|---|
-| `passed` | `true` if `score >= passing_score` (or `passing_score` is `0`) |
-| `is_first_attempt` | `true` if this is the enrollment's first completed attempt for this session |
-| `points_awarded` | `true` if a `PointEntry` was created — only on first passing attempt when `quiz_reason` is configured |
-| `results` | Per-question breakdown with correct answers and explanations revealed |
+Options are sorted by `id` (consistent order). Safe to call multiple times — disqualification is applied on the first call.
 
-Retakes are always allowed and create a new `Attempt`, but points are only awarded once.
-
-**Errors:** `400` missing `session_id` · `404` session not found or not ready
+Errors: `400` missing field · `404` attempt not found or belongs to another enrollment
 
 ---
 
 ### `POST /api/shop/`
+Available rewards (with claimed flag) and the student's last 10 point transactions. Empty request body.
 
-Returns available rewards (with claimed flag) and the student's last 10 point transactions.
-
-**Request** — empty body
-
-**Response 200**
 ```json
+// 200
 {
   "success": true,
   "data": {
     "rewards": [
-      {
-        "id": 1,
-        "name": "Sticker Pack",
-        "description": "Cool stickers",
-        "image": "/media/rewards/stickers.png",
-        "cost": 50,
-        "claimed": false
-      }
+      { "id": 1, "name": "Sticker Pack", "description": "Cool stickers", "image": "/media/rewards/stickers.png", "cost": 50, "claimed": false }
     ],
     "transactions": [
-      {
-        "datetime": "2026-02-23T18:00:00Z",
-        "reason": "Attendance",
-        "xp": 10,
-        "coins": 5,
-        "negative": false
-      }
+      { "datetime": "2026-02-23T18:00:00Z", "reason": "Attendance", "xp": 10, "coins": 5, "negative": false }
     ]
   }
 }
@@ -415,25 +431,22 @@ Returns available rewards (with claimed flag) and the student's last 10 point tr
 ---
 
 ### `POST /api/claim-reward/`
+Redeems a reward, deducting coins from `balance`.
 
-Redeems a reward, deducting coins from the student's balance.
+```json
+// Request  { "reward_id": 1 }
+// 200      { "success": true, "message": "Reward claimed" }
+```
 
-**Request:** `{ "reward_id": 1 }`
-
-**Response 200:** `{ "success": true, "message": "Reward claimed" }`
-
-**Errors:** `400` missing field / already claimed / insufficient balance · `404` reward not found
+Errors: `400` missing field · `400` already claimed · `400` insufficient balance · `404` reward not found
 
 ---
 
 ### `POST /api/notifications/`
+Today's notifications for the student. Marks `SCHEDULED` notifications as `SENT`. Empty request body.
 
-Returns today's notifications for the student. Marks `SCHEDULED` notifications as `SENT`.
-
-**Request** — empty body
-
-**Response 200**
 ```json
+// 200
 [
   {
     "id": 10,
@@ -449,40 +462,34 @@ Returns today's notifications for the student. Marks `SCHEDULED` notifications a
 ---
 
 ### `POST /api/notifications/mark-read/`
+Marks a notification as read.
 
-Marks a notification as read for the authenticated student.
+```json
+// Request  { "notification_id": 10 }
+// 200      { "success": true }
+```
 
-**Request:** `{ "notification_id": 10 }`
-
-**Response 200:** `{ "success": true }`
-
-**Errors:** `400` missing field · `404` not found or belongs to a different student
-
----
-
-## Bot Endpoints
+Errors: `400` missing field · `404` not found or belongs to another student
 
 ---
+
+## Bot
 
 ### `POST /api/bot/submit-assignment/`
-
-Submits homework for an assignment. Requires a valid student JWT.
-
-**Request** — `multipart/form-data`
+Submits homework. Requires a valid student JWT. `multipart/form-data`.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `assignment_id` | integer | Yes | ID of the assignment |
-| `comment` | string | No | Student's note to teacher |
+| `assignment_id` | integer | Yes | Assignment ID |
+| `comment` | string | No | Student note |
 | `attachments` | JSON array | No | Attachment metadata (max 5) |
-| `files` | file[] | No | Uploaded files — count must match non-link attachments |
+| `files` | file[] | No | Uploaded files — count must match non-link attachment objects |
 
-Attachment object: `{ "type": "file|image|link", "name": "My Work", "url": "https://..." }`
-`url` required only when `type` is `"link"`.
+Attachment object: `{ "type": "file|image|link", "name": "My Work", "url": "https://..." }` — `url` only required when `type` is `"link"`.
 
-**Response 201**
 ```json
+// 201
 { "success": true, "message": "Homework submitted successfully", "submission_id": 42 }
 ```
 
-**Errors:** `400` validation failure (max 5 attempts, already awaiting/approved, count mismatch) · `401` invalid token
+Errors: `400` max attempts reached / already awaiting or approved / file count mismatch · `401` invalid token

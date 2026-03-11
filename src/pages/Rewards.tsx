@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Coins, History, Check, Lock, ExternalLink, Loader2, ShoppingBag } from 'lucide-react';
+import { Coins, History, Check, Lock, ExternalLink, Loader2, ShoppingBag, Sparkles } from 'lucide-react';
 import CoinsHistory from '../components/CoinsHistory';
 import { useLanguage } from '../context/LanguageContext';
 import { ShopProvider, useShop } from '../context/ShopContext';
@@ -9,16 +9,11 @@ import { Reward } from '../services/apiTypes';
 const RewardsContent: React.FC = () => {
   const { t } = useLanguage();
   const { rewards, transactions, loading, error, claimReward } = useShop();
-  // Using user from DashboardContext to get current balance and refetch
   const { user, refetch } = useDashboard();
   const currentBalance = user?.coins || 0;
 
   const [processingId, setProcessingId] = useState<number | null>(null);
 
-  // Sorting Logic:
-  // 1. Claimed
-  // 2. Affordable (balance >= cost)
-  // 3. Locked (balance < cost)
   const sortedRewards = [...rewards].sort((a, b) => {
     if (a.claimed && !b.claimed) return -1;
     if (!a.claimed && b.claimed) return 1;
@@ -30,12 +25,11 @@ const RewardsContent: React.FC = () => {
     if (aAffordable && !bAffordable) return -1;
     if (!aAffordable && bAffordable) return 1;
 
-    return a.cost - b.cost; // Secondary sort by cost
+    return a.cost - b.cost;
   });
 
   const handleClaim = async (reward: Reward) => {
     if (reward.claimed) {
-      // Open Telegram link
       window.open(`https://t.me/ytrck_bot?start=reward_${reward.id}`, '_blank');
       return;
     }
@@ -45,11 +39,9 @@ const RewardsContent: React.FC = () => {
     setProcessingId(reward.id);
     try {
       await claimReward(reward.id);
-      refetch(); // Update balance
-      // Success toast could be added here
+      refetch();
     } catch (err) {
       console.error("Failed to claim:", err);
-      // Error toast could be added here
     } finally {
       setProcessingId(null);
     }
@@ -58,127 +50,177 @@ const RewardsContent: React.FC = () => {
   if (loading && rewards.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-brand-primary" />
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>
+          <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin"></div>
+        </div>
       </div>
     );
   }
 
   if (error && rewards.length === 0) {
     return (
-      <div className="text-center py-20 bg-red-50 dark:bg-red-900/10 rounded-3xl">
-        <p className="text-red-500 font-bold">{error}</p>
+      <div className="text-center py-20 bg-red-50 dark:bg-red-900/10 rounded-3xl border border-red-100 dark:border-red-500/10">
+        <p className="text-red-500 font-bold text-sm">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
 
-      {/* Header with Balance Context */}
-      <div className="bg-brand-primary rounded-[32px] p-8 md:p-12 text-white shadow-2xl shadow-brand-primary/30 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-32 -mt-32 opacity-50 blur-[80px] group-hover:scale-110 transition-transform duration-1000"></div>
-        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-8">
-          <div className="text-center lg:text-left">
-            <h1 className="text-3xl md:text-5xl font-bold mb-3 tracking-tight">{t('rewardsShop')}</h1>
-            <p className="text-white/80 max-w-xl text-base md:text-lg font-medium leading-relaxed">{t('exchangeCoins')}</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[24px] p-8 flex flex-col items-center min-w-[200px] transition-all hover:bg-white/20 hover:scale-105 shadow-2xl">
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-white/60 mb-3">{t('totalBalance')}</span>
-            <div className="flex items-center text-5xl md:text-6xl font-extrabold tracking-tighter tabular-nums">
-              <Coins className="w-10 h-10 mr-3 fill-white drop-shadow-lg" />
-              {currentBalance}
+      {/* Page Header */}
+      <div className="space-y-1 px-1">
+        <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
+          {t('rewardsShop')}
+        </h1>
+        <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+          {t('exchangeCoins')}
+        </p>
+      </div>
+
+      {/* Balance Hero Card */}
+      <div className="relative bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900 rounded-3xl overflow-hidden border border-white/5 shadow-2xl">
+        {/* Ambient blobs */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-brand-primary/20 rounded-full -mr-40 -mt-40 blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-primary/10 rounded-full -ml-24 -mb-24 blur-2xl pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(18,194,220,0.08),transparent_60%)] pointer-events-none"></div>
+
+        <div className="relative z-10 p-7 md:p-10 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="text-center md:text-left">
+            <p className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-3 opacity-80">{t('yourBalance')}</p>
+            <div className="flex items-center justify-center md:justify-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center">
+                <Coins className="w-6 h-6 text-amber-400 fill-amber-400" />
+              </div>
+              <span className="text-5xl md:text-6xl font-[800] tracking-tighter text-white tabular-nums">{currentBalance}</span>
             </div>
+          </div>
+
+          <div className="hidden md:block w-px h-16 bg-white/10"></div>
+
+          <div className="text-center md:text-right">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-primary/15 border border-brand-primary/20 rounded-full mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-brand-primary" />
+              <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-wider">Rewards Shop</span>
+            </div>
+            <p className="text-slate-400 font-medium text-sm max-w-[180px] leading-snug">
+              {t('shopWelcome')}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Available Rewards */}
-      <div className="pt-4 px-1">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('premiumItems')}</h2>
+      <div>
+        <div className="flex items-center gap-3 px-1 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-brand-primary/10 border border-brand-primary/10 flex items-center justify-center shrink-0">
+            <ShoppingBag className="w-[18px] h-[18px] text-brand-primary" />
+          </div>
+          <h2 className="text-[12px] font-mono font-bold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('premiumItems')}</h2>
         </div>
 
         {rewards.length === 0 ? (
-          <div className="bg-white p-8 rounded-xl border border-dashed border-gray-300 text-center text-gray-500">
-            {t('noRewards')}
+          <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border-2 border-dashed border-gray-200 dark:border-slate-800 text-center">
+            <ShoppingBag className="w-10 h-10 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
+            <p className="text-gray-400 dark:text-slate-500 font-medium text-sm italic">"{t('noRewards')}"</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
             {sortedRewards.map((reward) => {
               const affordable = currentBalance >= reward.cost;
               const isProcessing = processingId === reward.id;
 
               return (
-                <div key={reward.id} className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] shadow-sm hover:shadow-2xl hover:border-brand-primary/20 transition-all duration-500 overflow-hidden flex flex-col group/reward hover:-translate-y-2">
-                  <div className="h-48 bg-gray-100 dark:bg-slate-800 relative overflow-hidden flex items-center justify-center">
+                <div
+                  key={reward.id}
+                  className={`bg-white dark:bg-slate-900 border rounded-3xl overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
+                    ${reward.claimed
+                      ? 'border-emerald-200 dark:border-emerald-500/20 shadow-md'
+                      : affordable
+                        ? 'border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-brand-primary/20'
+                        : 'border-gray-100 dark:border-slate-800 shadow-sm opacity-70 hover:opacity-90'
+                    }`}
+                >
+                  {/* Image */}
+                  <div className="h-52 bg-gray-50 dark:bg-slate-800 relative overflow-hidden">
                     {reward.image ? (
                       <img
                         src={`${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/${(reward.image || '').replace(/^\/+/, '')}`}
                         alt={reward.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover/reward:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover/reward:scale-105"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://picsum.photos/400/200?grayscale';
                         }}
                       />
                     ) : (
-                      <div className="text-gray-300 dark:text-slate-700">
-                        <ShoppingBag className="w-16 h-16 opacity-20" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ShoppingBag className="w-16 h-16 text-gray-200 dark:text-slate-700" />
                       </div>
                     )}
 
                     {reward.claimed && (
-                      <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] flex items-center justify-center z-10">
-                        <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-xs font-bold flex items-center shadow-2xl scale-110">
-                          <Check className="w-4 h-4 mr-2" /> {t('claimed')}
+                      <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
+                        <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl font-mono">
+                          <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('claimed')}
                         </div>
                       </div>
                     )}
+
+                    {!affordable && !reward.claimed && (
+                      <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider flex items-center gap-1">
+                        <Lock className="w-3 h-3" /> {t('locked')}
+                      </div>
+                    )}
                   </div>
-                  <div className="p-8 flex-1 flex flex-col">
-                    <div className="flex justify-between items-start mb-4 gap-2">
-                      <h3 className="font-bold text-brand-dark dark:text-white text-xl leading-tight transition-colors group-hover/reward:text-brand-primary break-words flex-1">{reward.name}</h3>
-                      <span className={`flex-shrink-0 inline-flex items-center px-4 py-2 rounded-xl text-[11px] font-bold border transition-colors tabular-nums
+
+                  {/* Content */}
+                  <div className="p-5 md:p-6 flex-1 flex flex-col">
+                    <div className="flex justify-between items-start gap-3 mb-3">
+                      <h3 className="font-[800] text-brand-dark dark:text-white text-lg leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                      <span className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold font-mono border
                         ${affordable || reward.claimed
                           ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
-                          : 'bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-600 border-gray-200 dark:border-slate-700'}`}>
-                        <Coins className="w-4 h-4 mr-2 fill-current" />
+                          : 'bg-gray-50 dark:bg-slate-800 text-gray-400 border-gray-200 dark:border-slate-700'}`}>
+                        <Coins className={`w-3.5 h-3.5 ${affordable || reward.claimed ? 'fill-amber-500' : 'fill-gray-400'}`} />
                         {reward.cost}
                       </span>
                     </div>
 
                     {reward.description && (
-                      <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4 leading-relaxed break-words">
-                        {reward.description}
+                      <p className="text-sm text-gray-500 dark:text-slate-400 mb-5 leading-relaxed italic">
+                        "{reward.description}"
                       </p>
                     )}
 
-                    <div className="flex-1"></div> { /* Spacer to push button down */}
-
-                    <button
-                      disabled={(reward.claimed ? false : !affordable) || isProcessing}
-                      onClick={() => handleClaim(reward)}
-                      className={`w-full py-4 rounded-2xl font-bold transition-all shadow-xl flex items-center justify-center tracking-[0.15em] uppercase text-[10px] mt-6 relative overflow-hidden
-                        ${reward.claimed
-                          ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/30'
-                          : affordable
-                            ? 'bg-brand-primary text-white hover:bg-brand-accent shadow-brand-primary/30 hover:scale-[1.02] active:scale-95'
-                            : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-600 border border-gray-200 dark:border-slate-700 cursor-not-allowed'
-                        }`}
-                    >
-                      {isProcessing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : reward.claimed ? (
-                        <>
-                          {t('claimed')} <ExternalLink className="w-3 h-3 ml-2" />
-                        </>
-                      ) : affordable ? (
-                        t('claimNow')
-                      ) : (
-                        <>
-                          <Lock className="w-3 h-3 mr-2" /> {t('locked')}
-                        </>
-                      )}
-                    </button>
+                    <div className="mt-auto">
+                      <button
+                        disabled={(reward.claimed ? false : !affordable) || isProcessing}
+                        onClick={() => handleClaim(reward)}
+                        className={`w-full py-3.5 rounded-2xl font-bold text-[11px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95
+                          ${reward.claimed
+                            ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
+                            : affordable
+                              ? 'bg-gradient-to-r from-brand-primary to-brand-accent text-white shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02]'
+                              : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 cursor-not-allowed border border-gray-200 dark:border-slate-700'
+                          }`}
+                      >
+                        {isProcessing ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : reward.claimed ? (
+                          <>
+                            {t('claimed')}
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </>
+                        ) : affordable ? (
+                          t('claimNow')
+                        ) : (
+                          <>
+                            <Lock className="w-3.5 h-3.5" /> {t('locked')}
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -187,18 +229,20 @@ const RewardsContent: React.FC = () => {
         )}
       </div>
 
-      {/* Coins History Section */}
-      <section className="mt-12 md:mt-16 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-        <div className="flex items-center space-x-3 mb-8 px-2">
-          <div className="p-2.5 bg-amber-500/10 rounded-xl">
-            <History className="w-6 h-6 text-amber-500" />
+      {/* Coins History */}
+      <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
+        <div className="flex items-center gap-3 px-1 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
+            <History className="w-[18px] h-[18px] text-amber-500" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-brand-dark dark:text-white tracking-tight">{t('coinsHistory')}</h2>
-            <p className="text-sm font-bold text-gray-400 dark:text-slate-500">{t('trackingEarnings')}</p>
+            <h2 className="text-[12px] font-mono font-bold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('coinsHistory')}</h2>
+            <p className="text-[11px] font-medium text-gray-500 dark:text-slate-400">{t('trackingEarnings')}</p>
           </div>
         </div>
-        <CoinsHistory showTitle={false} transactions={transactions} />
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+          <CoinsHistory showTitle={false} transactions={transactions} compact={false} />
+        </div>
       </section>
     </div>
   );

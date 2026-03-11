@@ -1,6 +1,6 @@
 import React from 'react';
 import { ACTIVITY_LOG } from '../constants';
-import { Coins, Clock, Calendar, Zap, BookOpen, CheckCircle2, ShoppingBag, XCircle } from 'lucide-react';
+import { Coins, Calendar, Zap, BookOpen, CheckCircle2, ShoppingBag, XCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { Transaction } from '../services/apiTypes';
 
@@ -14,10 +14,9 @@ interface CoinsHistoryProps {
 const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, compact = false, transactions }) => {
     const { t } = useLanguage();
 
-    // Map transactions to ActivityItem format or use ACTIVITY_LOG
     const data = transactions ? transactions.map((t, idx) => ({
         id: `tx-${idx}`,
-        date: new Date(t.datetime).toLocaleDateString(), // Format date as needed
+        date: new Date(t.datetime).toLocaleDateString(),
         action: t.reason,
         xpChange: t.xp,
         coinChange: t.coins,
@@ -27,17 +26,20 @@ const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, co
     const displayActions = limit ? data.slice(0, limit) : data;
 
     const getIcon = (action: string, negative?: boolean) => {
-        if (negative) return <XCircle className="w-4 h-4 text-red-500" />;
-        if (action.includes('Attendance')) return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
-        if (action.includes('Homework')) return <BookOpen className="w-4 h-4 text-brand-primary" />;
-        if (action.includes('Claimed') || action.includes('Reward')) return <ShoppingBag className="w-4 h-4 text-brand-secondary" />;
-        return <CheckCircle2 className="w-4 h-4 text-gray-400" />;
+        if (negative) return <XCircle className="w-[18px] h-[18px] text-red-500" />;
+        if (action.includes('Attendance')) return <CheckCircle2 className="w-[18px] h-[18px] text-emerald-500" />;
+        if (action.includes('Homework')) return <BookOpen className="w-[18px] h-[18px] text-brand-primary" />;
+        if (action.includes('Claimed') || action.includes('Reward')) return <ShoppingBag className="w-[18px] h-[18px] text-brand-secondary" />;
+        return <CheckCircle2 className="w-[18px] h-[18px] text-gray-400" />;
     };
 
     if (displayActions.length === 0) {
         return (
-            <div className="text-center py-10 bg-gray-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700">
-                <p className="text-gray-400 dark:text-slate-500 font-medium text-sm">{t('noCoinTransactions')}</p>
+            <div className="text-center py-14 px-6">
+                <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                    <Coins className="w-6 h-6 text-gray-300 dark:text-slate-600" />
+                </div>
+                <p className="text-sm font-bold text-gray-400 dark:text-slate-500 italic">"{t('noCoinTransactions')}"</p>
             </div>
         );
     }
@@ -45,60 +47,62 @@ const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, co
     return (
         <div className={compact ? "space-y-0" : "space-y-6"}>
             {showTitle && (
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t('coinsHistory')}</h2>
-                    <p className="text-gray-500 dark:text-slate-400 mt-1 text-sm font-medium">{t('trackingEarnings')}</p>
+                <div className="flex items-center gap-3 px-1">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
+                        <Coins className="w-[18px] h-[18px] text-amber-500" />
+                    </div>
+                    <div>
+                        <h2 className="text-[12px] font-mono font-bold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('coinsHistory')}</h2>
+                        <p className="text-[11px] font-medium text-gray-500 dark:text-slate-400">{t('trackingEarnings')}</p>
+                    </div>
                 </div>
             )}
 
-            <div className={`bg-white dark:bg-slate-900 ${compact ? '' : 'border border-gray-100 dark:border-slate-800 rounded-[32px] shadow-sm'} overflow-hidden transition-all duration-300 ${!compact && 'hover:shadow-xl'}`}>
-                {/* Desktop View (Table) - Hidden if compact is true */}
+            <div className={`bg-white dark:bg-slate-900 ${compact ? '' : ''} overflow-hidden`}>
+                {/* Desktop Table */}
                 {!compact && (
                     <div className="hidden md:block overflow-x-auto custom-scrollbar">
-                        <table className="min-w-full divide-y divide-gray-50 dark:divide-slate-800">
-                            <thead className="bg-gray-50/50 dark:bg-slate-800/50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('date')}</th>
-                                    <th scope="col" className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('activity')}</th>
-                                    <th scope="col" className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('change') || 'Change'}</th>
+                        <table className="min-w-full">
+                            <thead>
+                                <tr className="border-b border-gray-50 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/30">
+                                    <th className="px-6 py-4 text-left text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('date')}</th>
+                                    <th className="px-6 py-4 text-left text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('activity')}</th>
+                                    <th className="px-6 py-4 text-right text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('change')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-50 dark:divide-slate-800">
+                            <tbody className="divide-y divide-gray-50 dark:divide-slate-800/60">
                                 {displayActions.map((item) => (
-                                    <tr key={item.id} className="hover:bg-brand-primary/5 dark:hover:bg-brand-primary/5 transition-all group/row">
-                                        <td className="px-6 py-4 whitespace-nowrap text-[11px] font-semibold text-gray-400 dark:text-slate-500 tabular-nums">
-                                            <div className="flex items-center">
-                                                <Calendar className="w-3 h-3 mr-2 opacity-50" />
+                                    <tr key={item.id} className="hover:bg-gray-50/40 dark:hover:bg-slate-800/20 transition-colors group/row">
+                                        <td className="px-6 py-5 whitespace-nowrap">
+                                            <div className="flex items-center gap-2 text-[12px] font-mono font-bold text-gray-400 dark:text-slate-500">
+                                                <Calendar className="w-3.5 h-3.5 text-brand-primary/40" />
                                                 {item.date}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center">
-                                                <div className={`flex-shrink-0 h-9 w-9 rounded-lg border flex items-center justify-center mr-3 shadow-sm group-hover/row:scale-110 transition-all ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700 group-hover/row:bg-white dark:group-hover/row:bg-slate-700'}`}>
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-transform group-hover/row:scale-110 duration-300 ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700'}`}>
                                                     {getIcon(item.action, item.negative)}
                                                 </div>
-                                                <div className="text-sm font-semibold text-brand-dark dark:text-white">{item.action}</div>
+                                                <span className="text-[14px] font-bold text-brand-dark dark:text-white tracking-tight">{item.action}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                                            <div className="flex items-center justify-end space-x-2">
+                                        <td className="px-6 py-5 text-right whitespace-nowrap">
+                                            <div className="flex items-center justify-end gap-2">
                                                 {item.xpChange !== 0 && item.xpChange !== null && (
-                                                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-extrabold tabular-nums border ${item.negative ? 'bg-red-50 text-red-600 border-red-100' : 'bg-brand-primary/10 text-brand-primary border-brand-primary/10'}`}>
-                                                        <Zap className="w-3 h-3 mr-1.5 fill-current" />
+                                                    <span className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border text-[10px] font-mono font-bold uppercase tracking-wider ${item.negative ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20' : 'bg-brand-primary/8 text-brand-primary border-brand-primary/15'}`}>
+                                                        <Zap className="w-3 h-3 fill-current" />
                                                         {item.xpChange > 0 ? '+' : ''}{item.xpChange} XP
                                                     </span>
                                                 )}
                                                 {item.coinChange !== 0 && item.coinChange !== null && (
-                                                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black tabular-nums border
+                                                    <span className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border text-[10px] font-mono font-bold uppercase tracking-wider
                                                     ${item.coinChange > 0
-                                                            ? 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
+                                                            ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
                                                             : 'bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'}`}>
-                                                        <Coins className="w-3.5 h-3.5 mr-1.5 fill-current" />
+                                                        <Coins className="w-3 h-3 fill-current" />
                                                         {item.coinChange > 0 ? `+${item.coinChange}` : item.coinChange}
                                                     </span>
-                                                )}
-                                                {(item.xpChange === 0 || item.xpChange === null) && (item.coinChange === 0 || item.coinChange === null) && (
-                                                    <span className="text-gray-300 dark:text-slate-700 text-[10px] font-bold">---</span>
                                                 )}
                                             </div>
                                         </td>
@@ -109,40 +113,36 @@ const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, co
                     </div>
                 )}
 
-                {/* Mobile View (Card List) - Shown if compact is true OR screen is small */}
-                <div className={`${compact ? 'block' : 'md:hidden'} divide-y divide-gray-50 dark:divide-slate-800`}>
+                {/* Mobile / Compact Card List */}
+                <div className={`${compact ? 'block' : 'md:hidden'} divide-y divide-gray-50 dark:divide-slate-800/60`}>
                     {displayActions.map((item) => (
-                        <div key={item.id} className="p-4 active:bg-gray-50 dark:active:bg-slate-800/50 transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
-                            <div className="flex items-start justify-between mb-3">
-                                <div className="flex items-center min-w-0">
-                                    <div className={`flex-shrink-0 h-10 w-10 rounded-xl border flex items-center justify-center mr-3 shadow-sm ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700'}`}>
-                                        {getIcon(item.action, item.negative)}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className="text-sm font-bold text-brand-dark dark:text-white truncate">{item.action}</div>
-                                        <div className="flex items-center text-[10px] font-semibold text-gray-400 dark:text-slate-500 mt-0.5 tabular-nums">
-                                            <Clock className="w-2.5 h-2.5 mr-1 opacity-50" />
-                                            {item.date}
-                                        </div>
+                        <div key={item.id} className="p-4 hover:bg-gray-50/40 dark:hover:bg-slate-800/20 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700'}`}>
+                                    {getIcon(item.action, item.negative)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[14px] font-bold text-brand-dark dark:text-white truncate leading-tight">{item.action}</p>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                        <Calendar className="w-3 h-3 text-brand-primary/40" />
+                                        <span className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{item.date}</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center justify-end space-x-2 pl-[3.25rem]">
-                                {item.xpChange !== 0 && item.xpChange !== null && (
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold border tabular-nums ${item.negative ? 'bg-red-50 text-red-600 border-red-100' : 'bg-brand-primary/5 text-brand-primary border-brand-primary/10'}`}>
-                                        <Zap className="w-3 h-3 mr-1 fill-current" />
-                                        {item.xpChange > 0 ? '+' : ''}{item.xpChange} XP
-                                    </span>
-                                )}
-                                {item.coinChange !== 0 && item.coinChange !== null && (
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold border tabular-nums
-                                        ${item.coinChange > 0
-                                            ? 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
-                                            : 'bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'}`}>
-                                        <Coins className="w-3 h-3 mr-1 fill-current" />
-                                        {item.coinChange > 0 ? `+${item.coinChange}` : item.coinChange}
-                                    </span>
-                                )}
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                    {item.xpChange !== 0 && item.xpChange !== null && (
+                                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-[9px] font-mono font-bold uppercase tracking-wide ${item.negative ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400' : 'bg-brand-primary/8 text-brand-primary border-brand-primary/15'}`}>
+                                            {item.xpChange > 0 ? '+' : ''}{item.xpChange} XP
+                                        </span>
+                                    )}
+                                    {item.coinChange !== 0 && item.coinChange !== null && (
+                                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-[9px] font-mono font-bold uppercase tracking-wide
+                                            ${item.coinChange > 0
+                                                ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
+                                                : 'bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400'}`}>
+                                            {item.coinChange > 0 ? `+${item.coinChange}` : item.coinChange}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}

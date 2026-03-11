@@ -8,7 +8,9 @@ import {
     ApiError,
     QuizResponse,
     QuizSubmission,
-    QuizSubmitResponse
+    QuizSubmitResponse,
+    QuizQuestionsResponse,
+    QuizReviewResponse
 } from '../services/apiTypes';
 
 interface LessonsContextType {
@@ -18,7 +20,8 @@ interface LessonsContextType {
     fetchLessons: () => Promise<void>;
     markAttendance: (keyword: string) => Promise<MarkAttendanceResponse>;
     submitAssignment: (data: Omit<HomeworkSubmissionData, 'assignment_id' | 'student_code'>) => Promise<void>;
-    getQuiz: (lessonId: number) => Promise<QuizResponse>;
+    getQuizQuestions: (sessionId: number) => Promise<QuizQuestionsResponse>;
+    getQuizReview: (attemptId: number) => Promise<QuizReviewResponse>;
     submitQuiz: (data: QuizSubmission) => Promise<QuizSubmitResponse>;
 }
 
@@ -96,11 +99,20 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    const getQuiz = async (lessonId: number): Promise<QuizResponse> => {
+    const getQuizQuestions = async (sessionId: number): Promise<QuizQuestionsResponse> => {
         try {
-            return await apiService.getQuiz(lessonId);
+            return await apiService.getQuizQuestions(sessionId);
         } catch (err: any) {
-            const msg = err.data?.message || err.message || "Failed to load quiz";
+            const msg = err.data?.message || err.message || "Failed to load quiz questions";
+            throw new Error(msg);
+        }
+    };
+
+    const getQuizReview = async (attemptId: number): Promise<QuizReviewResponse> => {
+        try {
+            return await apiService.getQuizReview(attemptId);
+        } catch (err: any) {
+            const msg = err.data?.message || err.message || "Failed to load quiz review";
             throw new Error(msg);
         }
     };
@@ -122,7 +134,8 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         fetchLessons,
         markAttendance,
         submitAssignment,
-        getQuiz,
+        getQuizQuestions,
+        getQuizReview,
         submitQuiz
     };
 

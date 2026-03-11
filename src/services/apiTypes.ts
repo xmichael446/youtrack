@@ -47,7 +47,7 @@ export interface AttendanceData {
     number: number;
     opens_at: string;
     closes_at: string;
-    status: 'attended' | 'absent' | null;
+    status: 'attended' | 'absent' | 'marked' | null;
 }
 
 export interface AssignmentAttachment {
@@ -83,6 +83,7 @@ export interface AssignmentData {
     deadline: string;
     attachments: AssignmentAttachment[];
     submissions: Submission[];
+    quiz?: QuizSessionData | null;
 }
 
 export interface AssignmentsData {
@@ -95,6 +96,7 @@ export interface LessonsResponse {
     data: {
         attendance: AttendanceData | null;
         assignments: AssignmentsData | null;
+        quiz: QuizSessionData | null;
     };
 }
 
@@ -177,29 +179,49 @@ export type NotificationsResponse = Notification[];
 
 // --- Quiz Types ---
 
+export interface QuizOption {
+    id: number;
+    content: string;
+    is_correct?: boolean;
+}
+
 export interface QuizQuestion {
     id: number;
     word: string;
     question_text: string;
-    option_a: string;
-    option_b: string;
-    option_c: string;
-    option_d: string;
+    options: QuizOption[];
 }
 
 export interface QuizAttempt {
     id: number;
     score: number;
     total: number;
+    reviewed: boolean;
+    points_awarded: boolean;
     created_at: string;
 }
 
 export interface QuizSessionData {
     session_id: number;
     vocab_level: string;
+    passing_score: number;
     question_count: number;
-    questions: QuizQuestion[];
+    already_awarded: boolean;
+    has_reviewed: boolean;
     previous_attempts: QuizAttempt[];
+}
+
+export interface QuizQuestionsData {
+    session_id: number;
+    vocab_level: string;
+    passing_score: number;
+    questions: QuizQuestion[];
+    source_text?: string;  // text passage to read before quiz
+}
+
+export interface QuizQuestionsResponse {
+    success: boolean;
+    data: QuizQuestionsData;
 }
 
 export interface QuizResponse {
@@ -209,7 +231,7 @@ export interface QuizResponse {
 
 export interface QuizAnswer {
     question_id: number;
-    selected_option: string;
+    option_id: number;
 }
 
 export interface QuizSubmission {
@@ -220,8 +242,9 @@ export interface QuizSubmission {
 export interface QuizQuestionResult {
     question_id: number;
     word: string;
-    selected_option: string;
-    correct_option: string;
+    question_text: string;
+    options: QuizOption[];
+    selected_option_id: number;
     is_correct: boolean;
     explanation: string;
 }
@@ -230,14 +253,32 @@ export interface QuizSubmitResponseData {
     attempt_id: number;
     score: number;
     total: number;
-    is_first_attempt: boolean;
+    passing_score: number;
+    passed: boolean;
+    already_awarded: boolean;
+    has_reviewed: boolean;
     points_awarded: boolean;
     xp: number;
     coins: number;
-    results: QuizQuestionResult[];
 }
 
 export interface QuizSubmitResponse {
     success: boolean;
     data: QuizSubmitResponseData;
+}
+
+export interface QuizReviewData {
+    attempt_id: number;
+    score: number;
+    total: number;
+    passing_score: number;
+    passed: boolean;
+    points_awarded: boolean;
+    reviewed: boolean;
+    answers: QuizQuestionResult[];
+}
+
+export interface QuizReviewResponse {
+    success: boolean;
+    data: QuizReviewData;
 }

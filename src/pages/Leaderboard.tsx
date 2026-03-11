@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { Trophy, Star, Zap, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Trophy, Star, Zap, TrendingUp, TrendingDown, Minus, Crown } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useLeaderboard } from '../context/LeaderboardContext';
 import { useDashboard } from '../context/DashboardContext';
 
 const Leaderboard: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'group' | 'course'>('group');
   const { groupLeaderboard, courseLeaderboard, enrollment, loading } = useLeaderboard();
   const { user } = useDashboard();
 
-  /* Force scroll to top on mount */
   React.useEffect(() => {
     const mainContainer = document.getElementById('main-scroll-container');
     if (mainContainer) {
@@ -18,13 +17,15 @@ const Leaderboard: React.FC = () => {
     }
   }, []);
 
-  // Show loader while data is being fetched
   if (loading || !user.id) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-16 h-16 border-4 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin"></div>
-          <p className="text-gray-500 dark:text-slate-400 font-bold">{t('loading') || 'Loading...'}</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-14 h-14">
+            <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>
+            <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin"></div>
+          </div>
+          <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest animate-pulse">{t('loading')}</p>
         </div>
       </div>
     );
@@ -32,113 +33,148 @@ const Leaderboard: React.FC = () => {
 
   const activeLeaderboard = activeTab === 'group' ? groupLeaderboard : courseLeaderboard;
 
-  // Helper function to render rank change indicator
   const renderRankChange = (rank: number, lastRank: number) => {
     if (rank < lastRank) {
       return (
-        <div className="flex items-center text-emerald-500">
-          <TrendingUp className="w-3 h-3" />
-          <span className="text-xs font-bold ml-1">+{lastRank - rank}</span>
+        <div className="flex items-center text-emerald-500 gap-1">
+          <TrendingUp className="w-3.5 h-3.5" />
+          <span className="text-[11px] font-bold font-mono">+{lastRank - rank}</span>
         </div>
       );
     } else if (rank > lastRank) {
       return (
-        <div className="flex items-center text-red-500">
-          <TrendingDown className="w-3 h-3" />
-          <span className="text-xs font-bold ml-1">-{rank - lastRank}</span>
+        <div className="flex items-center text-red-500 gap-1">
+          <TrendingDown className="w-3.5 h-3.5" />
+          <span className="text-[11px] font-bold font-mono">-{rank - lastRank}</span>
         </div>
       );
     } else {
       return (
-        <div className="flex items-center text-gray-400 dark:text-slate-500">
-          <Minus className="w-3 h-3" />
+        <div className="flex items-center text-gray-300 dark:text-slate-600">
+          <Minus className="w-3.5 h-3.5" />
         </div>
       );
     }
   };
 
+  const getRankBadge = (rank: number) => {
+    if (rank === 1) return (
+      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30 ring-2 ring-amber-400/30">
+        <Crown className="w-5 h-5 text-amber-900 fill-amber-900" />
+      </div>
+    );
+    if (rank === 2) return (
+      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center shadow-md ring-2 ring-slate-300/30">
+        <span className="text-sm font-bold font-mono text-slate-700">2</span>
+      </div>
+    );
+    if (rank === 3) return (
+      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md ring-2 ring-orange-400/30">
+        <span className="text-sm font-bold font-mono text-orange-900">3</span>
+      </div>
+    );
+    return (
+      <div className="w-10 h-10 flex items-center justify-center">
+        <span className="text-[13px] font-bold text-gray-300 dark:text-slate-700 tabular-nums font-mono">#{rank.toString().padStart(2, '0')}</span>
+      </div>
+    );
+  };
+
   return (
-    <div className="space-y-[clamp(1.5rem,4vw,2.5rem)] animate-in fade-in slide-in-from-bottom-4 duration-700 px-px pb-10">
-      {/* Header & Tabs Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="min-w-0">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-              <Trophy className="w-5 h-5 text-brand-primary" />
-            </div>
-            <h1 className="text-3xl md:text-4xl font-black text-brand-dark dark:text-white tracking-tight">{t('leaderboard')}</h1>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 font-bold text-sm md:text-base leading-relaxed">{t('competePeers')}</p>
-        </div>
+    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
+
+      {/* Header */}
+      <div className="space-y-1 px-1">
+        <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
+          {t('leaderboard')}
+        </h1>
+        <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+          {t('competePeers')}
+        </p>
       </div>
 
-      {/* User Stats Summary (Forced Side-by-Side on Mobile) */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-6">
+      {/* My Stats Cards */}
+      <div className="grid grid-cols-3 gap-3 md:gap-5">
         {[
           {
             icon: Trophy,
-            label: t('yourRank'),
-            value: enrollment ? `#${enrollment.rank}` : '-',
+            label: activeTab === 'group' ? t('groupRank') : t('yourRank'),
+            value: enrollment ? `#${activeTab === 'group' ? enrollment.group_rank : enrollment.rank}` : '—',
             color: 'text-amber-500',
-            bg: 'bg-amber-500/10'
+            bg: 'bg-amber-500/8 dark:bg-amber-500/10',
+            glow: 'shadow-amber-500/10',
           },
           {
             icon: Star,
-            label: t('weeklyPoints') || 'Points',
-            value: enrollment ? enrollment.week_points.toString() : '-',
+            label: t('weeklyPoints'),
+            value: enrollment ? enrollment.week_points.toString() : '—',
+            suffix: 'xp',
             color: 'text-brand-primary',
-            bg: 'bg-brand-primary/10'
+            bg: 'bg-brand-primary/8 dark:bg-brand-primary/10',
+            glow: 'shadow-brand-primary/10',
           },
           {
             icon: Zap,
             label: t('totalXp'),
-            value: enrollment ? enrollment.total_points.toString() : '-',
-            color: 'text-indigo-500',
-            bg: 'bg-indigo-500/10'
+            value: enrollment ? enrollment.total_points.toString() : '—',
+            suffix: 'xp',
+            color: 'text-violet-500',
+            bg: 'bg-violet-500/8 dark:bg-violet-500/10',
+            glow: 'shadow-violet-500/10',
           },
         ].map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 px-2 py-4 sm:px-6 sm:py-8 rounded-[24px] sm:rounded-[32px] border-2 border-gray-300 dark:border-slate-800 shadow-sm flex flex-col items-center text-center group hover:scale-[1.02] transition-transform duration-500">
-            <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center ${stat.bg} ${stat.color} mb-3 sm:mb-4 group-hover:rotate-12 transition-transform`}>
-              <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+          <div
+            key={i}
+            className={`bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 px-3 py-5 md:px-6 md:py-7 flex flex-col items-center text-center`}
+          >
+            <div className={`w-10 h-10 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center mb-3`}>
+              <stat.icon className="w-5 h-5" />
             </div>
-            <p className="text-[8px] sm:text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
-            <span className="text-base sm:text-2xl font-black text-brand-dark dark:text-white tabular-nums">{stat.value}</span>
+            <p className="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2 font-mono">{stat.label}</p>
+            <span className="text-xl md:text-3xl font-[800] text-brand-dark dark:text-white tabular-nums tracking-tighter leading-none">{stat.value}</span>
+            {stat.suffix && (
+              <span className="text-[9px] md:text-[10px] font-bold text-brand-primary font-mono uppercase tracking-wider mt-1">{stat.suffix}</span>
+            )}
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center mb-6 md:mb-8">
-        {/* Tab System Hardening */}
-        <div className="bg-gray-100/80 dark:bg-slate-800/80 backdrop-blur-sm p-1.5 md:p-2 rounded-2xl md:rounded-[20px] flex items-center shadow-sm w-full md:w-auto scale-100 origin-center transition-transform">
+      {/* Tab Switcher */}
+      <div className="max-w-sm mx-auto w-full">
+        <div className="bg-gray-100 dark:bg-slate-800/80 p-1 rounded-2xl flex border border-gray-200/50 dark:border-slate-700/50">
           <button
             onClick={() => setActiveTab('group')}
-            className={`flex-1 md:flex-none h-11 md:h-14 px-6 md:px-10 rounded-xl md:rounded-2xl font-black text-xs md:text-base uppercase tracking-wider transition-all duration-300 min-w-[100px] md:min-w-[200px]
-                ${activeTab === 'group' ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-lg shadow-brand-primary/5 scale-[1.02]' : 'text-gray-500 dark:text-slate-400 hover:text-brand-primary/80'}`}
+            className={`flex-1 h-11 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono
+              ${activeTab === 'group'
+                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-sm'
+                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
           >
             {t('groupRank')}
           </button>
           <button
             onClick={() => setActiveTab('course')}
-            className={`flex-1 md:flex-none h-11 md:h-14 px-6 md:px-10 rounded-xl md:rounded-2xl font-black text-xs md:text-base uppercase tracking-wider transition-all duration-300 min-w-[100px] md:min-w-[200px]
-                ${activeTab === 'course' ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-lg shadow-brand-primary/5 scale-[1.02]' : 'text-gray-500 dark:text-slate-400 hover:text-brand-primary/80'}`}
+            className={`flex-1 h-11 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono
+              ${activeTab === 'course'
+                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-sm'
+                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
           >
             {t('courseRank')}
           </button>
         </div>
       </div>
 
-      {/* Leaderboard Table (Flexible Flex-Row implementation) */}
-      <div className="bg-white dark:bg-slate-900 rounded-[32px] border-2 border-gray-300 dark:border-slate-800 shadow-sm overflow-hidden p-[clamp(0.5rem,2vw,1.5rem)]">
-        <div className="hidden sm:flex items-center px-6 py-4 border-b-2 border-gray-300 dark:border-slate-800 text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">
-          <div className="w-16">{t('rank')}</div>
-          <div className="flex-1">{t('student')}</div>
-          <div className="w-24 text-right">{t('points')}</div>
-          <div className="w-24 text-center">{t('change') || 'Change'}</div>
+      {/* Leaderboard List */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        {/* Table Header (Desktop) */}
+        <div className="hidden sm:flex items-center px-6 py-4 border-b border-gray-50 dark:border-slate-800/70 bg-gray-50/50 dark:bg-slate-800/30">
+          <div className="w-14 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('rank')}</div>
+          <div className="flex-1 ml-4 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('student')}</div>
+          <div className="w-28 text-right text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('points')}</div>
+          <div className="w-20 text-center ml-4 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('change')}</div>
         </div>
 
         <div className="divide-y divide-gray-50 dark:divide-slate-800/50">
           {activeLeaderboard.map((entry, i) => {
-            // For group tab, match by full_name; for course tab, match by id
             const isCurrentUser = activeTab === 'group'
               ? entry.full_name === user.name
               : entry.id === user.id;
@@ -146,39 +182,43 @@ const Leaderboard: React.FC = () => {
             return (
               <div
                 key={entry.id || i}
-                className={`group flex items-center p-4 sm:p-6 transition-all hover:bg-gray-50/50 dark:hover:bg-slate-800/30 rounded-2xl sm:rounded-none ${isCurrentUser ? 'bg-brand-primary/5 dark:bg-brand-primary/10 relative z-10 shadow-sm ring-1 ring-brand-primary/20' : ''
-                  }`}
+                className={`group flex items-center px-4 py-4 sm:px-6 sm:py-5 transition-all duration-200 relative
+                  ${isCurrentUser
+                    ? 'bg-brand-primary/5 dark:bg-brand-primary/8'
+                    : 'hover:bg-gray-50/60 dark:hover:bg-slate-800/30'
+                  }
+                  ${entry.rank <= 3 ? 'py-5 sm:py-6' : ''}
+                `}
               >
-                {/* Rank Badge */}
-                <div className="w-12 sm:w-16 flex items-center justify-center sm:justify-start">
-                  {entry.rank <= 3 ? (
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-black shadow-lg
-                    ${entry.rank === 1 ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-900' :
-                        entry.rank === 2 ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-800' :
-                          'bg-gradient-to-br from-orange-300 to-orange-500 text-orange-900'}`}>
-                      {entry.rank}
-                    </div>
-                  ) : (
-                    <span className="text-sm font-black text-gray-400 dark:text-slate-500 tabular-nums">#{entry.rank}</span>
+                {/* Current user accent line */}
+                {isCurrentUser && (
+                  <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-brand-primary rounded-r-full"></div>
+                )}
+
+                {/* Rank */}
+                <div className="w-12 sm:w-14 flex items-center justify-center sm:justify-start shrink-0">
+                  {getRankBadge(entry.rank)}
+                </div>
+
+                {/* Student Info */}
+                <div className="flex-1 min-w-0 px-3 sm:px-5">
+                  <p className="text-sm sm:text-[15px] font-bold text-brand-dark dark:text-white truncate leading-tight">
+                    {entry.full_name}
+                  </p>
+                  {isCurrentUser && (
+                    <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-wider mt-0.5 block">{t('student')} (YOU)</span>
                   )}
                 </div>
 
-                {/* Student Info - Hardened Single Line */}
-                <div className="flex-1 min-w-0 px-4 sm:px-6">
-                  <p className="text-sm sm:text-base font-black text-brand-dark dark:text-white truncate leading-none">
-                    {entry.full_name}
-                  </p>
-                </div>
-
-                {/* Points & Stats (Stacked on mobile, row on desktop) */}
-                <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-1 sm:space-y-0 sm:space-x-8 text-right shrink-0">
-                  <div className="flex items-center space-x-2 sm:w-24 justify-end">
-                    <span className="text-base sm:text-lg font-black text-brand-dark dark:text-white tabular-nums">{entry.total_points}</span>
-                    <div className="w-5 h-5 rounded-full bg-brand-primary/10 flex items-center justify-center">
-                      <Star className="w-3 h-3 text-brand-primary fill-brand-primary" />
+                {/* Points + Change */}
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-8 shrink-0">
+                  <div className="flex items-center gap-2 sm:w-28 justify-end">
+                    <span className="text-base sm:text-xl font-bold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">{entry.total_points}</span>
+                    <div className="w-6 h-6 rounded-lg bg-brand-primary/10 flex items-center justify-center shrink-0">
+                      <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
                     </div>
                   </div>
-                  <div className="hidden sm:flex items-center justify-center sm:w-24">
+                  <div className="hidden sm:flex items-center justify-center sm:w-20">
                     {renderRankChange(entry.rank, entry.last_rank)}
                   </div>
                 </div>

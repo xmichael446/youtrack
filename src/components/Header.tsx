@@ -58,71 +58,70 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   };
 
   return (
-    <header className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 fixed w-full md:sticky top-0 z-30 px-2 md:px-8 pt-2 pb-4 md:py-4 flex items-center justify-between shadow-sm transition-colors duration-300">
+    <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-gray-100/80 dark:border-slate-800/80 fixed w-full md:sticky top-0 z-30 px-3 md:px-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3.5 md:py-3.5 flex items-center justify-between shadow-[0_1px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.2)] transition-colors duration-300">
+      {/* Mobile Logo */}
       <div className="flex items-center md:hidden min-w-0">
         <img
           src={isDark ? "/logo-dark.png" : "/logo-light.png"}
           alt="YouTrack Logo"
           className="w-16 sm:w-20 h-6 sm:h-7 object-contain"
           onError={(e) => {
-            // Fallback to generic logo
             (e.target as HTMLImageElement).src = '/logo.png';
           }}
         />
       </div>
 
-      {/* Left side spacer for desktop to align with content */}
+      {/* Desktop spacer */}
       <div className="hidden md:block"></div>
 
-      <div className="flex items-center space-x-2 md:space-x-6 min-w-0 flex-shrink ml-auto">
-        {/* Combined Stats Pill - Stacked on Mobile for UX */}
-        <div className="flex flex-col md:flex-row md:items-center bg-gray-50/80 dark:bg-slate-800/80 backdrop-blur-sm border border-gray-100 dark:border-slate-700/50 rounded-xl md:rounded-2xl shadow-sm min-w-0 relative">
-          <div
-            className="flex items-center space-x-1.5 md:space-x-2 px-2 md:px-0 py-1 md:py-0 rounded-lg"
-          >
-            <Coins className="w-3 md:w-4 h-3 md:h-4 text-amber-500 fill-amber-500 shrink-0" />
-            <span className="font-bold text-[11px] md:text-sm text-gray-700 dark:text-slate-200 whitespace-nowrap leading-none">{user?.coins || 0} Coins</span>
+      <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-shrink ml-auto">
+        {/* Stats Pill — redesigned as a single clean card */}
+        <div className="flex items-center bg-gray-50 dark:bg-slate-800/70 border border-gray-100 dark:border-slate-700/50 rounded-2xl px-3.5 py-2 gap-3 shadow-sm">
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <Coins className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            </div>
+            <span className="font-bold text-[12px] md:text-sm text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums">{user?.coins || 0}</span>
           </div>
-
-          {/* Vertical divider on mobile, horizontal on desktop */}
-          <div className="hidden md:block w-px h-4 bg-gray-200 dark:bg-slate-700 mx-3"></div>
-          <div className="md:hidden h-px w-full bg-gray-200 dark:bg-slate-700/50 my-1"></div>
-
-          <div className="flex items-center space-x-1.5 md:space-x-2 px-2 md:px-0">
-            <Zap className="w-3 md:w-4 h-3 md:h-4 text-brand-primary fill-brand-primary shrink-0" />
-            <span className="font-bold text-[11px] md:text-sm text-gray-700 dark:text-slate-200 whitespace-nowrap leading-none">{user?.xp || 0} XP</span>
+          <div className="w-px h-4 bg-gray-200 dark:bg-slate-700"></div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-lg bg-brand-primary/10 flex items-center justify-center">
+              <Zap className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
+            </div>
+            <span className="font-bold text-[12px] md:text-sm text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums">{user?.xp || 0} <span className="text-gray-400 dark:text-slate-500 text-[10px]">XP</span></span>
           </div>
         </div>
 
         {/* Action Group */}
-        <div className="flex items-center space-x-1 md:space-x-3 shrink-0">
+        <div className="flex items-center gap-1 md:gap-2 shrink-0">
           {/* Notifications */}
           <div className="relative">
             <button
               onClick={handleOpenNotifications}
-              className="w-11 h-11 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-all relative border border-transparent hover:border-brand-primary/10 shadow-none active:scale-95"
+              className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 relative ${showNotifications ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
             >
-              <Bell className="w-5 h-5 md:w-6 md:h-6" />
+              <Bell className="w-[18px] h-[18px]" />
               {unreadCount > 0 && (
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse"></span>
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse"></span>
               )}
             </button>
 
             {showNotifications && (
-              <div className="absolute top-full right-0 mt-3 w-[260px] md:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border-2 border-gray-300 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-                <div className="p-2.5 bg-gray-50/50 dark:bg-slate-800/50 border-b-2 border-gray-200 dark:border-slate-700 flex justify-between items-center gap-2 flex-wrap sm:flex-nowrap">
-                  <h3 className="font-bold text-[10px] sm:text-xs text-gray-900 dark:text-white uppercase tracking-wider shrink-0">{t('notifications')}</h3>
-                  <span
+              <div className="absolute top-full right-0 mt-2.5 w-[280px] md:w-[340px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-3 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
+                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-wider text-gray-900 dark:text-white">{t('notifications')}</h3>
+                  <button
                     onClick={() => markAllAsRead()}
-                    className="text-[8px] sm:text-[9px] text-brand-primary font-black cursor-pointer hover:text-brand-accent transition-colors uppercase tracking-widest shrink-0"
+                    className="text-[10px] font-mono font-bold text-brand-primary hover:text-brand-accent transition-colors uppercase tracking-wider"
                   >
                     {t('markAllRead')}
-                  </span>
+                  </button>
                 </div>
-                <div className="max-h-[60vh] md:max-h-80 overflow-y-auto divide-y divide-gray-50 dark:divide-slate-800/50 text-left">
+                <div className="max-h-[65vh] md:max-h-96 overflow-y-auto divide-y divide-gray-50 dark:divide-slate-800/50">
                   {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-gray-400 text-xs">
-                      {t('noNotifications') || 'No notifications'}
+                    <div className="p-8 text-center">
+                      <Bell className="w-8 h-8 text-gray-200 dark:text-slate-700 mx-auto mb-2" />
+                      <p className="text-xs font-mono text-gray-400 dark:text-slate-500">{t('noNotifications')}</p>
                     </div>
                   ) : (
                     notifications.map(notification => {
@@ -130,17 +129,17 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                       const message = language === 'uz' ? notification.message_uz : notification.message_en;
 
                       return (
-                        <div key={notification.id} className={`p-2.5 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors border-b-2 border-gray-100 dark:border-slate-800/50 ${!notification.read ? 'bg-brand-primary/5 dark:bg-brand-primary/10' : ''}`}>
-                          <div className="flex justify-between items-start mb-1">
-                            <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-lg border ${typeInfo.color}`}>
+                        <div key={notification.id} className={`p-3.5 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors ${!notification.read ? 'bg-brand-primary/5 dark:bg-brand-primary/10' : ''}`}>
+                          <div className="flex justify-between items-start mb-1.5">
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border font-mono tracking-wider ${typeInfo.color}`}>
                               {typeInfo.label.toUpperCase()}
                             </span>
-                            <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 tabular-nums uppercase">
+                            <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 tabular-nums font-mono">
                               {formatTime(notification.scheduled_datetime)}
                             </span>
                           </div>
-                          <p className="text-[11px] font-black text-brand-dark dark:text-white leading-snug">{typeInfo.header}</p>
-                          <p className="text-[10px] text-neutral-body dark:text-slate-400 mt-0.5 leading-relaxed opacity-80 whitespace-pre-line">{message}</p>
+                          <p className="text-[12px] font-bold text-brand-dark dark:text-white leading-snug">{typeInfo.header}</p>
+                          <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5 leading-relaxed whitespace-pre-line">{message}</p>
                         </div>
                       );
                     })
@@ -150,94 +149,103 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
             )}
           </div>
 
-          {/* User Profile Hook - Only trigger button in header flow */}
+          {/* Profile */}
           <div className="relative">
             <button
               onClick={() => {
                 setShowProfileMenu(!showProfileMenu);
                 setShowNotifications(false);
               }}
-              className={`flex items-center pl-2 sm:pl-4 border-l-2 border-gray-300 dark:border-slate-800 group transition-all active:scale-95 ${showProfileMenu ? 'opacity-70' : ''}`}
+              className="flex items-center gap-2.5 pl-2.5 md:pl-3.5 border-l border-gray-200 dark:border-slate-700/70 group transition-all active:scale-95"
             >
-              <div className="hidden sm:block text-right mr-3">
-                <p className="text-xs font-black text-gray-900 dark:text-white leading-none truncate max-w-[120px]">{user?.name || 'Student'}</p>
-                <p className="text-[9px] font-black text-gray-400 dark:text-slate-500 mt-1 uppercase tracking-widest">{t('student')}</p>
+              <div className="hidden sm:block text-right">
+                <p className="text-[12px] font-bold text-gray-900 dark:text-white leading-none truncate max-w-[110px]">{user?.name || 'Student'}</p>
+                <p className="text-[9px] font-mono font-bold text-gray-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider">{t('student')}</p>
               </div>
               <div className="relative">
                 <img
                   src={user?.avatar || '/default-avatar.png'}
                   alt={user?.name || 'Student'}
-                  className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 shadow-sm object-cover ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all"
+                  className="w-9 h-9 rounded-xl border-2 border-white dark:border-slate-800 shadow-sm object-cover ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all"
                 />
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
               </div>
             </button>
 
             {/* Profile Dropdown */}
             {showProfileMenu && (
-              <div className="absolute top-full right-0 mt-3 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border-2 border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-                <div className="p-5 bg-gray-50/50 dark:bg-slate-800/50 border-b-2 border-gray-100 dark:border-slate-800">
-                  <div className="flex items-center space-x-3 mb-1">
-                    <h3 className="text-sm font-black text-brand-dark dark:text-white truncate">{user?.name || 'Student'}</h3>
-                    <span className="bg-brand-primary/10 text-brand-primary text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">{t('student')}</span>
+              <div className="absolute top-full right-0 mt-2.5 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                {/* Profile Header */}
+                <div className="p-4 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex items-center gap-3">
+                  <img
+                    src={user?.avatar || '/default-avatar.png'}
+                    alt={user?.name || 'Student'}
+                    className="w-12 h-12 rounded-xl border-2 border-white dark:border-slate-700 shadow-sm object-cover"
+                  />
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-brand-dark dark:text-white truncate">{user?.name || 'Student'}</h3>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="bg-brand-primary/10 text-brand-primary text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-mono">{t('student')}</span>
+                      <span className="text-[10px] font-mono text-gray-400 dark:text-slate-500">{user?.accessCode}</span>
+                    </div>
                   </div>
-                  <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">ID: {user?.accessCode}</p>
                 </div>
 
-                <div className="p-2 space-y-1">
-                  {/* Night Mode Toggle */}
+                <div className="p-2 space-y-0.5">
+                  {/* Night Mode */}
                   <button
                     onClick={toggleTheme}
-                    className="w-full flex items-center justify-between px-3 py-3 text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-colors group"
+                    className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-colors group"
                   >
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center mr-3 transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
                         {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
                       </div>
                       <span>{t('nightMode')}</span>
                     </div>
-                    <div className={`w-10 h-5 rounded-full relative transition-colors duration-300 ${isDark ? 'bg-brand-primary' : 'bg-gray-200 dark:bg-slate-700'}`}>
-                      <div className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-300 ${isDark ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                    <div className={`w-9 h-5 rounded-full relative transition-colors duration-300 ${isDark ? 'bg-brand-primary' : 'bg-gray-200'}`}>
+                      <div className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-300 ${isDark ? 'translate-x-4' : 'translate-x-0'}`}></div>
                     </div>
                   </button>
 
-                  {/* Language Selector */}
-                  <div className="w-full flex items-center justify-between px-3 py-3 text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-colors group">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-500/10 text-sky-500 flex items-center justify-center mr-3 transition-all">
-                        <span className="text-[10px] font-black">{language.toUpperCase()}</span>
+                  {/* Language */}
+                  <div className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
+                        <span className="text-[9px] font-bold font-mono">{language.toUpperCase()}</span>
                       </div>
-                      <span>{t('language') || 'Language'}</span>
+                      <span>{t('language')}</span>
                     </div>
-                    <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg">
+                    <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg gap-0.5">
                       <button
                         onClick={() => setLanguage('uz')}
-                        className={`px-2 py-1 rounded-md text-[10px] font-black transition-all ${language === 'uz' ? 'bg-white dark:bg-slate-700 shadow-sm text-brand-dark dark:text-white' : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'}`}
+                        className={`px-2.5 py-1 rounded-md text-[9px] font-bold transition-all font-mono ${language === 'uz' ? 'bg-white dark:bg-slate-700 shadow-sm text-brand-dark dark:text-white' : 'text-gray-400 dark:text-slate-500 hover:text-gray-600'}`}
                       >
                         UZB
                       </button>
                       <button
                         onClick={() => setLanguage('en')}
-                        className={`px-2 py-1 rounded-md text-[10px] font-black transition-all ${language === 'en' ? 'bg-white dark:bg-slate-700 shadow-sm text-brand-dark dark:text-white' : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'}`}
+                        className={`px-2.5 py-1 rounded-md text-[9px] font-bold transition-all font-mono ${language === 'en' ? 'bg-white dark:bg-slate-700 shadow-sm text-brand-dark dark:text-white' : 'text-gray-400 dark:text-slate-500 hover:text-gray-600'}`}
                       >
                         ENG
                       </button>
                     </div>
                   </div>
-                  {/* Logout Button in Dropdown */}
+
+                  <div className="my-1 border-t border-gray-100 dark:border-slate-800"></div>
+
+                  {/* Logout */}
                   <button
-                    className="w-full flex items-center justify-between px-3 py-3 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors group"
                     onClick={() => {
                       setShowProfileMenu(false);
                       onLogout();
                     }}
                   >
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center mr-3 group-hover:bg-red-100 dark:group-hover:bg-red-500/20 transition-all">
-                        <LogOut className="w-4 h-4" />
-                      </div>
-                      <span>{t('logout')}</span>
+                    <div className="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center shrink-0 group-hover:bg-red-100 dark:group-hover:bg-red-500/20 transition-colors">
+                      <LogOut className="w-4 h-4" />
                     </div>
+                    <span>{t('logout')}</span>
                   </button>
                 </div>
               </div>

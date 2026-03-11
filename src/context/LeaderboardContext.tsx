@@ -12,6 +12,8 @@ interface LeaderboardEntry {
 
 interface EnrollmentData {
     rank: number;
+    group_rank: number;
+    last_group_rank: number;
     week_points: number;
     total_points: number;
 }

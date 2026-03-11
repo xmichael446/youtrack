@@ -623,10 +623,17 @@ class ApiService {
     }
 
     /**
-     * Get Quiz for a lesson
+     * Get Quiz Questions for a session
      */
-    async getQuiz(lessonId: number): Promise<QuizResponse> {
-        return (await this.post<QuizResponse>('/api/quiz/get/', { lesson_id: lessonId })).data;
+    async getQuizQuestions(sessionId: number): Promise<QuizQuestionsResponse> {
+        return (await this.post<QuizQuestionsResponse>('/api/quiz/questions/', { session_id: sessionId })).data;
+    }
+
+    /**
+     * Get Quiz Review for an attempt
+     */
+    async getQuizReview(attemptId: number): Promise<QuizReviewResponse> {
+        return (await this.post<QuizReviewResponse>('/api/quiz/review/', { attempt_id: attemptId })).data;
     }
 
     /**
