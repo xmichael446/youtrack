@@ -67,36 +67,54 @@ const SubmissionModal: React.FC<{
 }> = ({ isOpen, onClose, assignment, onSubmit, showToast }) => {
   const { t } = useLanguage();
   const [comment, setComment] = useState('');
-  const [links, setLinks] = useState<string[]>(['']);
-  const [files, setFiles] = useState<File[]>([]);
+  const [attachments, setAttachments] = useState<({ type: 'link', value: string } | { type: 'file', file: File })[]>([{ type: 'link', value: '' }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentAttachmentType, setCurrentAttachmentType] = useState<'link' | 'file'>('link');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
-  const handleAddLink = () => setLinks([...links, '']);
-  const handleRemoveLink = (index: number) => setLinks(links.filter((_, i) => i !== index));
+  const handleAddLink = () => setAttachments([...attachments, { type: 'link', value: '' }]);
+  const handleRemoveAttachment = (index: number) => setAttachments(attachments.filter((_, i) => i !== index));
   const handleLinkChange = (index: number, value: string) => {
-    const newLinks = [...links];
-    newLinks[index] = value;
-    setLinks(newLinks);
+    const newAttachments = [...attachments];
+    if (newAttachments[index].type === 'link') {
+      newAttachments[index] = { type: 'link', value };
+      setAttachments(newAttachments);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFiles(Array.from(e.target.files));
+      const newFiles = Array.from(e.target.files).map(file => ({ type: 'file' as const, file }));
+      setAttachments(prev => [...prev, ...newFiles]);
+    }
+    if (e.target) {
+        e.target.value = '';
     }
   };
 
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      const filteredLinks = links.filter(l => l.trim() !== '');
+      const links = attachments.filter(a => a.type === 'link' && a.value.trim() !== '') as { type: 'link', value: string }[];
+      const files = attachments.filter(a => a.type === 'file') as { type: 'file', file: File }[];
+
+      const finalAttachments: any[] = [];
+      const finalFiles: File[] = [];
+
+      links.forEach(l => {
+        finalAttachments.push({ type: 'link', name: 'Link', url: l.value });
+      });
+
+      files.forEach(f => {
+        finalAttachments.push({ type: 'file', name: f.file.name });
+        finalFiles.push(f.file);
+      });
 
       await onSubmit({
         student_comment: comment,
-        attachments: filteredLinks.length > 0 ? filteredLinks.map(l => ({ name: 'Link', link: l })) : undefined,
-        files: files.length > 0 ? files : undefined
+        attachments: finalAttachments.length > 0 ? finalAttachments : undefined,
+        files: finalFiles.length > 0 ? finalFiles : undefined
       });
 
       showToast("Assignment submitted successfully!", "success");
@@ -144,79 +162,61 @@ const SubmissionModal: React.FC<{
               </label>
               <div className="flex bg-gray-100 dark:bg-slate-950 p-1 rounded-[12px] border border-gray-200/50 dark:border-slate-800">
                 <button
-                  onClick={() => setCurrentAttachmentType('link')}
-                  className={`px-4 py-1.5 rounded-[10px] text-[11px] font-mono font-bold tracking-wider transition-all ${currentAttachmentType === 'link' ? 'bg-white dark:bg-slate-800 shadow-sm text-brand-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={handleAddLink}
+                  className="px-4 py-1.5 rounded-[10px] text-[11px] font-mono font-bold tracking-wider transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 >
-                  LINK
+                  + LINK
                 </button>
                 <button
-                  onClick={() => setCurrentAttachmentType('file')}
-                  className={`px-4 py-1.5 rounded-[10px] text-[11px] font-mono font-bold tracking-wider transition-all ${currentAttachmentType === 'file' ? 'bg-white dark:bg-slate-800 shadow-sm text-brand-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-1.5 rounded-[10px] text-[11px] font-mono font-bold tracking-wider transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 >
-                  FILE
+                  + FILE
                 </button>
+                <input
+                  type="file"
+                  multiple
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
             </div>
 
-            {currentAttachmentType === 'link' ? (
-              <div className="space-y-2">
-                {links.map((link, idx) => (
-                  <div key={idx} className="flex gap-2 group">
+            <div className="space-y-2">
+              {attachments.map((attachment, idx) => (
+                <div key={idx} className="flex gap-2 group items-center">
+                  {attachment.type === 'link' ? (
                     <div className="relative flex-1">
                       <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
                         type="url"
-                        value={link}
+                        value={attachment.value}
                         onChange={(e) => handleLinkChange(idx, e.target.value)}
                         placeholder="https://..."
                         className="w-full rounded-[12px] border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 pl-10 pr-3 py-2.5 text-sm font-mono focus:border-brand-primary focus:outline-none transition-all dark:text-white"
                       />
                     </div>
-                    {links.length > 1 && (
-                      <button onClick={() => handleRemoveLink(idx)} className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors">
-                        <X className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  onClick={handleAddLink}
-                  className="flex items-center text-[11px] font-mono font-bold uppercase tracking-wider text-brand-primary hover:text-brand-accent transition-colors mt-2"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" />
-                  {t('addAttachment')}
-                </button>
-              </div>
-            ) : (
-              <div>
-                <div className="relative border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-[16px] p-6 text-center hover:border-brand-primary/50 transition-colors cursor-pointer bg-gray-50/50 dark:bg-slate-800/30">
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                  <div className="flex flex-col items-center">
-                    <UploadCloud className="w-6 h-6 text-brand-primary mb-2" />
-                    <p className="text-sm font-bold text-gray-700 dark:text-slate-300">{t('chooseFile')}</p>
-                    <p className="text-[10px] font-mono text-gray-500 mt-1 uppercase tracking-widest">Max 10MB per file</p>
-                  </div>
-                </div>
-                {files.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    {files.map((file, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-slate-800 rounded-[12px] border border-gray-100 dark:border-slate-700 hover:border-brand-primary/30 transition-colors group">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-3.5 h-3.5 text-brand-primary" />
-                          <span className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate max-w-[150px] md:max-w-[200px]">{file.name}</span>
-                        </div>
-                        <span className="text-[10px] font-mono text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-between p-2.5 bg-gray-50 dark:bg-slate-800 rounded-[12px] border border-gray-100 dark:border-slate-700 hover:border-brand-primary/30 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-3.5 h-3.5 text-brand-primary" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate max-w-[150px] md:max-w-[200px]">{attachment.file.name}</span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                      <span className="text-[10px] font-mono text-gray-500">{(attachment.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                    </div>
+                  )}
+                  <button onClick={() => handleRemoveAttachment(idx)} className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors shrink-0">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+              {attachments.length === 0 && (
+                <div className="text-center py-6 text-sm text-gray-500 font-mono">
+                  No attachments added.
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -288,11 +288,7 @@ const QuizSection: React.FC<{
         setQuestionsData(res.data);
         setCurrentQuestionIndex(0);
         setAnswers({});
-        if (res.data.source_text) {
-          setMode('article');
-        } else {
-          setMode('solving');
-        }
+        setMode('solving');
       }
     } catch (err: any) {
       showToast(err.message || "Failed to load questions", 'error');
@@ -342,7 +338,7 @@ const QuizSection: React.FC<{
           className="w-full max-w-4xl mx-auto py-4 rounded-[16px] font-bold text-[15px] bg-gradient-to-r from-brand-primary to-brand-accent text-white hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95 block"
         >
           <PlayCircle className="w-5 h-5" />
-          {t('readArticleBtn')}
+          Back to Quiz
         </button>
       </div>
     </div>
@@ -433,10 +429,28 @@ const QuizSection: React.FC<{
           <button onClick={() => setMode('info')} className="p-2 -ml-2 text-gray-400 hover:text-brand-primary transition-colors">
             <X className="w-6 h-6" />
           </button>
-          <div className="flex-1 px-4 md:px-12">
-            <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="flex-1 px-4 md:px-12 flex items-center justify-center gap-4">
+            {questionsData!.source_text && (
+              <button 
+                onClick={() => setMode('article')}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-brand-primary/10 text-brand-primary rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-brand-primary/20 transition-colors shrink-0"
+              >
+                <BookOpen className="w-4 h-4" />
+                Article
+              </button>
+            )}
+            <div className="flex-1 max-w-md h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div className="h-full bg-brand-primary transition-all duration-500 ease-out shadow-[0_0_10px_rgba(18,194,220,0.5)]" style={{ width: `${((currentQuestionIndex + 1) / questionsData!.questions.length) * 100}%` }} />
             </div>
+            {questionsData!.source_text && (
+              <button 
+                onClick={() => setMode('article')}
+                className="md:hidden flex items-center gap-1 px-2 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-brand-primary/20 transition-colors shrink-0"
+              >
+                <BookOpen className="w-3 h-3" />
+                Article
+              </button>
+            )}
           </div>
           <div className="text-[11px] font-mono font-[800] text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
             {currentQuestionIndex + 1} / {questionsData!.questions.length}
