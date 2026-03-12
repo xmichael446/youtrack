@@ -279,7 +279,7 @@ const QuizSection: React.FC<{
     };
   }, [mode]);
 
-  const startQuiz = async () => {
+  const startQuiz = async (initialMode: 'solving' | 'article' = 'solving') => {
     if (!quizSummary) return;
     try {
       setLoading(true);
@@ -288,7 +288,7 @@ const QuizSection: React.FC<{
         setQuestionsData(res.data);
         setCurrentQuestionIndex(0);
         setAnswers({});
-        setMode('solving');
+        setMode(res.data.source_text && initialMode === 'article' ? 'article' : 'solving');
       }
     } catch (err: any) {
       showToast(err.message || "Failed to load questions", 'error');
@@ -398,6 +398,7 @@ const QuizSection: React.FC<{
       const res = await getQuizReview(attemptId);
       if (res.success) {
         setReviewData(res.data.answers);
+        setCurrentQuestionIndex(0);
         setMode('review');
         setShowReviewWarning(null);
       }
@@ -430,27 +431,9 @@ const QuizSection: React.FC<{
             <X className="w-6 h-6" />
           </button>
           <div className="flex-1 px-4 md:px-12 flex items-center justify-center gap-4">
-            {questionsData!.source_text && (
-              <button 
-                onClick={() => setMode('article')}
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-brand-primary/10 text-brand-primary rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-brand-primary/20 transition-colors shrink-0"
-              >
-                <BookOpen className="w-4 h-4" />
-                Article
-              </button>
-            )}
             <div className="flex-1 max-w-md h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div className="h-full bg-brand-primary transition-all duration-500 ease-out shadow-[0_0_10px_rgba(18,194,220,0.5)]" style={{ width: `${((currentQuestionIndex + 1) / questionsData!.questions.length) * 100}%` }} />
             </div>
-            {questionsData!.source_text && (
-              <button 
-                onClick={() => setMode('article')}
-                className="md:hidden flex items-center gap-1 px-2 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-brand-primary/20 transition-colors shrink-0"
-              >
-                <BookOpen className="w-3 h-3" />
-                Article
-              </button>
-            )}
           </div>
           <div className="text-[11px] font-mono font-[800] text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
             {currentQuestionIndex + 1} / {questionsData!.questions.length}
@@ -587,31 +570,38 @@ const QuizSection: React.FC<{
     </div>
   );
 
-  const renderReviewMode = () => (
+  const renderReviewMode = () => {
+    if (!reviewData || reviewData.length === 0) return null;
+    const item = reviewData[currentQuestionIndex];
+    return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-950 animate-in fade-in duration-500">
       <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
         <h4 className="font-[800] text-lg md:text-xl text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
-        <button onClick={() => setMode('info')} className="p-2 -mr-2 text-gray-400 hover:text-brand-primary transition-colors">
-          <X className="w-6 h-6" />
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="text-[11px] font-mono font-[800] text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
+            {currentQuestionIndex + 1} / {reviewData.length}
+          </div>
+          <button onClick={() => setMode('info')} className="p-2 -mr-2 text-gray-400 hover:text-brand-primary transition-colors">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-10 custom-scrollbar">
-        <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 py-4">
-          {reviewData!.map((item, idx) => (
-            <div key={idx} className={`rounded-[28px] border-2 overflow-hidden transition-all shadow-sm ${item.is_correct ? 'border-emerald-500/20 bg-emerald-50/5' : 'border-red-500/20 bg-red-50/5'}`}>
-              <div className="p-6 md:p-10 space-y-6">
-                <div className="flex justify-between items-start gap-6">
-                  <div className="space-y-2">
-                     <span className={`text-[10px] font-mono font-bold uppercase tracking-[2px] ${item.is_correct ? 'text-emerald-500' : 'text-red-500'}`}>Question {idx + 1}</span>
-                     <h5 className="font-bold text-[18px] md:text-xl text-brand-dark dark:text-white leading-snug">{item.question_text}</h5>
+      <div className="flex-1 overflow-y-auto p-3 md:p-5 custom-scrollbar">
+        <div className="max-w-4xl mx-auto py-2">
+            <div className={`rounded-[24px] border-2 overflow-hidden transition-all shadow-sm ${item.is_correct ? 'border-emerald-500/20 bg-emerald-50/5' : 'border-red-500/20 bg-red-50/5'}`}>
+              <div className="p-4 md:p-6 space-y-4">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="space-y-1.5">
+                     <span className={`text-[10px] font-mono font-bold uppercase tracking-[2px] ${item.is_correct ? 'text-emerald-500' : 'text-red-500'}`}>Question {currentQuestionIndex + 1}</span>
+                     <h5 className="font-bold text-[16px] md:text-lg text-brand-dark dark:text-white leading-snug">{item.question_text}</h5>
                   </div>
-                  <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center shrink-0 shadow-sm ${item.is_correct ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}>
-                    {item.is_correct ? <CheckCircle2 className="w-7 h-7" /> : <XCircle className="w-7 h-7" />}
+                  <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0 shadow-sm ${item.is_correct ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}>
+                    {item.is_correct ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                   {item.options.map((option) => {
                     const isSelected = item.selected_option_id === option.id;
                     const isCorrect = option.is_correct;
@@ -621,7 +611,7 @@ const QuizSection: React.FC<{
                     else if (isCorrect) stateClass = 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30';
 
                     return (
-                      <div key={option.id} className={`p-4 md:p-5 rounded-[16px] border text-[14px] md:text-[15px] font-bold flex items-center gap-3 transition-all ${stateClass}`}>
+                      <div key={option.id} className={`p-3 md:p-4 rounded-[12px] border text-[13px] md:text-[14px] font-bold flex items-center gap-3 transition-all ${stateClass}`}>
                         {isCorrect ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : isSelected ? <XCircle className="w-4 h-4 shrink-0" /> : <div className="w-2.5 h-2.5 rounded-full bg-current opacity-20 shrink-0" />}
                         <span>{option.content}</span>
                       </div>
@@ -630,25 +620,43 @@ const QuizSection: React.FC<{
                 </div>
                 
                 {item.explanation && (
-                  <div className="bg-white/80 dark:bg-slate-900/50 p-6 rounded-[20px] border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                  <div className="bg-white/80 dark:bg-slate-900/50 p-4 rounded-[16px] border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary opacity-30"></div>
-                    <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-2 opacity-70">Explanation</span>
-                    <p className="text-[14px] md:text-[15px] font-medium text-gray-600 dark:text-slate-400 italic leading-relaxed">{item.explanation}</p>
+                    <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-1 opacity-70">Explanation</span>
+                    <p className="text-[13px] md:text-[14px] font-medium text-gray-600 dark:text-slate-400 italic leading-relaxed">{item.explanation}</p>
                   </div>
                 )}
               </div>
             </div>
-          ))}
         </div>
       </div>
 
-      <div className="p-4 md:p-8 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-8">
-        <button onClick={() => setMode('info')} className="w-full max-w-4xl mx-auto py-4 rounded-[16px] font-bold text-[15px] bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95">
-          {t('backToOverview')}
-        </button>
+      <div className="p-3 md:p-5 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-5">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+          <button
+            onClick={() => currentQuestionIndex > 0 && setCurrentQuestionIndex(prev => prev - 1)}
+            disabled={currentQuestionIndex === 0}
+            className="flex-1 md:flex-none px-6 md:px-10 py-3 rounded-[12px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
+          >
+            <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span><span className="md:hidden">Back</span>
+          </button>
+
+          {currentQuestionIndex === reviewData.length - 1 ? (
+            <button onClick={() => setMode('info')} className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
+              {t('backToOverview')}
+            </button>
+          ) : (
+            <button
+              onClick={() => currentQuestionIndex < reviewData.length - 1 && setCurrentQuestionIndex(prev => prev + 1)}
+              className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[12px] font-bold text-[14px] hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+            >
+              {t('nextQuestion') || 'Next'} <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
-  );
+  )};
 
   const renderQuizOverlay = () => {
     if (mode === 'info') return null;
@@ -678,14 +686,24 @@ const QuizSection: React.FC<{
               {t('quizReadyDesc').replace('{count}', quizSummary.question_count.toString())}
             </p>
           </div>
-          <button
-            onClick={startQuiz}
-            disabled={loading}
-            className="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[12px] font-bold text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
-          >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <PlayCircle className="w-5 h-5" />}
-            {t('startQuiz')}
-          </button>
+          <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <button
+              onClick={() => startQuiz('article')}
+              disabled={loading}
+              className="w-full md:w-auto px-6 py-4 bg-white dark:bg-slate-900 text-brand-primary border-2 border-brand-primary/20 rounded-[12px] font-bold text-[15px] hover:bg-brand-primary/5 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+            >
+              <BookOpen className="w-5 h-5" />
+              Article
+            </button>
+            <button
+              onClick={() => startQuiz('solving')}
+              disabled={loading}
+              className="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[12px] font-bold text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+            >
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <PlayCircle className="w-5 h-5" />}
+              {t('startQuiz')}
+            </button>
+          </div>
         </div>
 
         {quizSummary.previous_attempts && quizSummary.previous_attempts.length > 0 && (
@@ -702,7 +720,7 @@ const QuizSection: React.FC<{
             </div>
             
             <div className="flex flex-wrap gap-6 items-end">
-              {quizSummary.previous_attempts.map(attempt => {
+              {[...quizSummary.previous_attempts].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map(attempt => {
                 const isPassed = attempt.score >= (quizSummary.passing_score || 0);
                 const barHeight = Math.min(40, (attempt.score / attempt.total) * 40);
                 
@@ -1094,7 +1112,7 @@ const LessonsContent: React.FC = () => {
     } catch (err: any) { showToast(err.message || "Invalid keyword", 'error'); }
   };
 
-  if (loading) return (
+  if (loading && !lessonsData) return (
     <div className="flex items-center justify-center min-h-[60vh]">
       <div className="flex flex-col items-center gap-5">
         <div className="relative w-14 h-14">
@@ -1176,17 +1194,17 @@ const LessonsContent: React.FC = () => {
                   <label className="block text-[10px] font-mono font-bold text-gray-500 dark:text-slate-500 uppercase tracking-[2px] text-center md:text-left">
                     {t('enterKeyword')}
                   </label>
-                  <div className="flex gap-2.5">
+                  <div className="flex flex-col gap-2.5">
                     <input
                       type="text"
                       value={attendanceCode}
-                      onChange={(e) => setAttendanceCode(e.target.value)}
+                      onChange={(e) => setAttendanceCode(e.target.value.toLowerCase())}
                       placeholder="e.g. apple"
-                      className="flex-1 h-[52px] rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 px-5 text-sm font-mono font-bold focus:border-brand-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-brand-primary/8 transition-all uppercase tracking-wider"
+                      className="w-full h-[52px] rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 px-5 text-sm font-mono font-bold focus:border-brand-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-brand-primary/8 transition-all lowercase tracking-wider"
                     />
                     <button
                       onClick={handleMarkAttendance}
-                      className="h-[52px] px-7 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono"
+                      className="w-full h-[52px] px-7 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono"
                     >
                       {t('mark')}
                     </button>
