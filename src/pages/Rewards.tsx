@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Coins, History, Check, Lock, ExternalLink, Loader2, ShoppingBag, Sparkles, Trophy } from 'lucide-react';
+import { Coins, History, Check, Lock, ExternalLink, Loader2, ShoppingBag, Sparkles, Trophy, Gift } from 'lucide-react';
 import CoinsHistory from '../components/CoinsHistory';
 import { useLanguage } from '../context/LanguageContext';
 import { ShopProvider, useShop } from '../context/ShopContext';
@@ -92,13 +92,18 @@ const RewardsContent: React.FC = () => {
     <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
 
       {/* Page Header */}
-      <div className="space-y-1 px-1">
-        <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
-          {t('rewardsShop')}
-        </h1>
-        <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
-          {t('exchangeCoins')}
-        </p>
+      <div className="flex items-start gap-4 px-1">
+        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/30 shrink-0 ring-2 ring-amber-400/20">
+          <Gift className="w-7 h-7 md:w-8 md:h-8 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
+            {t('rewardsShop')}
+          </h1>
+          <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
+            {t('exchangeCoins')}
+          </p>
+        </div>
       </div>
 
       {/* Balance Hero Card */}

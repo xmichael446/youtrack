@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Trophy, Star, Zap, TrendingUp, TrendingDown, Minus, Crown, Flame } from 'lucide-react';
+import { Trophy, Star, Zap, TrendingUp, TrendingDown, Minus, Crown, Flame, Users, Globe } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useLeaderboard } from '../context/LeaderboardContext';
 import { useDashboard } from '../context/DashboardContext';
 
 const Leaderboard: React.FC = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'group' | 'course'>('group');
   const { groupLeaderboard, courseLeaderboard, enrollment, loading } = useLeaderboard();
   const { user } = useDashboard();
@@ -20,12 +20,18 @@ const Leaderboard: React.FC = () => {
   if (loading || !user.id) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative w-14 h-14">
-            <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>
-            <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin"></div>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm px-12 py-10 flex flex-col items-center gap-5">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full" />
+            <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin" />
+            <div className="absolute inset-2 rounded-full bg-brand-primary/5 animate-pulse" />
           </div>
-          <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest animate-pulse">{t('loading')}</p>
+          <div className="flex flex-col items-center gap-1.5">
+            <p className="text-[11px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest animate-pulse">
+              {t('loading')}
+            </p>
+            <p className="text-[10px] text-gray-300 dark:text-slate-600 font-mono">Fetching rankings…</p>
+          </div>
         </div>
       </div>
     );
@@ -33,19 +39,22 @@ const Leaderboard: React.FC = () => {
 
   const activeLeaderboard = activeTab === 'group' ? groupLeaderboard : courseLeaderboard;
 
-  const renderRankChange = (rank: number, lastRank: number) => {
-    if (rank < lastRank) {
+  const currentRank = enrollment ? (activeTab === 'group' ? enrollment.group_rank : enrollment.rank) : null;
+  const lastRank = enrollment ? (activeTab === 'group' ? enrollment.last_group_rank : enrollment.rank) : null;
+
+  const renderRankChange = (rank: number, lastRankVal: number) => {
+    if (rank < lastRankVal) {
       return (
         <div className="flex items-center text-emerald-500 gap-1">
           <TrendingUp className="w-3.5 h-3.5" />
-          <span className="text-[11px] font-bold font-mono">+{lastRank - rank}</span>
+          <span className="text-[11px] font-bold font-mono">+{lastRankVal - rank}</span>
         </div>
       );
-    } else if (rank > lastRank) {
+    } else if (rank > lastRankVal) {
       return (
         <div className="flex items-center text-red-500 gap-1">
           <TrendingDown className="w-3.5 h-3.5" />
-          <span className="text-[11px] font-bold font-mono">-{rank - lastRank}</span>
+          <span className="text-[11px] font-bold font-mono">-{rank - lastRankVal}</span>
         </div>
       );
     } else {
@@ -57,19 +66,34 @@ const Leaderboard: React.FC = () => {
     }
   };
 
+  const renderRankDelta = (rank: number | null, last: number | null) => {
+    if (!rank || !last || rank === last) return null;
+    const improved = rank < last;
+    const delta = Math.abs(last - rank);
+    return (
+      <div className={`flex items-center gap-0.5 mt-1 ${improved ? 'text-emerald-500' : 'text-red-400'}`}>
+        {improved
+          ? <TrendingUp className="w-3 h-3" />
+          : <TrendingDown className="w-3 h-3" />
+        }
+        <span className="text-[10px] font-bold font-mono">{improved ? '+' : '-'}{delta}</span>
+      </div>
+    );
+  };
+
   const getRankBadge = (rank: number) => {
     if (rank === 1) return (
-      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30 ring-2 ring-amber-400/30">
+      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40 ring-2 ring-amber-400/30">
         <Crown className="w-5 h-5 text-amber-900 fill-amber-900" />
       </div>
     );
     if (rank === 2) return (
-      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center shadow-md ring-2 ring-slate-300/30">
-        <span className="text-sm font-bold font-mono text-slate-700">2</span>
+      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
+        <span className="text-sm font-bold font-mono text-slate-700 dark:text-slate-200">2</span>
       </div>
     );
     if (rank === 3) return (
-      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md ring-2 ring-orange-400/30">
+      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md shadow-orange-400/30 ring-2 ring-orange-400/30">
         <span className="text-sm font-bold font-mono text-orange-900">3</span>
       </div>
     );
@@ -80,103 +104,150 @@ const Leaderboard: React.FC = () => {
     );
   };
 
+  const getPodiumRowClasses = (rank: number, isCurrentUser: boolean) => {
+    if (isCurrentUser) {
+      return 'bg-brand-primary/5 dark:bg-brand-primary/8';
+    }
+    if (rank === 1) return 'bg-amber-50/50 dark:bg-amber-500/5';
+    if (rank === 2) return 'bg-slate-50/50 dark:bg-slate-700/5';
+    if (rank === 3) return 'bg-orange-50/50 dark:bg-orange-500/5';
+    return 'hover:bg-gray-50/60 dark:hover:bg-slate-800/30';
+  };
+
+  const getPodiumBorderColor = (rank: number, isCurrentUser: boolean) => {
+    if (isCurrentUser) return 'bg-brand-primary';
+    if (rank === 1) return 'bg-amber-400';
+    if (rank === 2) return 'bg-slate-400';
+    if (rank === 3) return 'bg-orange-400';
+    return '';
+  };
+
+  const stats = [
+    {
+      icon: Trophy,
+      label: activeTab === 'group' ? t('groupRank') : t('yourRank'),
+      value: enrollment ? `#${currentRank}` : '—',
+      color: 'text-amber-500',
+      bg: 'bg-amber-500/10 dark:bg-amber-500/12',
+      glow: 'shadow-amber-500/20',
+      suffix: undefined as string | undefined,
+      delta: renderRankDelta(currentRank, lastRank),
+    },
+    {
+      icon: Star,
+      label: t('weeklyPoints'),
+      value: enrollment ? enrollment.week_points.toString() : '—',
+      suffix: 'xp',
+      color: 'text-brand-primary',
+      bg: 'bg-brand-primary/10 dark:bg-brand-primary/12',
+      glow: 'shadow-brand-primary/20',
+      delta: null,
+    },
+    {
+      icon: Zap,
+      label: t('totalXp'),
+      value: enrollment ? enrollment.total_points.toString() : '—',
+      suffix: 'xp',
+      color: 'text-violet-500',
+      bg: 'bg-violet-500/10 dark:bg-violet-500/12',
+      glow: 'shadow-violet-500/20',
+      delta: null,
+    },
+    {
+      icon: Flame,
+      label: t('streak'),
+      value: enrollment ? (enrollment.streak ?? 0).toString() : '—',
+      suffix: enrollment && enrollment.streak > 0 ? 'days' : undefined,
+      color: 'text-orange-500',
+      bg: 'bg-orange-500/10 dark:bg-orange-500/12',
+      glow: 'shadow-orange-500/20',
+      delta: null,
+    },
+  ];
+
   return (
     <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
 
       {/* Header */}
-      <div className="space-y-1 px-1">
-        <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
-          {t('leaderboard')}
-        </h1>
-        <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
-          {t('competePeers')}
-        </p>
+      <div className="flex items-start gap-4 px-1">
+        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-xl shadow-amber-500/30 shrink-0 ring-2 ring-amber-400/20">
+          <Trophy className="w-7 h-7 md:w-8 md:h-8 text-white fill-white/80" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
+            {t('leaderboard')}
+          </h1>
+          <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
+            Top {activeLeaderboard.length > 0 ? activeLeaderboard.length : 20} &middot; {t('competePeers').split(',')[0]}
+          </p>
+        </div>
       </div>
 
-      {/* My Stats Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-5">
-        {[
-          {
-            icon: Trophy,
-            label: activeTab === 'group' ? t('groupRank') : t('yourRank'),
-            value: enrollment ? `#${activeTab === 'group' ? enrollment.group_rank : enrollment.rank}` : '—',
-            color: 'text-amber-500',
-            bg: 'bg-amber-500/8 dark:bg-amber-500/10',
-            suffix: undefined as string | undefined,
-          },
-          {
-            icon: Star,
-            label: t('weeklyPoints'),
-            value: enrollment ? enrollment.week_points.toString() : '—',
-            suffix: 'xp',
-            color: 'text-brand-primary',
-            bg: 'bg-brand-primary/8 dark:bg-brand-primary/10',
-          },
-          {
-            icon: Zap,
-            label: t('totalXp'),
-            value: enrollment ? enrollment.total_points.toString() : '—',
-            suffix: 'xp',
-            color: 'text-violet-500',
-            bg: 'bg-violet-500/8 dark:bg-violet-500/10',
-          },
-          {
-            icon: Flame,
-            label: t('streak'),
-            value: enrollment ? (enrollment.streak ?? 0).toString() : '—',
-            suffix: enrollment && enrollment.streak > 0 ? 'days' : undefined,
-            color: 'text-orange-500',
-            bg: 'bg-orange-500/8 dark:bg-orange-500/10',
-          },
-        ].map((stat, i) => (
+        {stats.map((stat, i) => (
           <div
             key={i}
-            className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 px-3 py-5 md:px-6 md:py-7 flex flex-col items-center text-center"
+            className={`bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 px-3 py-5 md:px-5 md:py-7 flex flex-col items-center text-center relative overflow-hidden group`}
           >
-            <div className={`w-10 h-10 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center mb-3`}>
+            {/* Subtle background glow */}
+            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
+              style={{ background: `radial-gradient(ellipse at 50% 0%, ${stat.color.includes('amber') ? 'rgba(245,158,11,0.06)' : stat.color.includes('brand') ? 'rgba(18,194,220,0.06)' : stat.color.includes('violet') ? 'rgba(139,92,246,0.06)' : 'rgba(249,115,22,0.06)'} 0%, transparent 70%)` }}
+            />
+            <div className={`w-11 h-11 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center mb-3 shadow-lg ${stat.glow} relative`}>
               <stat.icon className="w-5 h-5" />
             </div>
             <p className="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2 font-mono">{stat.label}</p>
-            <span className="text-xl md:text-3xl font-[800] text-brand-dark dark:text-white tabular-nums tracking-tighter leading-none">{stat.value}</span>
+            <span className="text-3xl md:text-4xl font-[800] text-brand-dark dark:text-white tabular-nums tracking-tighter leading-none">{stat.value}</span>
             {stat.suffix && (
-              <span className="text-[9px] md:text-[10px] font-bold text-brand-primary font-mono uppercase tracking-wider mt-1">{stat.suffix}</span>
+              <span className="text-[9px] md:text-[10px] font-bold text-brand-primary font-mono uppercase tracking-wider mt-1.5">{stat.suffix}</span>
             )}
+            {stat.delta}
           </div>
         ))}
       </div>
 
       {/* Tab Switcher */}
       <div className="max-w-sm mx-auto w-full">
-        <div className="bg-gray-100 dark:bg-slate-800/80 p-1 rounded-2xl flex border border-gray-200/50 dark:border-slate-700/50">
+        <div className="bg-gray-100 dark:bg-slate-800/80 p-1 rounded-2xl flex border border-gray-200/50 dark:border-slate-700/50 shadow-inner">
           <button
             onClick={() => setActiveTab('group')}
-            className={`flex-1 h-11 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono
+            className={`flex-1 h-12 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono flex items-center justify-center gap-2
               ${activeTab === 'group'
-                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-sm'
+                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
           >
+            <Users className="w-3.5 h-3.5 shrink-0" />
             {t('groupRank')}
           </button>
           <button
             onClick={() => setActiveTab('course')}
-            className={`flex-1 h-11 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono
+            className={`flex-1 h-12 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono flex items-center justify-center gap-2
               ${activeTab === 'course'
-                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-sm'
+                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
           >
+            <Globe className="w-3.5 h-3.5 shrink-0" />
             {t('courseRank')}
           </button>
         </div>
       </div>
 
-      {/* Leaderboard List */}
+      {/* Leaderboard Table */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
-        {/* Table Header (Desktop) */}
-        <div className="hidden sm:flex items-center px-6 py-4 border-b border-gray-50 dark:border-slate-800/70 bg-gray-50/50 dark:bg-slate-800/30">
-          <div className="w-14 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('rank')}</div>
-          <div className="flex-1 ml-4 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('student')}</div>
-          <div className="w-28 text-right text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('points')}</div>
-          <div className="w-20 text-center ml-4 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('change')}</div>
+
+        {/* Desktop Table Header */}
+        <div className="hidden sm:grid px-6 py-4 border-b border-gray-100 dark:border-slate-800/70 bg-gray-50/80 dark:bg-slate-800/40"
+          style={{ gridTemplateColumns: '3.5rem 1fr 5rem 7rem 5rem' }}
+        >
+          <div className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('rank')}</div>
+          <div className="ml-5 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('student')}</div>
+          <div className="text-center text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-center gap-1">
+            <Flame className="w-3 h-3 text-amber-400" />
+            <span>{t('streak')}</span>
+          </div>
+          <div className="text-right text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('points')}</div>
+          <div className="text-center text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('change')}</div>
         </div>
 
         <div className="divide-y divide-gray-50 dark:divide-slate-800/50">
@@ -185,71 +256,153 @@ const Leaderboard: React.FC = () => {
               ? entry.full_name === user.name
               : entry.id === user.id;
 
+            const showAccentBorder = isCurrentUser || entry.rank <= 3;
+            const borderColor = getPodiumBorderColor(entry.rank, isCurrentUser);
+
             return (
               <div
                 key={entry.id || i}
-                className={`group flex items-center px-4 py-4 sm:px-6 sm:py-5 transition-all duration-200 relative
-                  ${isCurrentUser
-                    ? 'bg-brand-primary/5 dark:bg-brand-primary/8'
-                    : 'hover:bg-gray-50/60 dark:hover:bg-slate-800/30'
-                  }
-                  ${entry.rank <= 3 ? 'py-5 sm:py-6' : ''}
+                className={`group relative transition-all duration-200
+                  ${getPodiumRowClasses(entry.rank, isCurrentUser)}
+                  ${entry.rank <= 3 ? 'sm:py-1' : ''}
                 `}
               >
-                {/* Current user accent line */}
-                {isCurrentUser && (
-                  <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-brand-primary rounded-r-full"></div>
+                {/* Left accent border */}
+                {showAccentBorder && (
+                  <div className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-r-full ${borderColor}`} />
                 )}
 
-                {/* Rank */}
-                <div className="w-12 sm:w-14 flex items-center justify-center sm:justify-start shrink-0">
-                  {getRankBadge(entry.rank)}
-                </div>
+                {/* Desktop layout */}
+                <div
+                  className="hidden sm:grid items-center px-6 py-4"
+                  style={{ gridTemplateColumns: '3.5rem 1fr 5rem 7rem 5rem' }}
+                >
+                  {/* Rank */}
+                  <div className="flex items-center justify-start shrink-0">
+                    {getRankBadge(entry.rank)}
+                  </div>
 
-                {/* Student Info */}
-                <div className="flex-1 min-w-0 px-3 sm:px-5">
-                  <p className="text-sm sm:text-[15px] font-bold text-brand-dark dark:text-white truncate leading-tight">
-                    {entry.full_name}
-                  </p>
-                  {isCurrentUser && (
-                    <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-wider mt-0.5 block">{t('student')} (YOU)</span>
-                  )}
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  {/* Student Info */}
+                  <div className="min-w-0 ml-5">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-[15px] font-bold text-brand-dark dark:text-white truncate leading-tight">
+                        {entry.full_name}
+                      </p>
+                      {isCurrentUser && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
+                          YOU
+                        </span>
+                      )}
+                    </div>
                     {entry.level && (
                       <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono mt-1"
                         style={{
-                          backgroundColor: `${entry.level.badge_color || '#6366f1'}15`,
+                          backgroundColor: `${entry.level.badge_color || '#6366f1'}18`,
                           color: entry.level.badge_color || '#6366f1',
                           border: `1px solid ${entry.level.badge_color || '#6366f1'}30`,
                         }}
                       >
-                        {entry.level.icon} Lvl {entry.level.number}
-                      </span>
-                    )}
-                    {entry.streak > 0 && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
-                        🔥 {entry.streak}
+                        <span>{entry.level.icon}</span>
+                        <span>Lvl {entry.level.number} &middot; {entry.level.name}</span>
                       </span>
                     )}
                   </div>
-                </div>
 
-                {/* Points + Change */}
-                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-8 shrink-0">
-                  <div className="flex items-center gap-2 sm:w-28 justify-end">
-                    <span className="text-base sm:text-xl font-bold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">{entry.total_points}</span>
+                  {/* Streak column */}
+                  <div className="flex items-center justify-center">
+                    {entry.streak > 0 ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                        🔥 {entry.streak}
+                      </span>
+                    ) : (
+                      <Minus className="w-3.5 h-3.5 text-gray-200 dark:text-slate-700" />
+                    )}
+                  </div>
+
+                  {/* Points */}
+                  <div className="flex items-center justify-end gap-2">
+                    <span className="text-xl font-bold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">
+                      {entry.total_points.toLocaleString()}
+                    </span>
                     <div className="w-6 h-6 rounded-lg bg-brand-primary/10 flex items-center justify-center shrink-0">
                       <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
                     </div>
                   </div>
-                  <div className="hidden sm:flex items-center justify-center sm:w-20">
+
+                  {/* Change */}
+                  <div className="flex items-center justify-center">
+                    {renderRankChange(entry.rank, entry.last_rank)}
+                  </div>
+                </div>
+
+                {/* Mobile layout */}
+                <div className="flex sm:hidden items-center px-4 py-4">
+                  {/* Rank */}
+                  <div className="w-12 flex items-center justify-center shrink-0">
+                    {getRankBadge(entry.rank)}
+                  </div>
+
+                  {/* Student Info */}
+                  <div className="flex-1 min-w-0 px-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold text-brand-dark dark:text-white truncate leading-tight">
+                        {entry.full_name}
+                      </p>
+                      {isCurrentUser && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
+                          YOU
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                      {entry.level && (
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono"
+                          style={{
+                            backgroundColor: `${entry.level.badge_color || '#6366f1'}18`,
+                            color: entry.level.badge_color || '#6366f1',
+                            border: `1px solid ${entry.level.badge_color || '#6366f1'}30`,
+                          }}
+                        >
+                          <span>{entry.level.icon}</span>
+                          <span>Lvl {entry.level.number} &middot; {entry.level.name}</span>
+                        </span>
+                      )}
+                      {entry.streak > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                          🔥 {entry.streak} days
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Points + Change stacked */}
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base font-bold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">
+                        {entry.total_points.toLocaleString()}
+                      </span>
+                      <div className="w-5 h-5 rounded-md bg-brand-primary/10 flex items-center justify-center">
+                        <Star className="w-3 h-3 text-brand-primary fill-brand-primary" />
+                      </div>
+                    </div>
                     {renderRankChange(entry.rank, entry.last_rank)}
                   </div>
                 </div>
               </div>
             );
           })}
+
+          {activeLeaderboard.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <div className="w-16 h-16 rounded-3xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
+                <Trophy className="w-7 h-7 text-gray-300 dark:text-slate-600" />
+              </div>
+              <p className="text-sm font-bold text-gray-400 dark:text-slate-500">No rankings yet</p>
+              <p className="text-[11px] text-gray-300 dark:text-slate-600 font-mono">Attend lessons to earn your spot</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

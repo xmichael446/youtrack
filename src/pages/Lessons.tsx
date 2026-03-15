@@ -1136,13 +1136,18 @@ const LessonsContent: React.FC = () => {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Page Title */}
-      <div className="space-y-1 px-1">
-        <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
-          {t('lessons') || "Lessons"}
-        </h1>
-        <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
-          {t('lessonsSubtitle') || "Track your attendance and manage your assignments."}
-        </p>
+      <div className="flex items-start gap-4 px-1">
+        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center shadow-xl shadow-brand-primary/30 shrink-0 ring-2 ring-brand-primary/20">
+          <BookOpen className="w-7 h-7 md:w-8 md:h-8 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
+            {t('lessons')}
+          </h1>
+          <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
+            {t('lessonsSubtitle')}
+          </p>
+        </div>
       </div>
 
       {/* Attendance Section */}
