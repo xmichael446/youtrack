@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePost } from '../services/useApi';
-import { ApiError } from '../services/apiTypes';
+import { ApiError, CompactLevelInfo } from '../services/apiTypes';
 
 interface LeaderboardEntry {
     id?: number;
@@ -8,6 +8,8 @@ interface LeaderboardEntry {
     full_name: string;
     total_points: number;
     last_rank: number;
+    streak: number;
+    level: CompactLevelInfo;
 }
 
 interface EnrollmentData {
@@ -16,6 +18,7 @@ interface EnrollmentData {
     last_group_rank: number;
     week_points: number;
     total_points: number;
+    streak: number;
 }
 
 interface LeaderboardData {

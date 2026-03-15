@@ -121,6 +121,18 @@ Full enrollment profile and course stats. Empty request body.
       "last_rank": 5,
       "group_rank": 1,
       "last_group_rank": 2,
+      "streak": 7,
+      "level": {
+        "number": 7,
+        "name": "Enthusiast",
+        "icon": "🔥",
+        "badge_color": "#f87171",
+        "description": "Passion fuels progress.",
+        "xp_current": 5600,
+        "xp_required": 5400,
+        "xp_next": 7200,
+        "progress_percent": 28.6
+      },
       "course": {
         "name": "Python Bootcamp",
         "description": "...",
@@ -172,13 +184,29 @@ Group and course leaderboards plus the student's weekly stats. Empty request bod
       "group_rank": 1,
       "last_group_rank": 2,
       "week_points": 40,
-      "total_points": 350
+      "total_points": 350,
+      "streak": 7
     },
     "group": [
-      { "rank": 1, "last_rank": 2, "full_name": "Bobur Yusupov", "total_points": 500 }
+      {
+        "rank": 1,
+        "last_rank": 2,
+        "full_name": "Bobur Yusupov",
+        "total_points": 500,
+        "streak": 12,
+        "level": { "number": 8, "name": "Achiever", "icon": "⭐" }
+      }
     ],
     "course": [
-      { "id": 1, "full_name": "Bobur Yusupov", "total_points": 500, "rank": 1, "last_rank": 2 }
+      {
+        "id": 1,
+        "full_name": "Bobur Yusupov",
+        "total_points": 500,
+        "rank": 1,
+        "last_rank": 2,
+        "streak": 12,
+        "level": { "number": 8, "name": "Achiever", "icon": "⭐", "badge_color": "#fbbf24" }
+      }
     ]
   }
 }
@@ -188,6 +216,24 @@ Group and course leaderboards plus the student's weekly stats. Empty request bod
 - `course` — top 20 across all groups by stored `rank` asc. Requesting student always included.
 - `week_points` — XP earned in the last 7 days.
 - `*.last_rank` — rank before the last points update. Use to show rank change arrows.
+- `streak` — current consecutive-day activity streak. Resets if no PointEntry for a full calendar day (local timezone). Increments once per calendar day on first activity.
+- `level` — compact level info (number, name, icon, badge_color) for display on leaderboard cards.
+
+---
+
+### Streak System
+
+Each enrollment maintains a **streak** tracking consecutive days of activity. A "day" is a calendar day in the server's local timezone (`Asia/Tashkent`).
+
+| Condition | Result |
+|---|---|
+| First PointEntry today, last activity was yesterday | Streak +1 |
+| First PointEntry today, last activity was 2+ days ago | Streak resets to 1 |
+| Already had activity today | Streak unchanged |
+| No activity today yet | Streak preserved until end of day |
+| No activity for a full calendar day | Streak resets to 0 (via nightly task) |
+
+`streak` is returned in `enrollment` objects on both `/api/dashboard/` and `/api/leaderboard/`, and on each entry in `group` and `course` leaderboard arrays.
 
 ---
 
@@ -411,15 +457,26 @@ Errors: `400` missing field · `404` attempt not found or belongs to another enr
 ---
 
 ### `POST /api/shop/`
-Available rewards (with claimed flag) and the student's last 10 point transactions. Empty request body.
+Available rewards (split into balance and level rewards) and the student's last 10 point transactions. Empty request body.
 
 ```json
 // 200
 {
   "success": true,
   "data": {
-    "rewards": [
+    "balance_rewards": [
       { "id": 1, "name": "Sticker Pack", "description": "Cool stickers", "image": "/media/rewards/stickers.png", "cost": 50, "claimed": false }
+    ],
+    "level_rewards": [
+      {
+        "id": 2,
+        "name": "Exclusive Badge",
+        "description": "Awarded to dedicated learners",
+        "image": "/media/rewards/badge.png",
+        "required_level": { "number": 5, "name": "Scholar", "icon": "🎓" },
+        "unlocked": true,
+        "granted": false
+      }
     ],
     "transactions": [
       { "datetime": "2026-02-23T18:00:00Z", "reason": "Attendance", "xp": 10, "coins": 5, "negative": false }
@@ -431,14 +488,17 @@ Available rewards (with claimed flag) and the student's last 10 point transactio
 ---
 
 ### `POST /api/claim-reward/`
-Redeems a reward, deducting coins from `balance`.
+Redeems a reward. Behaviour depends on the reward type:
+
+- **Balance reward** (`is_level_reward: false`): deducts coins from `balance`.
+- **Level reward** (`is_level_reward: true`): requires the student's current level ≥ `unlock_level`. No coins deducted.
 
 ```json
 // Request  { "reward_id": 1 }
 // 200      { "success": true, "message": "Reward claimed" }
 ```
 
-Errors: `400` missing field · `400` already claimed · `400` insufficient balance · `404` reward not found
+Errors: `400` missing field · `400` already claimed · `400` insufficient balance (balance rewards) · `400` level too low (level rewards) · `404` reward not found
 
 ---
 

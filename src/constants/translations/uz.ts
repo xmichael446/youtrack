@@ -167,5 +167,18 @@ export default {
   "sourceArticle": "Manba Maqolasi",
   "readArticleTitle": "Boshlashdan Oldin O'qing",
   "readArticleDesc": "Test savollariga javob berishdan oldin quyidagi matnni diqqat bilan o'qing.",
-  "readArticleBtn": "O'qidim — Testni Boshlash"
+  "readArticleBtn": "O'qidim — Testni Boshlash",
+  "level": "Daraja",
+  "streak": "Streak",
+  "streakDays": "{count} kun streak",
+  "xpProgress": "XP Jarayoni",
+  "levelRewards": "Daraja Sovg'alari",
+  "balanceRewards": "Coin Sovg'alari",
+  "levelRequired": "{level}-daraja Kerak",
+  "levelUnlocked": "OCHILGAN",
+  "levelLocked": "{level}-DARAJA KERAK",
+  "claimFree": "BEPUL OLISH",
+  "alreadyGranted": "BERILGAN",
+  "nextLevel": "Keyingi Daraja",
+  "currentLevel": "Joriy Daraja"
 }

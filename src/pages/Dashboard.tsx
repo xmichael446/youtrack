@@ -1,12 +1,12 @@
 import React from 'react';
-import { PlayCircle, Clock, Calendar, TrendingUp, BookOpen, ChevronRight } from 'lucide-react';
+import { PlayCircle, Clock, Calendar, TrendingUp, BookOpen, ChevronRight, Flame } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 import Curriculum from '../components/Curriculum';
 
 const Dashboard: React.FC = () => {
   const { t } = useLanguage();
-  const { user, course, upcomingLesson, loading } = useDashboard();
+  const { user, course, upcomingLesson, loading, enrollment } = useDashboard();
   const BASE_URL = import.meta.env.VITE_API_URL || "https://api.youtrack.cc/";
 
   const [timeLeft, setTimeLeft] = React.useState({
@@ -209,6 +209,57 @@ const Dashboard: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Level & Streak */}
+      {enrollment?.level && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-100 fill-mode-both">
+          {/* Level Card */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 md:p-6 border border-gray-100 dark:border-slate-800 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
+                style={{ backgroundColor: `${enrollment.level.badge_color}20`, border: `1px solid ${enrollment.level.badge_color}40` }}
+              >
+                {enrollment.level.icon}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('currentLevel')}</p>
+                <p className="font-bold text-brand-dark dark:text-white text-base leading-tight truncate">
+                  Lvl {enrollment.level.number} · {enrollment.level.name}
+                </p>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-[10px] font-mono font-bold mb-1.5">
+                <span className="text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('xpProgress')}</span>
+                <span style={{ color: enrollment.level.badge_color }}>{enrollment.level.xp_current} / {enrollment.level.xp_next} XP</span>
+              </div>
+              <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${enrollment.level.progress_percent}%`, backgroundColor: enrollment.level.badge_color }}
+                />
+              </div>
+              {enrollment.level.description && (
+                <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1.5 font-mono">{enrollment.level.description}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Streak Card */}
+          <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-3xl p-5 md:p-6 text-white shadow-lg shadow-amber-500/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
+            <div className="relative z-10">
+              <p className="text-[10px] font-mono font-bold text-white/70 uppercase tracking-[2px] mb-3">{t('streak')}</p>
+              <div className="flex items-center gap-3 mb-2">
+                <Flame className="w-8 h-8 text-white fill-white/30" />
+                <span className="text-5xl font-[800] tabular-nums">{enrollment.streak ?? 0}</span>
+              </div>
+              <p className="text-sm font-bold text-white/80">{t('streakDays').replace('{count}', String(enrollment.streak ?? 0))}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tutorial Banner */}
       <div className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in zoom-in-95 duration-700 delay-300 fill-mode-both">

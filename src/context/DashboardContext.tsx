@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePost } from '../services/useApi';
 import { CURRENT_USER } from '../constants';
-import { ApiError } from '../services/apiTypes';
+import { ApiError, LevelInfo } from '../services/apiTypes';
 
 interface Lesson {
     id: number;
@@ -28,6 +28,10 @@ interface DashboardData {
             balance: number;
             rank: number;
             last_rank: number;
+            group_rank: number;
+            last_group_rank: number;
+            streak: number;
+            level: LevelInfo;
             access_code: string;
             course: {
                 name: string;

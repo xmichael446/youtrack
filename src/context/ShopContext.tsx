@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/ApiService';
-import { Reward, Transaction, ShopData } from '../services/apiTypes';
+import { BalanceReward, LevelReward, Transaction, ShopData } from '../services/apiTypes';
 
 interface ShopContextType {
-    rewards: Reward[];
+    rewards: BalanceReward[];
+    balanceRewards: BalanceReward[];
+    levelRewards: LevelReward[];
     transactions: Transaction[];
     loading: boolean;
     error: string | null;
@@ -55,8 +57,13 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const balanceRewards = data?.balance_rewards || [];
+    const levelRewards = data?.level_rewards || [];
+
     const value = {
-        rewards: data?.rewards || [],
+        rewards: balanceRewards,
+        balanceRewards,
+        levelRewards,
         transactions: data?.transactions || [],
         loading,
         error,

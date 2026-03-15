@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Star, Zap, TrendingUp, TrendingDown, Minus, Crown } from 'lucide-react';
+import { Trophy, Star, Zap, TrendingUp, TrendingDown, Minus, Crown, Flame } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useLeaderboard } from '../context/LeaderboardContext';
 import { useDashboard } from '../context/DashboardContext';
@@ -94,7 +94,7 @@ const Leaderboard: React.FC = () => {
       </div>
 
       {/* My Stats Cards */}
-      <div className="grid grid-cols-3 gap-3 md:gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-5">
         {[
           {
             icon: Trophy,
@@ -102,7 +102,7 @@ const Leaderboard: React.FC = () => {
             value: enrollment ? `#${activeTab === 'group' ? enrollment.group_rank : enrollment.rank}` : '—',
             color: 'text-amber-500',
             bg: 'bg-amber-500/8 dark:bg-amber-500/10',
-            glow: 'shadow-amber-500/10',
+            suffix: undefined as string | undefined,
           },
           {
             icon: Star,
@@ -111,7 +111,6 @@ const Leaderboard: React.FC = () => {
             suffix: 'xp',
             color: 'text-brand-primary',
             bg: 'bg-brand-primary/8 dark:bg-brand-primary/10',
-            glow: 'shadow-brand-primary/10',
           },
           {
             icon: Zap,
@@ -120,12 +119,19 @@ const Leaderboard: React.FC = () => {
             suffix: 'xp',
             color: 'text-violet-500',
             bg: 'bg-violet-500/8 dark:bg-violet-500/10',
-            glow: 'shadow-violet-500/10',
+          },
+          {
+            icon: Flame,
+            label: t('streak'),
+            value: enrollment ? (enrollment.streak ?? 0).toString() : '—',
+            suffix: enrollment && enrollment.streak > 0 ? 'days' : undefined,
+            color: 'text-orange-500',
+            bg: 'bg-orange-500/8 dark:bg-orange-500/10',
           },
         ].map((stat, i) => (
           <div
             key={i}
-            className={`bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 px-3 py-5 md:px-6 md:py-7 flex flex-col items-center text-center`}
+            className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 px-3 py-5 md:px-6 md:py-7 flex flex-col items-center text-center"
           >
             <div className={`w-10 h-10 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center mb-3`}>
               <stat.icon className="w-5 h-5" />
@@ -208,6 +214,25 @@ const Leaderboard: React.FC = () => {
                   {isCurrentUser && (
                     <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-wider mt-0.5 block">{t('student')} (YOU)</span>
                   )}
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    {entry.level && (
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono"
+                        style={{
+                          backgroundColor: `${entry.level.badge_color || '#6366f1'}15`,
+                          color: entry.level.badge_color || '#6366f1',
+                          border: `1px solid ${entry.level.badge_color || '#6366f1'}30`,
+                        }}
+                      >
+                        {entry.level.icon} Lvl {entry.level.number}
+                      </span>
+                    )}
+                    {entry.streak > 0 && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                        🔥 {entry.streak}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Points + Change */}

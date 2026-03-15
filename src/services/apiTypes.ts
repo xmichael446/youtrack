@@ -130,9 +130,30 @@ export interface HomeworkSubmissionResponse {
     submission_id: number;
 }
 
+// --- Level Types ---
+
+export interface LevelInfo {
+    number: number;
+    name: string;
+    icon: string;
+    badge_color: string;
+    description?: string;
+    xp_current: number;
+    xp_required: number;
+    xp_next: number;
+    progress_percent: number;
+}
+
+export interface CompactLevelInfo {
+    number: number;
+    name: string;
+    icon: string;
+    badge_color?: string;
+}
+
 // --- Shop Types ---
 
-export interface Reward {
+export interface BalanceReward {
     id: number;
     name: string;
     image: string | null;
@@ -140,6 +161,19 @@ export interface Reward {
     claimed: boolean;
     description?: string;
 }
+
+export interface LevelReward {
+    id: number;
+    name: string;
+    image: string | null;
+    description?: string;
+    required_level: CompactLevelInfo;
+    unlocked: boolean;
+    granted: boolean;
+}
+
+// Backward compat alias
+export type Reward = BalanceReward;
 
 export interface Transaction {
     datetime: string;
@@ -150,7 +184,8 @@ export interface Transaction {
 }
 
 export interface ShopData {
-    rewards: Reward[];
+    balance_rewards: BalanceReward[];
+    level_rewards: LevelReward[];
     transactions: Transaction[];
 }
 

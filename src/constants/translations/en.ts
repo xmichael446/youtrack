@@ -167,5 +167,18 @@ export default {
   "sourceArticle": "Source Article",
   "readArticleTitle": "Read Before You Start",
   "readArticleDesc": "Read the following passage carefully before answering the quiz questions.",
-  "readArticleBtn": "I've Read It — Start Quiz"
+  "readArticleBtn": "I've Read It — Start Quiz",
+  "level": "Level",
+  "streak": "Streak",
+  "streakDays": "{count} day streak",
+  "xpProgress": "XP Progress",
+  "levelRewards": "Level Rewards",
+  "balanceRewards": "Coin Rewards",
+  "levelRequired": "Level {level} Required",
+  "levelUnlocked": "UNLOCKED",
+  "levelLocked": "LEVEL {level} REQUIRED",
+  "claimFree": "CLAIM FREE",
+  "alreadyGranted": "GRANTED",
+  "nextLevel": "Next Level",
+  "currentLevel": "Current Level"
 }
