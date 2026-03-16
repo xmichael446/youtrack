@@ -25,3 +25,15 @@ export function openTelegramLink(url: string): void {
         window.open(url, '_blank');
     }
 }
+
+/**
+ * Opens an external (non-t.me) URL. Uses Telegram.WebApp.openLink() when
+ * running inside a Telegram Mini App, otherwise falls back to window.open().
+ */
+export function openExternalLink(url: string): void {
+    if (isTelegramWebApp()) {
+        window.Telegram!.WebApp!.openLink(url);
+    } else {
+        window.open(url, '_blank');
+    }
+}

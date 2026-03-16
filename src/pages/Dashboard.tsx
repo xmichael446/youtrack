@@ -10,6 +10,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 import Curriculum from '../components/Curriculum';
+import { openExternalLink } from '../utils/telegram';
 
 const Dashboard: React.FC = () => {
   const { t } = useLanguage();
@@ -362,7 +363,10 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
 
-        <button className="w-full md:w-auto shrink-0 px-7 py-3.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2.5 relative z-10 group/btn">
+        <button
+          onClick={() => openExternalLink('https://youtu.be/5xAfErTQvic')}
+          className="w-full md:w-auto shrink-0 px-7 py-3.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2.5 relative z-10 group/btn"
+        >
           {t('watchTutorial')}
           <PlayCircle className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
         </button>
