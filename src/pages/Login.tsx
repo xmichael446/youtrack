@@ -132,7 +132,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
 
             {/* Main Card */}
             <div className="w-full max-w-sm md:max-w-4xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out">
-                <div className={`backdrop-blur-2xl border rounded-3xl md:rounded-[32px] shadow-2xl relative overflow-hidden transition-all duration-500 ${isDark ? 'bg-slate-900/50 border-white/8 shadow-black/40' : 'bg-white/85 border-gray-200/60 shadow-black/8'}`}>
+                <div className={`backdrop-blur-2xl border rounded-3xl md:rounded-[32px] shadow-2xl relative overflow-hidden transition-all duration-500 ${isDark ? 'bg-slate-900/50 border-transparent shadow-black/40' : 'bg-white/85 border-gray-200/60 shadow-black/8'}`}>
 
                     {/* Subtle grid texture */}
                     <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #888 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
