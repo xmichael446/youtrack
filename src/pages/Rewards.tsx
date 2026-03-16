@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { ShopProvider, useShop } from '../context/ShopContext';
 import { useDashboard } from '../context/DashboardContext';
 import { BalanceReward, LevelReward } from '../services/apiTypes';
+import { openTelegramLink } from '../utils/telegram';
 
 const RewardsContent: React.FC = () => {
   const { t } = useLanguage();
@@ -38,7 +39,7 @@ const RewardsContent: React.FC = () => {
 
   const handleClaim = async (reward: BalanceReward) => {
     if (reward.claimed) {
-      window.open(`https://t.me/ytrck_bot?start=reward_${reward.id}`, '_blank');
+      openTelegramLink(`https://t.me/ytrck_bot?start=reward_${reward.id}`);
       return;
     }
 
