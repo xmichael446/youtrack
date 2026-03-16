@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Star, Zap, TrendingUp, TrendingDown, Minus, Crown, Flame, Users, Globe } from 'lucide-react';
+import { Trophy, Star, TrendingUp, TrendingDown, Minus, Crown, Flame, Users, Globe } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useLeaderboard } from '../context/LeaderboardContext';
 import { useDashboard } from '../context/DashboardContext';
@@ -66,20 +66,6 @@ const Leaderboard: React.FC = () => {
     }
   };
 
-  const renderRankDelta = (rank: number | null, last: number | null) => {
-    if (!rank || !last || rank === last) return null;
-    const improved = rank < last;
-    const delta = Math.abs(last - rank);
-    return (
-      <div className={`flex items-center gap-0.5 mt-1 ${improved ? 'text-emerald-500' : 'text-red-400'}`}>
-        {improved
-          ? <TrendingUp className="w-3 h-3" />
-          : <TrendingDown className="w-3 h-3" />
-        }
-        <span className="text-[10px] font-bold font-mono">{improved ? '+' : '-'}{delta}</span>
-      </div>
-    );
-  };
 
   const getRankBadge = (rank: number) => {
     if (rank === 1) return (
@@ -122,49 +108,6 @@ const Leaderboard: React.FC = () => {
     return '';
   };
 
-  const stats = [
-    {
-      icon: Trophy,
-      label: activeTab === 'group' ? t('groupRank') : t('yourRank'),
-      value: enrollment ? `#${currentRank}` : '—',
-      color: 'text-amber-500',
-      bg: 'bg-amber-500/10 dark:bg-amber-500/12',
-      glow: 'shadow-amber-500/20',
-      suffix: undefined as string | undefined,
-      delta: renderRankDelta(currentRank, lastRank),
-    },
-    {
-      icon: Star,
-      label: t('weeklyPoints'),
-      value: enrollment ? enrollment.week_points.toString() : '—',
-      suffix: 'xp',
-      color: 'text-brand-primary',
-      bg: 'bg-brand-primary/10 dark:bg-brand-primary/12',
-      glow: 'shadow-brand-primary/20',
-      delta: null,
-    },
-    {
-      icon: Zap,
-      label: t('totalXp'),
-      value: enrollment ? enrollment.total_points.toString() : '—',
-      suffix: 'xp',
-      color: 'text-violet-500',
-      bg: 'bg-violet-500/10 dark:bg-violet-500/12',
-      glow: 'shadow-violet-500/20',
-      delta: null,
-    },
-    {
-      icon: Flame,
-      label: t('streak'),
-      value: enrollment ? (enrollment.streak ?? 0).toString() : '—',
-      suffix: enrollment && enrollment.streak > 0 ? 'days' : undefined,
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10 dark:bg-orange-500/12',
-      glow: 'shadow-orange-500/20',
-      delta: null,
-    },
-  ];
-
   return (
     <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
 
@@ -181,30 +124,6 @@ const Leaderboard: React.FC = () => {
             Top {activeLeaderboard.length > 0 ? activeLeaderboard.length : 20} &middot; {t('competePeers').split(',')[0]}
           </p>
         </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-5">
-        {stats.map((stat, i) => (
-          <div
-            key={i}
-            className={`bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 px-3 py-5 md:px-5 md:py-7 flex flex-col items-center text-center relative overflow-hidden group`}
-          >
-            {/* Subtle background glow */}
-            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
-              style={{ background: `radial-gradient(ellipse at 50% 0%, ${stat.color.includes('amber') ? 'rgba(245,158,11,0.06)' : stat.color.includes('brand') ? 'rgba(18,194,220,0.06)' : stat.color.includes('violet') ? 'rgba(139,92,246,0.06)' : 'rgba(249,115,22,0.06)'} 0%, transparent 70%)` }}
-            />
-            <div className={`w-11 h-11 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center mb-3 shadow-lg ${stat.glow} relative`}>
-              <stat.icon className="w-5 h-5" />
-            </div>
-            <p className="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2 font-mono">{stat.label}</p>
-            <span className="text-3xl md:text-4xl font-[800] text-brand-dark dark:text-white tabular-nums tracking-tighter leading-none">{stat.value}</span>
-            {stat.suffix && (
-              <span className="text-[9px] md:text-[10px] font-bold text-brand-primary font-mono uppercase tracking-wider mt-1.5">{stat.suffix}</span>
-            )}
-            {stat.delta}
-          </div>
-        ))}
       </div>
 
       {/* Tab Switcher */}
@@ -237,11 +156,12 @@ const Leaderboard: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
 
         {/* Desktop Table Header */}
-        <div className="hidden sm:grid px-6 py-4 border-b border-gray-100 dark:border-slate-800/70 bg-gray-50/80 dark:bg-slate-800/40"
-          style={{ gridTemplateColumns: '3.5rem 1fr 5rem 7rem 5rem' }}
+        <div className="hidden sm:grid px-6 py-3 border-b border-gray-100 dark:border-slate-800/70 bg-gray-50/80 dark:bg-slate-800/40"
+          style={{ gridTemplateColumns: '3.5rem 1fr 6rem 5rem 7rem 5rem' }}
         >
           <div className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('rank')}</div>
           <div className="ml-5 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('student')}</div>
+          <div className="text-center text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('level')}</div>
           <div className="text-center text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-center gap-1">
             <Flame className="w-3 h-3 text-amber-400" />
             <span>{t('streak')}</span>
@@ -274,8 +194,8 @@ const Leaderboard: React.FC = () => {
 
                 {/* Desktop layout */}
                 <div
-                  className="hidden sm:grid items-center px-6 py-4"
-                  style={{ gridTemplateColumns: '3.5rem 1fr 5rem 7rem 5rem' }}
+                  className="hidden sm:grid items-center px-6 py-2.5"
+                  style={{ gridTemplateColumns: '3.5rem 1fr 6rem 5rem 7rem 5rem' }}
                 >
                   {/* Rank */}
                   <div className="flex items-center justify-start shrink-0">
@@ -285,7 +205,7 @@ const Leaderboard: React.FC = () => {
                   {/* Student Info */}
                   <div className="min-w-0 ml-5">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-[15px] font-bold text-brand-dark dark:text-white truncate leading-tight">
+                      <p className="text-[14px] font-bold text-brand-dark dark:text-white truncate leading-tight">
                         {entry.full_name}
                       </p>
                       {isCurrentUser && (
@@ -294,9 +214,13 @@ const Leaderboard: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    {entry.level && (
+                  </div>
+
+                  {/* Level column */}
+                  <div className="flex items-center justify-center">
+                    {entry.level ? (
                       <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono mt-1"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono"
                         style={{
                           backgroundColor: `${entry.level.badge_color || '#6366f1'}18`,
                           color: entry.level.badge_color || '#6366f1',
@@ -304,15 +228,17 @@ const Leaderboard: React.FC = () => {
                         }}
                       >
                         <span>{entry.level.icon}</span>
-                        <span>Lvl {entry.level.number} &middot; {entry.level.name}</span>
+                        <span>Lvl&nbsp;{entry.level.number}</span>
                       </span>
+                    ) : (
+                      <Minus className="w-3 h-3 text-gray-200 dark:text-slate-700" />
                     )}
                   </div>
 
                   {/* Streak column */}
                   <div className="flex items-center justify-center">
                     {entry.streak > 0 ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
                         🔥 {entry.streak}
                       </span>
                     ) : (
@@ -322,11 +248,11 @@ const Leaderboard: React.FC = () => {
 
                   {/* Points */}
                   <div className="flex items-center justify-end gap-2">
-                    <span className="text-xl font-bold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">
+                    <span className="text-lg font-bold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">
                       {entry.total_points.toLocaleString()}
                     </span>
-                    <div className="w-6 h-6 rounded-lg bg-brand-primary/10 flex items-center justify-center shrink-0">
-                      <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
+                    <div className="w-5 h-5 rounded-md bg-brand-primary/10 flex items-center justify-center shrink-0">
+                      <Star className="w-3 h-3 text-brand-primary fill-brand-primary" />
                     </div>
                   </div>
 
@@ -337,7 +263,7 @@ const Leaderboard: React.FC = () => {
                 </div>
 
                 {/* Mobile layout */}
-                <div className="flex sm:hidden items-center px-4 py-4">
+                <div className="flex sm:hidden items-center px-4 py-3">
                   {/* Rank */}
                   <div className="w-12 flex items-center justify-center shrink-0">
                     {getRankBadge(entry.rank)}

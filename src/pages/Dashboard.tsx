@@ -161,10 +161,10 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column — Countdown + Overall Progress */}
+        {/* Right Column — Countdown */}
         <div className="flex flex-col gap-5">
           {/* Countdown */}
-          <div className="flex-1 bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary rounded-3xl p-5 md:p-6 text-white shadow-2xl shadow-brand-primary/30 relative overflow-hidden group animate-in fade-in slide-in-from-right-4 duration-700">
+          <div className="bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary rounded-3xl p-5 md:p-6 text-white shadow-2xl shadow-brand-primary/30 relative overflow-hidden group animate-in fade-in slide-in-from-right-4 duration-700">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
             <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mb-20" />
 
@@ -212,29 +212,6 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Overall Progress Ring — desktop only */}
-          <div className="hidden md:flex bg-white dark:bg-slate-900 rounded-3xl p-5 border border-gray-100 dark:border-slate-800 shadow-sm flex-col items-center justify-center animate-in fade-in slide-in-from-right-4 duration-700 delay-100">
-            <div className="relative w-24 h-24 mb-3">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                <path
-                  className="text-gray-100 dark:text-slate-800"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none" stroke="currentColor" strokeWidth="2.5"
-                />
-                <path
-                  className="text-brand-primary"
-                  strokeDasharray={`${course.completion}, 100`}
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
-                  style={{ filter: 'drop-shadow(0 0 4px rgba(18,194,220,0.5))' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-brand-dark dark:text-white tabular-nums font-mono">{course.completion}%</span>
-              </div>
-            </div>
-            <span className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('overallProgress')}</span>
-          </div>
         </div>
       </div>
 
@@ -265,10 +242,7 @@ const Dashboard: React.FC = () => {
               {course.name}
             </h2>
             {course.description && (
-              <p
-                className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed font-medium mb-3"
-                style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
-              >
+              <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed font-medium mb-3">
                 {course.description}
               </p>
             )}

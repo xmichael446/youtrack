@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, Coins, Zap, Sun, Moon, LogOut } from 'lucide-react';
+import { Bell, Coins, Zap, Sun, Moon, LogOut, Flame } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -12,7 +12,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const { t, language, setLanguage } = useLanguage();
-  const { user } = useDashboard();
+  const { user, enrollment } = useDashboard();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -75,21 +75,45 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
       <div className="hidden md:block"></div>
 
       <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-shrink ml-auto">
-        {/* Stats Pill — redesigned as a single clean card */}
-        <div className="flex items-center bg-gray-50 dark:bg-slate-800/70 border border-gray-100 dark:border-slate-700/50 rounded-2xl px-3.5 py-2 gap-3 shadow-sm">
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
-              <Coins className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            </div>
-            <span className="font-bold text-[12px] md:text-sm text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums">{user?.coins || 0}</span>
+        {/* Stats cluster */}
+        <div className="flex items-center gap-1.5 md:gap-2">
+
+          {/* Streak chip — always visible */}
+          <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 rounded-xl px-2.5 py-1.5 shrink-0">
+            <Flame className={`w-3.5 h-3.5 shrink-0 ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-500' : 'text-gray-300 dark:text-slate-600'}`} />
+            <span className={`font-bold text-[12px] whitespace-nowrap font-mono tabular-nums leading-none ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-slate-500'}`}>
+              {enrollment?.streak ?? 0}d
+            </span>
           </div>
-          <div className="w-px h-4 bg-gray-200 dark:bg-slate-700"></div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-lg bg-brand-primary/10 flex items-center justify-center">
-              <Zap className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
-            </div>
-            <span className="font-bold text-[12px] md:text-sm text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums">{user?.xp || 0} <span className="text-gray-400 dark:text-slate-500 text-[10px]">XP</span></span>
+
+          {/* Level + XP chip — always visible */}
+          <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-800/70 border border-gray-100 dark:border-slate-700/50 rounded-xl px-2.5 py-1.5 shrink-0">
+            {enrollment?.level ? (
+              <span
+                className="w-[18px] h-[18px] rounded-md flex items-center justify-center text-[12px] shrink-0 leading-none"
+                style={{ backgroundColor: `${enrollment.level.badge_color}22` }}
+              >
+                {enrollment.level.icon}
+              </span>
+            ) : (
+              <Zap className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+            )}
+            <span className="font-bold text-[12px] text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums leading-none">
+              {enrollment?.level
+                ? <>Lvl&nbsp;{enrollment.level.number}<span className="hidden sm:inline text-gray-400 dark:text-slate-500">&nbsp;·&nbsp;{user?.xp || 0}&nbsp;<span className="text-[10px]">XP</span></span></>
+                : <>{user?.xp || 0}&nbsp;<span className="text-gray-400 dark:text-slate-500 text-[10px]">XP</span></>
+              }
+            </span>
           </div>
+
+          {/* Coins chip */}
+          <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-800/70 border border-gray-100 dark:border-slate-700/50 rounded-xl px-2.5 py-1.5 shrink-0">
+            <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span className="font-bold text-[12px] text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums leading-none">
+              {user?.coins || 0}
+            </span>
+          </div>
+
         </div>
 
         {/* Action Group */}
