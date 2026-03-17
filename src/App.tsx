@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
 import Lessons from './pages/Lessons';
 import { Rewards } from './pages/Rewards';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Footer from './components/Footer';
 import { LayoutDashboard, Trophy, BookOpen, Gift } from 'lucide-react';
@@ -12,12 +13,25 @@ import { useLanguage } from './context/LanguageContext';
 import { DashboardProvider, useDashboard } from './context/DashboardContext';
 import { LeaderboardProvider } from './context/LeaderboardContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { NavigationContext } from './context/NavigationContext';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
+  const [previousView, setPreviousView] = useState<ViewState>('leaderboard');
+  const [profileEnrollmentId, setProfileEnrollmentId] = useState<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('isLogged') === 'true';
   });
+
+  const navigateToProfile = (enrollmentId: number | null) => {
+    setPreviousView(currentView);
+    setProfileEnrollmentId(enrollmentId);
+    setCurrentView('profile');
+  };
+
+  const navigateBack = () => {
+    setCurrentView(previousView);
+  };
 
   const [isDark, setIsDark] = useState(() => {
     return document.documentElement.classList.contains('dark');
@@ -84,17 +98,19 @@ const App: React.FC = () => {
   }
 
   return (
-    <DashboardProvider>
-      <NotificationProvider>
-        <AppContent
-          currentView={currentView}
-          setCurrentView={setCurrentView}
-          isDark={isDark}
-          toggleTheme={toggleTheme}
-          handleLogout={handleLogout}
-        />
-      </NotificationProvider>
-    </DashboardProvider>
+    <NavigationContext.Provider value={{ profileEnrollmentId, navigateToProfile, navigateBack }}>
+      <DashboardProvider>
+        <NotificationProvider>
+          <AppContent
+            currentView={currentView}
+            setCurrentView={setCurrentView}
+            isDark={isDark}
+            toggleTheme={toggleTheme}
+            handleLogout={handleLogout}
+          />
+        </NotificationProvider>
+      </DashboardProvider>
+    </NavigationContext.Provider>
   );
 };
 
@@ -134,6 +150,7 @@ const AppContent: React.FC<{
         case 'leaderboard': return <Leaderboard />;
         case 'lessons': return <Lessons />;
         case 'rewards': return <Rewards />;
+        case 'profile': return <Profile />;
         default: return <Dashboard />;
       }
     })();

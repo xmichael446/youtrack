@@ -47,7 +47,7 @@ export interface HomeworkSubmission {
   comment?: string;
 }
 
-export type ViewState = 'login' | 'dashboard' | 'leaderboard' | 'lessons' | 'rewards';
+export type ViewState = 'login' | 'dashboard' | 'leaderboard' | 'lessons' | 'rewards' | 'profile';
 
 export interface CurriculumItem {
   id: string;

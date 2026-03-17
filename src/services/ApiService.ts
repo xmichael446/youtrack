@@ -11,6 +11,13 @@ import {
     ShopResponse,
     ClaimRewardResponse,
     NotificationsResponse,
+    ProfileResponse,
+    ActivityResponse,
+    HeatmapResponse,
+    QuizQuestionsResponse,
+    QuizSubmitResponse,
+    QuizReviewResponse,
+    QuizSubmission,
 } from './apiTypes';
 
 class ApiService {
@@ -641,6 +648,43 @@ class ApiService {
      */
     async submitQuiz(data: QuizSubmission): Promise<QuizSubmitResponse> {
         return (await this.post<QuizSubmitResponse>('/api/quiz/submit/', data)).data;
+    }
+
+    /** Get own profile */
+    async getProfile(): Promise<ProfileResponse> {
+        return (await this.post<ProfileResponse>('/api/profile/')).data;
+    }
+
+    /** Get a peer's profile */
+    async getProfileView(enrollmentId: number): Promise<ProfileResponse> {
+        return (await this.post<ProfileResponse>('/api/profile/view/', { enrollment_id: enrollmentId })).data;
+    }
+
+    /** Update own avatar and/or bio */
+    async updateProfile(bio?: string, avatar?: File): Promise<ProfileResponse> {
+        const data: Record<string, string> = {};
+        if (bio !== undefined) data.bio = bio;
+        const files = avatar ? [avatar] : undefined;
+        return (await this.post<ProfileResponse>('/api/profile/update/', data, files, 'avatar')).data;
+    }
+
+    /** Update privacy settings */
+    async updatePrivacy(data: { hide_balance?: boolean; hide_activity?: boolean }): Promise<{ success: boolean }> {
+        return (await this.post<{ success: boolean }>('/api/profile/privacy/', data)).data;
+    }
+
+    /** Get paginated activity feed */
+    async getProfileActivity(page = 1, enrollmentId?: number | null): Promise<ActivityResponse> {
+        const body: Record<string, number | null> = { page };
+        if (enrollmentId != null) body.enrollment_id = enrollmentId;
+        return (await this.post<ActivityResponse>('/api/profile/activity/', body)).data;
+    }
+
+    /** Get 30-day activity heatmap */
+    async getProfileHeatmap(enrollmentId?: number | null): Promise<HeatmapResponse> {
+        const body: Record<string, number | null> = {};
+        if (enrollmentId != null) body.enrollment_id = enrollmentId;
+        return (await this.post<HeatmapResponse>('/api/profile/heatmap/', body)).data;
     }
 
     /**

@@ -189,6 +189,7 @@ Group and course leaderboards plus the student's weekly stats. Empty request bod
     },
     "group": [
       {
+        "id": 2,
         "rank": 1,
         "last_rank": 2,
         "full_name": "Bobur Yusupov",
@@ -530,6 +531,448 @@ Marks a notification as read.
 ```
 
 Errors: `400` missing field · `404` not found or belongs to another student
+
+---
+
+## Profile
+
+### `POST /api/profile/`
+Returns the full profile of the authenticated student. Empty request body.
+
+```json
+// 200
+{
+  "success": true,
+  "data": {
+    "is_own_profile": true,
+    "full_name": "Ali Karimov",
+    "avatar": "/media/avatars/avatar_1.jpg",
+    "bio": "Passionate about code.",
+    "group_name": "Group A",
+    "course_name": "Python Bootcamp",
+    "level": {
+      "number": 7,
+      "name": "Enthusiast",
+      "icon": "🔥",
+      "badge_color": "#f87171",
+      "description": "Passion fuels progress.",
+      "xp_current": 5600,
+      "xp_required": 5400,
+      "xp_next": 7200,
+      "progress_percent": 28.6
+    },
+    "rank": 3,
+    "streak": 7,
+    "longest_streak": 14,
+    "stats": {
+      "attendance_pct": 80.0,
+      "assignment_pct": 75.0,
+      "total_points": 350,
+      "balance": 120
+    },
+    "achievements": [
+      {
+        "key": "first_login",
+        "name": "First Steps",
+        "description": "Logged in for the first time.",
+        "icon": "👣",
+        "rarity": "common",
+        "earned_at": "2026-01-15T10:00:00+05:00"
+      }
+    ],
+    "privacy": {
+      "hide_balance": false,
+      "hide_activity": false
+    }
+  }
+}
+```
+
+- `level` is `null` if the enrollment has not been assigned a level.
+- `avatar` is `null` if the student has not uploaded one.
+- `stats.attendance_pct` and `stats.assignment_pct` are computed over due items only (opened/started before now).
+
+---
+
+### `POST /api/profile/view/`
+Returns a peer student's profile. Both must belong to the same course. Privacy settings on the target are enforced.
+
+```json
+// Request
+{ "enrollment_id": 42 }
+
+// 200
+{
+  "success": true,
+  "data": {
+    "is_own_profile": false,
+    "full_name": "Bobur Yusupov",
+    "avatar": "/media/avatars/avatar_42.jpg",
+    "bio": "Learning never stops.",
+    "group_name": "Group B",
+    "course_name": "Python Bootcamp",
+    "level": { ... },
+    "rank": 1,
+    "streak": 12,
+    "longest_streak": 20,
+    "stats": {
+      "attendance_pct": 90.0,
+      "assignment_pct": 85.0,
+      "total_points": 500,
+      "balance": null
+    },
+    "achievements": [ ... ],
+    "privacy": {
+      "hide_balance": true,
+      "hide_activity": false
+    }
+  }
+}
+```
+
+**Privacy rules:**
+- `hide_balance=true` — `stats.balance` is returned as `null`.
+- `hide_activity=true` — `streak`, `longest_streak`, `stats.attendance_pct`, and `stats.assignment_pct` are omitted from the response entirely.
+
+Errors: `400` missing `enrollment_id` · `404` student not found or outside your course
+
+---
+
+### `POST /api/profile/update/`
+Updates the authenticated student's avatar and/or bio. Accepts `multipart/form-data`.
+
+| Field | Type | Required | Constraints |
+|---|---|---|---|
+| `avatar` | file | No | JPEG / PNG / WebP, max 2 MB — resized to 256×256 JPEG before storage |
+| `bio` | string | No | Plain text, max 280 chars; HTML tags are stripped automatically |
+
+```json
+// 200 — returns the full updated profile (same shape as /api/profile/)
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+Errors: `400` avatar exceeds 2 MB · `400` unsupported image format · `400` image processing failed · `400` bio exceeds 280 chars
+
+---
+
+### `POST /api/profile/privacy/`
+Updates the privacy settings for the authenticated student.
+
+```json
+// Request
+{ "hide_balance": true, "hide_activity": false }
+
+// 200
+{ "success": true }
+```
+
+Both fields are optional; omit to leave unchanged. Each must be a boolean when provided.
+
+Errors: `400` non-boolean value
+
+---
+
+### `POST /api/profile/activity/`
+Paginated point history (20 entries per page).
+Defaults to the authenticated student's own history.
+Peer history is allowed unless `hide_activity` is set.
+
+```json
+// Request
+{ "page": 1, "enrollment_id": null }
+
+// 200
+{
+  "success": true,
+  "data": {
+    "entries": [
+      {
+        "reason": "Attendance",
+        "xp": 10,
+        "coins": 5,
+        "negative": false,
+        "datetime": "2026-03-15T18:00:00+05:00"
+      }
+    ],
+    "page": 1,
+    "total_pages": 4,
+    "has_next": true
+  }
+}
+```
+
+- `enrollment_id: null` (or omit) — own history.
+- `enrollment_id: <int>` — peer's history; subject to course scoping and `hide_activity` check.
+
+Errors: `400` invalid `enrollment_id` · `403` peer has hidden activity · `404` peer not found or outside your course
+
+---
+
+### `POST /api/profile/heatmap/`
+Activity heatmap for the last 30 days. Only days with at least one PointEntry are included.
+Defaults to the authenticated student. Peer viewing follows the same privacy rules as `/api/profile/activity/`.
+
+```json
+// Request
+{ "enrollment_id": null }
+
+// 200
+{
+  "success": true,
+  "data": [
+    { "date": "2026-02-15", "count": 3 },
+    { "date": "2026-02-16", "count": 1 },
+    { "date": "2026-03-01", "count": 5 }
+  ]
+}
+```
+
+- `date` — ISO 8601 date string (`YYYY-MM-DD`).
+- `count` — number of point entries on that day.
+
+Errors: `403` peer has hidden activity · `404` peer not found or outside your course
+
+---
+
+## Frontend Implementation Guide — Student Profile
+
+This section walks frontend developers through building the complete Student Profile feature. It covers routing, data flow, component structure, and edge cases.
+
+### Routing
+
+| Route | View | Data source |
+|---|---|---|
+| `/profile` | Own profile | `POST /api/profile/` on mount |
+| `/profile/:enrollmentId` | Peer profile | `POST /api/profile/view/` with `{ enrollment_id }` on mount |
+| `/profile/edit` | Edit own profile | `POST /api/profile/update/` on submit |
+| `/profile/settings` | Privacy settings | `POST /api/profile/privacy/` on submit |
+
+The profile should also be reachable by tapping a student's name/avatar anywhere it appears (leaderboard, group list). Pass the `enrollment.id` to navigate to `/profile/:enrollmentId`.
+
+When `enrollmentId` matches the authenticated student's own ID, redirect to `/profile` (or render as own profile — check `is_own_profile` in the response).
+
+---
+
+### Data Fetching Flow
+
+```
+Page mount
+  │
+  ├─ Own profile (/profile)
+  │    └─ POST /api/profile/              → full profile data
+  │    └─ POST /api/profile/heatmap/      → heatmap (parallel)
+  │    └─ POST /api/profile/activity/     → first page of activity (parallel)
+  │
+  └─ Peer profile (/profile/:id)
+       └─ POST /api/profile/view/         → { enrollment_id: id }
+       └─ POST /api/profile/heatmap/      → { enrollment_id: id } (parallel)
+       └─ POST /api/profile/activity/     → { enrollment_id: id, page: 1 } (parallel)
+```
+
+Fire all three requests in parallel on mount. The profile response contains everything for the hero, stats, level bar, and achievements sections. The heatmap and activity feed are independent and can render as they arrive.
+
+**Important:** The heatmap and activity endpoints will return `403` if the peer has `hide_activity: true`. Check `data.privacy.hide_activity` from the profile response to decide whether to even call these — skip the requests and show nothing if hidden.
+
+---
+
+### Component Breakdown
+
+Build these as separate components. Each maps to a visual section of the profile page:
+
+#### 1. `ProfileHero`
+The top banner area.
+
+**Fields used:** `full_name`, `avatar`, `bio`, `group_name`, `course_name`, `rank`
+
+**Rendering:**
+- **Avatar**: Show `avatar` URL in a rounded image (e.g. 96×96px). If `null`, render the student's initials inside a colored circle. Derive the background color deterministically from the enrollment ID (e.g. `hsl(enrollmentId * 137 % 360, 60%, 50%)`).
+- **Name & subtitle**: `full_name` as the heading. Below it: `group_name` and `course_name` in muted text.
+- **Rank badge**: Show `rank` as "#3" if > 0. If `rank` is `0`, show nothing (unranked).
+- **Bio**: Render below the name. If empty and `is_own_profile`, show a prompt: *"Tell your classmates about yourself!"* styled as a clickable placeholder that navigates to `/profile/edit`.
+- **Edit button**: Only visible when `is_own_profile: true`. Navigates to `/profile/edit`.
+
+#### 2. `StatsCards`
+Three side-by-side cards (stack vertically on mobile).
+
+**Fields used:** `stats.attendance_pct`, `stats.assignment_pct`, `stats.balance`, `stats.total_points`
+
+| Card | Value | Visual |
+|---|---|---|
+| Attendance | `attendance_pct` | Circular progress ring (SVG). Ring color: green ≥80%, yellow ≥50%, red <50% |
+| Assignments | `assignment_pct` | Same ring style |
+| Coins | `balance` with `total_points` as a subtitle | Large number, coin icon. No ring. |
+
+**Privacy handling for peer profiles:**
+- If `stats.balance` is `null` → show "Hidden" in the coins card instead of a number.
+- If `stats.attendance_pct` is missing (key absent from object) → the peer has `hide_activity` on. **Hide the entire Attendance and Assignments cards.** Show only the Coins card (or "Hidden" if that's also null). Do NOT show 0% — absence of the key means hidden, not zero.
+
+**How to distinguish "hidden" from "zero":**
+- `stats.attendance_pct` is a number (including `0.0`) → display it.
+- `stats.attendance_pct` key is missing from the `stats` object → hidden, don't display.
+- `stats.balance` is `null` → hidden. `stats.balance` is `0` → display 0.
+
+#### 3. `LevelProgressBar`
+A horizontal progress bar showing current level and XP progress toward the next level.
+
+**Fields used:** `level` object
+
+**Rendering:**
+- If `level` is `null`: show *"No level yet — start earning XP!"* with an empty bar.
+- Otherwise:
+  - Left label: `level.icon` + `"Level " + level.number` + `level.name`
+  - Bar fill: `level.progress_percent`% width, colored with `level.badge_color`
+  - Right label: Next level number (`level.number + 1`), or "MAX" if `level.xp_next` is `null`
+  - Below bar: `level.xp_current` / `level.xp_next` XP (or just `level.xp_current` XP if max level)
+
+#### 4. `AchievementShowcase`
+Horizontally scrollable row of badge icons.
+
+**Fields used:** `achievements` array
+
+**All possible achievement keys and their data:**
+
+| Key | Icon | Name | Rarity |
+|---|---|---|---|
+| `streak_7` | 🔥 | On Fire | common |
+| `streak_14` | ⚡ | Unstoppable | rare |
+| `streak_30` | 👑 | Legendary Streak | legendary |
+| `perfect_week` | 📅 | Perfect Week | rare |
+| `hw_hero_5` | 📚 | Homework Hero | common |
+| `hw_hero_10` | 🎓 | Assignment Master | epic |
+| `first_blood` | 🏁 | First Blood | rare |
+| `top_3` | 🏆 | Podium Finish | epic |
+| `shopaholic_3` | 🛍️ | Shopaholic | common |
+| `level_5` | ⭐ | Rising Star | rare |
+| `level_10` | 💎 | Elite Scholar | legendary |
+
+**Rendering:**
+- Show earned badges as full-color icons. On tap/hover, show a tooltip with `name`, `description`, and `earned_at` formatted as a relative date (e.g. "3 days ago").
+- Show unearned badges as greyed-out silhouettes with a lock icon. On tap/hover, show the `description` as the unlock condition. To know which badges are unearned, hardcode the full list of 11 keys above and diff against the `achievements` array from the API.
+- **Rarity border colors** (suggested):
+  - `common` → gray (`#9ca3af`)
+  - `rare` → blue (`#3b82f6`)
+  - `epic` → purple (`#8b5cf6`)
+  - `legendary` → gold (`#f59e0b`)
+- **Empty state**: If `achievements` is empty, show 3 locked badge placeholders with: *"Complete activities to earn badges!"*
+
+#### 5. `ActivityHeatmap`
+A GitHub-style grid for the last 30 days.
+
+**Data source:** `POST /api/profile/heatmap/` → array of `{ date, count }`
+
+**Rendering:**
+- Build a 30-cell grid (today at the right end, 29 days ago at the left). Each cell = one calendar day.
+- Fill in `count` from the API response. Days not in the response have count `0`.
+- Color scale (suggested): 0 = `#e5e7eb` (light gray), 1-2 = `#bbf7d0`, 3-4 = `#4ade80`, 5+ = `#16a34a`.
+- On hover/tap, show a tooltip: *"+{count} XP from {count} activities"* and the date.
+- Label the first and last dates below the grid.
+- **On mobile**: The grid still fits in 30 cells. Use a single row if space is tight, or wrap to 2 rows of 15.
+- **Hidden state (peer)**: If `privacy.hide_activity` is `true`, do not render this component at all. Do not show an empty grid.
+
+#### 6. `ActivityFeed`
+A vertical list of recent point transactions with pagination.
+
+**Data source:** `POST /api/profile/activity/` → paginated `entries` array
+
+**Rendering per entry:**
+- Icon: green up-arrow for positive, red down-arrow for `negative: true`
+- Text: `reason` (e.g. "Attendance", "Claimed "Coffee Voucher"")
+- Right side: `+{xp} XP, +{coins} coins` (or `-` for negatives)
+- Subtitle: `datetime` formatted as relative ("2 hours ago") or absolute ("Mar 15, 18:00") depending on recency.
+- **Load More button**: Visible when `has_next: true`. On tap, call `/api/profile/activity/` with `page: page + 1` and append results to the list. Hide button when `has_next: false`.
+- **Empty state**: *"No activity yet. Attend lessons and complete assignments to start earning XP!"*
+- **Hidden state (peer)**: If `privacy.hide_activity` is `true`, do not render this component. Do not show the empty state either.
+
+---
+
+### Profile Edit Screen (`/profile/edit`)
+
+Only accessible when viewing own profile. Two fields:
+
+**Avatar upload:**
+- Show current avatar (or initials placeholder) with a camera/upload overlay icon.
+- On tap, open the device file picker. Accept `image/jpeg, image/png, image/webp`.
+- Client-side: preview the selected image immediately. Validate file size < 2 MB before uploading. Show an error toast if too large.
+- Submit via `POST /api/profile/update/` as `multipart/form-data`. The field name is `avatar`.
+- The server resizes to 256×256 JPEG. The response contains the updated `avatar` URL — use it to update the preview.
+
+**Bio:**
+- A textarea, max 280 characters. Show a live character counter (e.g. "42 / 280").
+- Submit via the same `POST /api/profile/update/` request. The field name is `bio`. Can be sent together with `avatar` or alone.
+- HTML tags are stripped server-side, so no need to sanitize on the client — but avoid rendering bio as raw HTML regardless.
+
+**Submit flow:**
+```
+User taps "Save"
+  → show loading spinner on button
+  → POST /api/profile/update/ (multipart/form-data)
+  → on 200: update local profile state, navigate back to /profile, show success toast
+  → on 400: show error message from response.message
+```
+
+---
+
+### Privacy Settings Screen (`/profile/settings`)
+
+Two toggle switches:
+
+| Toggle | Field | Effect explained to user |
+|---|---|---|
+| "Hide my coin balance" | `hide_balance` | "Other students won't see how many coins you have" |
+| "Hide my activity details" | `hide_activity` | "Other students won't see your attendance rate, assignment stats, streak, or activity history" |
+
+**Submit flow:**
+```
+User changes a toggle
+  → POST /api/profile/privacy/ with { hide_balance: bool, hide_activity: bool }
+  → on 200: show success toast
+  → on 400: revert toggle, show error
+```
+
+Only send the changed field(s). Both are optional in the request.
+
+---
+
+### Linking Profiles from Other Screens
+
+Profiles should be accessible from any screen that shows a student's name or avatar. Add tap handlers on:
+
+| Screen | Element | Action |
+|---|---|---|
+| Leaderboard (group list) | Student name/row | Navigate to `/profile/{enrollment.id}` |
+| Leaderboard (course list) | Student name/row | Navigate to `/profile/{enrollment.id}` |
+
+Both the group and course leaderboard arrays include `id` (the enrollment ID). Use it to navigate to `/profile/{id}` on tap.
+
+---
+
+### Error Handling
+
+| HTTP Status | Meaning | Frontend Action |
+|---|---|---|
+| `400` | Validation error (bad input) | Show `response.message` as an inline error or toast |
+| `401` | Token expired | Trigger token refresh flow, retry the request |
+| `403` | Peer has hidden their activity | Don't show activity/heatmap sections. You should already know this from the profile response's `privacy` object |
+| `404` | Student not found or not in your course | Show a "Student not found" screen with a back button |
+
+---
+
+### Empty State Summary
+
+| Condition | What to show |
+|---|---|
+| No avatar | Initials circle with deterministic color |
+| No bio (own profile) | Clickable placeholder: *"Tell your classmates about yourself!"* |
+| No bio (peer profile) | Muted text: *"This student hasn't written a bio yet"* |
+| No level assigned | Empty progress bar with: *"No level yet — start earning XP!"* |
+| 0% attendance (not hidden) | Show 0% in the ring — it's real data, not an error |
+| No assignments exist in course | Show *"No assignments yet"* instead of 0% |
+| No achievements earned | 3 locked badge placeholders: *"Complete activities to earn badges!"* |
+| No activity entries | *"No activity yet. Attend lessons and complete assignments to start earning XP!"* |
+| Empty heatmap (no entries in 30 days) | All cells are the empty color (`#e5e7eb`). No special message needed. |
 
 ---
 

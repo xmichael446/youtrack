@@ -34,6 +34,7 @@ import { LessonsProvider, useLessons } from '../context/LessonsContext';
 import { useDashboard } from '../context/DashboardContext';
 import {
   AssignmentData,
+  AttendanceData,
   HomeworkSubmissionData,
   QuizSessionData,
   QuizQuestionsData,
@@ -1059,46 +1060,38 @@ const AssignmentHistoryCard: React.FC<{
   );
 };
 
-// --- Lessons Content Component ---
-const LessonsContent: React.FC = () => {
+// Isolated component — owns timer, attendance code, prevents LessonsContent from re-rendering every second
+const ActiveAttendanceCard: React.FC<{
+  attendance: AttendanceData;
+  quiz: QuizSessionData | null | undefined;
+  showToast: (msg: string, type: 'success' | 'error') => void;
+}> = ({ attendance, quiz, showToast }) => {
   const { t } = useLanguage();
+  const { markAttendance } = useLessons();
   const { refetch } = useDashboard();
-  const { lessonsData, loading, error, markAttendance, submitAssignment } = useLessons();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [expandedRowIds, setExpandedRowIds] = useState<number[]>([]);
-
-  const toggleRow = (id: number) => {
-    setExpandedRowIds(prev => prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]);
-  };
-
-  const [attendanceCode, setAttendanceCode] = useState('');
   const [timeLeft, setTimeLeft] = useState('00:00:00');
   const [isExpired, setIsExpired] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
-  const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
+  const [attendanceCode, setAttendanceCode] = useState('');
 
   useEffect(() => {
-    if (!lessonsData?.attendance?.closes_at || lessonsData.attendance.status !== null) return;
-    const deadline = new Date(lessonsData.attendance.closes_at).getTime();
-    const timer = setInterval(() => {
-      const now = Date.now();
-      const diff = deadline - now;
+    if (!attendance.closes_at || attendance.status !== null) return;
+    const deadline = new Date(attendance.closes_at).getTime();
+    const tick = () => {
+      const diff = deadline - Date.now();
       if (diff <= 0) {
-        clearInterval(timer);
         setTimeLeft('00:00:00');
         setIsExpired(true);
       } else {
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const m = Math.floor((diff / 1000 / 60) % 60);
         const s = Math.floor((diff / 1000) % 60);
-        setTimeLeft(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
-        setIsExpired(false);
+        setTimeLeft(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
       }
-    }, 1000);
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [lessonsData?.attendance?.closes_at, lessonsData?.attendance?.status]);
+  }, [attendance.closes_at, attendance.status]);
 
   const handleMarkAttendance = async () => {
     if (!attendanceCode) return;
@@ -1109,8 +1102,98 @@ const LessonsContent: React.FC = () => {
         setAttendanceCode('');
         refetch();
       }
-    } catch (err: any) { showToast(err.message || "Invalid keyword", 'error'); }
+    } catch (err: any) {
+      showToast(err.message || 'Invalid keyword', 'error');
+    }
   };
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-sm">
+      <div className="p-5 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex-1 min-w-0 text-center md:text-left">
+          <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-2 opacity-80">Current Lesson</span>
+          <h3 className="text-lg md:text-xl font-[800] text-brand-dark dark:text-white leading-tight mb-3">
+            Lesson {attendance.number}: {attendance.lesson_topic}
+          </h3>
+          <div className="flex items-center justify-center md:justify-start gap-4 text-[12px] font-mono font-bold text-gray-500">
+            <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-brand-primary/50" /> {new Date(attendance.opens_at).toLocaleDateString()}</span>
+            <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-brand-primary/50" /> {new Date(attendance.opens_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        </div>
+
+        {attendance.status === null && !isExpired ? (
+          <div className="bg-gradient-to-br from-slate-900 to-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col items-center min-w-[150px] shadow-lg">
+            <p className="text-[9px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">{t('timeRemaining')}</p>
+            <p className="text-2xl font-bold text-brand-primary tabular-nums tracking-tight font-mono" style={{ textShadow: '0 0 20px rgba(18,194,220,0.3)' }}>{timeLeft}</p>
+          </div>
+        ) : (
+          <div className="shrink-0 flex justify-center w-full md:w-auto">
+            {attendance.status === 'attended' || attendance.status === 'marked' ? (
+              <div className="flex items-center gap-2 px-5 py-3 bg-emerald-500 text-white rounded-2xl font-mono font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-emerald-500/20">
+                <CheckCircle2 className="w-4 h-4" /> {t('attended') || "Attended"}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-5 py-3 bg-red-500 text-white rounded-2xl font-mono font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-red-500/20">
+                <XCircle className="w-4 h-4" /> {t('missed') || "Missed"}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="px-5 pb-8 md:px-8">
+        {attendance.status === null && !isExpired && (
+          <div className="max-w-md mx-auto md:mx-0 space-y-3">
+            <label className="block text-[10px] font-mono font-bold text-gray-500 dark:text-slate-500 uppercase tracking-[2px] text-center md:text-left">
+              {t('enterKeyword')}
+            </label>
+            <div className="flex flex-col gap-2.5">
+              <input
+                type="text"
+                value={attendanceCode}
+                onChange={(e) => setAttendanceCode(e.target.value.toLowerCase())}
+                placeholder="e.g. apple"
+                className="w-full h-[52px] rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 px-5 text-sm font-mono font-bold focus:border-brand-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-brand-primary/8 transition-all lowercase tracking-wider"
+              />
+              <button
+                onClick={handleMarkAttendance}
+                className="w-full h-[52px] px-7 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono"
+              >
+                {t('mark')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {quiz && (
+          <div className="pt-8 border-t border-gray-100 dark:border-slate-800 mt-8">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[3px]">{t('todaysPractice')}</h4>
+              <div className="h-px flex-1 bg-gray-100 dark:bg-slate-800 ml-6"></div>
+            </div>
+            <QuizSection lessonId={attendance.track_id} showToast={showToast} initialData={quiz} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// --- Lessons Content Component ---
+const LessonsContent: React.FC = () => {
+  const { t } = useLanguage();
+  const { lessonsData, loading, error, submitAssignment } = useLessons();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedRowIds, setExpandedRowIds] = useState<number[]>([]);
+
+  const toggleRow = (id: number) => {
+    setExpandedRowIds(prev => prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]);
+  };
+
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
 
   if (loading && !lessonsData) return (
     <div className="flex items-center justify-center min-h-[60vh]">
@@ -1160,75 +1243,7 @@ const LessonsContent: React.FC = () => {
         </div>
 
         {attendance ? (
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-sm">
-            <div className="p-5 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="flex-1 min-w-0 text-center md:text-left">
-                <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-2 opacity-80">Current Lesson</span>
-                <h3 className="text-lg md:text-xl font-[800] text-brand-dark dark:text-white leading-tight mb-3">
-                  Lesson {attendance.number}: {attendance.lesson_topic}
-                </h3>
-                <div className="flex items-center justify-center md:justify-start gap-4 text-[12px] font-mono font-bold text-gray-500">
-                  <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-brand-primary/50" /> {new Date(attendance.opens_at).toLocaleDateString()}</span>
-                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-brand-primary/50" /> {new Date(attendance.opens_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-              </div>
-
-              {attendance.status === null && !isExpired ? (
-                <div className="bg-gradient-to-br from-slate-900 to-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col items-center min-w-[150px] shadow-lg">
-                  <p className="text-[9px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">{t('timeRemaining')}</p>
-                  <p className="text-2xl font-bold text-brand-primary tabular-nums tracking-tight font-mono" style={{ textShadow: '0 0 20px rgba(18,194,220,0.3)' }}>{timeLeft}</p>
-                </div>
-              ) : (
-                <div className="shrink-0 flex justify-center w-full md:w-auto">
-                  {attendance.status === 'attended' || attendance.status === 'marked' ? (
-                    <div className="flex items-center gap-2 px-5 py-3 bg-emerald-500 text-white rounded-2xl font-mono font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-emerald-500/20">
-                      <CheckCircle2 className="w-4 h-4" /> {t('attended') || "Attended"}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 px-5 py-3 bg-red-500 text-white rounded-2xl font-mono font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-red-500/20">
-                      <XCircle className="w-4 h-4" /> {t('missed') || "Missed"}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="px-5 pb-8 md:px-8">
-              {(attendance.status === null) && !isExpired && (
-                <div className="max-w-md mx-auto md:mx-0 space-y-3">
-                  <label className="block text-[10px] font-mono font-bold text-gray-500 dark:text-slate-500 uppercase tracking-[2px] text-center md:text-left">
-                    {t('enterKeyword')}
-                  </label>
-                  <div className="flex flex-col gap-2.5">
-                    <input
-                      type="text"
-                      value={attendanceCode}
-                      onChange={(e) => setAttendanceCode(e.target.value.toLowerCase())}
-                      placeholder="e.g. apple"
-                      className="w-full h-[52px] rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 px-5 text-sm font-mono font-bold focus:border-brand-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-brand-primary/8 transition-all lowercase tracking-wider"
-                    />
-                    <button
-                      onClick={handleMarkAttendance}
-                      className="w-full h-[52px] px-7 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono"
-                    >
-                      {t('mark')}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Re-embedded quiz section directly inside attendance for active lesson */}
-              {lessonsData?.quiz && (
-                <div className="pt-8 border-t border-gray-100 dark:border-slate-800 mt-8">
-                   <div className="flex items-center justify-between mb-6">
-                     <h4 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[3px]">{t('todaysPractice')}</h4>
-                     <div className="h-px flex-1 bg-gray-100 dark:bg-slate-800 ml-6"></div>
-                   </div>
-                   <QuizSection lessonId={attendance.track_id} showToast={showToast} initialData={lessonsData.quiz} />
-                </div>
-              )}
-            </div>
-          </div>
+          <ActiveAttendanceCard attendance={attendance} quiz={lessonsData?.quiz} showToast={showToast} />
         ) : (
           <div className="text-center py-14 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
             <BookOpen className="w-10 h-10 text-gray-200 dark:text-slate-700 mx-auto mb-3" />

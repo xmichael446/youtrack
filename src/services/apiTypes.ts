@@ -317,3 +317,77 @@ export interface QuizReviewResponse {
     success: boolean;
     data: QuizReviewData;
 }
+
+// --- Profile Types ---
+
+export interface Achievement {
+    key: string;
+    name: string;
+    description: string;
+    icon: string;
+    rarity: 'common' | 'rare' | 'epic' | 'legendary';
+    earned_at: string;
+}
+
+export interface ProfilePrivacy {
+    hide_balance: boolean;
+    hide_activity: boolean;
+}
+
+export interface ProfileStats {
+    attendance_pct?: number;
+    assignment_pct?: number;
+    total_points: number;
+    balance: number | null;
+}
+
+export interface ProfileData {
+    is_own_profile: boolean;
+    full_name: string;
+    avatar: string | null;
+    bio: string;
+    group_name: string;
+    course_name: string;
+    level: LevelInfo | null;
+    rank: number;
+    streak: number;
+    longest_streak: number;
+    stats: ProfileStats;
+    achievements: Achievement[];
+    privacy: ProfilePrivacy;
+}
+
+export interface ProfileResponse {
+    success: boolean;
+    data: ProfileData;
+}
+
+export interface ActivityEntry {
+    reason: string;
+    xp: number;
+    coins: number;
+    negative: boolean;
+    datetime: string;
+}
+
+export interface ActivityData {
+    entries: ActivityEntry[];
+    page: number;
+    total_pages: number;
+    has_next: boolean;
+}
+
+export interface ActivityResponse {
+    success: boolean;
+    data: ActivityData;
+}
+
+export interface HeatmapEntry {
+    date: string;
+    count: number;
+}
+
+export interface HeatmapResponse {
+    success: boolean;
+    data: HeatmapEntry[];
+}
