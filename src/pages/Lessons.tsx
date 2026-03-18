@@ -347,6 +347,10 @@ const QuizSection: React.FC<{
 
   const handleSelectOption = (questionId: number, optionId: number) => {
     setAnswers(prev => ({ ...prev, [questionId]: optionId }));
+    // Auto-advance to next question after a short delay
+    if (questionsData && currentQuestionIndex < questionsData.questions.length - 1) {
+      setTimeout(() => setCurrentQuestionIndex(prev => prev + 1), 300);
+    }
   };
 
   const goToNextQuestion = () => {
@@ -477,31 +481,23 @@ const QuizSection: React.FC<{
         </div>
 
         <div className="p-4 md:p-8 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-8">
-          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+          <div className="max-w-4xl mx-auto flex items-center justify-center gap-4">
             <button
               onClick={goToPrevQuestion}
               disabled={currentQuestionIndex === 0}
-              className="flex-1 md:flex-none px-6 md:px-10 py-4 rounded-[16px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
+              className="px-6 md:px-10 py-4 rounded-[16px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
             >
               <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion')}</span><span className="md:hidden">Back</span>
             </button>
 
-            {currentQuestionIndex === questionsData!.questions.length - 1 ? (
+            {currentQuestionIndex === questionsData!.questions.length - 1 && (
               <button
                 onClick={handleSubmitQuiz}
                 disabled={submitting || Object.keys(answers).length < questionsData!.questions.length}
-                className="flex-[2] md:flex-none px-12 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[16px] font-bold text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+                className="px-12 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[16px] font-bold text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
               >
                 {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trophy className="w-5 h-5" />}
                 {t('finishQuiz')}
-              </button>
-            ) : (
-              <button
-                onClick={goToNextQuestion}
-                disabled={!answers[questionsData!.questions[currentQuestionIndex].id]}
-                className="flex-[2] md:flex-none px-12 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[16px] font-bold text-[15px] hover:opacity-90 transition-all disabled:opacity-30 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
-              >
-                {t('nextQuestion')} <ChevronRight className="w-4 h-4" />
               </button>
             )}
           </div>

@@ -48,7 +48,16 @@
             '3xl': '24px',
             '4xl': '32px',
             '5xl': '40px',
-          }
+          },
+          keyframes: {
+            shimmer: {
+              '0%': { transform: 'translateX(-100%)' },
+              '100%': { transform: 'translateX(100%)' },
+            },
+          },
+          animation: {
+            shimmer: 'shimmer 1.6s infinite',
+          },
         }
       }
     }

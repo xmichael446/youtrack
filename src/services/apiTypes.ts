@@ -318,6 +318,139 @@ export interface QuizReviewResponse {
     data: QuizReviewData;
 }
 
+// --- Contest Types ---
+
+export type ContestStatus = 'scheduled' | 'open' | 'closed' | 'finalized';
+
+export interface ContestListItem {
+    id: number;
+    number: number;
+    status: ContestStatus;
+    scheduled_start: string;
+    scheduled_end: string;
+    question_count: number;
+    registration_count: number;
+    is_registered: boolean;
+}
+
+export interface ContestListResponse {
+    success: boolean;
+    data: ContestListItem[];
+}
+
+export interface ContestPrize {
+    place: number;
+    reward_name: string;
+    reward_description: string;
+    xp: number;
+    coins: number;
+}
+
+export interface ContestRegistration {
+    id: number;
+    full_name: string;
+    avatar: string | null;
+    rank: number;
+    xp: number;
+    level: CompactLevelInfo | null;
+}
+
+export interface ContestWinner {
+    place: number;
+    enrollment_id: number;
+    full_name: string;
+    score: number;
+    total: number;
+}
+
+export interface ContestDetailData {
+    id: number;
+    number: number;
+    status: ContestStatus;
+    scheduled_start: string;
+    scheduled_end: string;
+    question_count: number;
+    registration_count: number;
+    is_registered: boolean;
+    prizes: ContestPrize[];
+    winners: ContestWinner[];
+    registrations: ContestRegistration[];
+}
+
+export interface ContestDetailResponse {
+    success: boolean;
+    data: ContestDetailData;
+}
+
+export interface ContestRegisterResponse {
+    success: boolean;
+    message: string;
+    registration_count: number;
+}
+
+export interface ContestStartResponse {
+    success: boolean;
+    contest_end_time: string;
+    questions: QuizQuestion[];
+}
+
+export interface ContestAnswer {
+    question_id: number;
+    option_id: number;
+}
+
+export interface ContestSubmission {
+    contest_id: number;
+    answers: ContestAnswer[];
+}
+
+export interface ContestSubmitResponse {
+    success: boolean;
+    score: number;
+    total: number;
+    message: string;
+}
+
+export interface ContestLeaderboardEntry {
+    rank: number;
+    enrollment_id: number;
+    full_name: string;
+    score: number;
+    total: number;
+    submitted_at: string;
+}
+
+export interface ContestPrizeWon {
+    place: number;
+    reward_name: string;
+}
+
+export interface ContestMyAttempt {
+    score: number;
+    total: number;
+    rank: number;
+    submitted_at: string;
+    prize: ContestPrizeWon | null;
+    answers: QuizQuestionResult[];
+}
+
+export interface ContestResultsData {
+    contest_id: number;
+    number: number;
+    leaderboard: ContestLeaderboardEntry[];
+    my_attempt: ContestMyAttempt | null;
+}
+
+export interface ContestResultsResponse {
+    success: boolean;
+    data: ContestResultsData;
+}
+
+export interface ContestLiveLeaderboardResponse {
+    success: boolean;
+    data: ContestLeaderboardEntry[];
+}
+
 // --- Profile Types ---
 
 export interface Achievement {

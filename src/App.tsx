@@ -6,9 +6,10 @@ import Leaderboard from './pages/Leaderboard';
 import Lessons from './pages/Lessons';
 import { Rewards } from './pages/Rewards';
 import Profile from './pages/Profile';
+import { Contests } from './pages/Contests';
 import Login from './pages/Login';
 import Footer from './components/Footer';
-import { LayoutDashboard, Trophy, BookOpen, Gift } from 'lucide-react';
+import { LayoutDashboard, Trophy, BookOpen, Gift, Swords } from 'lucide-react';
 import { useLanguage } from './context/LanguageContext';
 import { DashboardProvider, useDashboard } from './context/DashboardContext';
 import { LeaderboardProvider } from './context/LeaderboardContext';
@@ -151,6 +152,7 @@ const AppContent: React.FC<{
         case 'lessons': return <Lessons />;
         case 'rewards': return <Rewards />;
         case 'profile': return <Profile />;
+        case 'contests': return <Contests />;
         default: return <Dashboard />;
       }
     })();
@@ -254,6 +256,7 @@ const AppContent: React.FC<{
             <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} />
             <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} />
             <NavItem view="lessons" icon={BookOpen} label={t('lessons')} />
+            <NavItem view="contests" icon={Swords} label={t('contests')} />
             <NavItem view="rewards" icon={Gift} label={t('giftShop')} />
           </nav>
 
@@ -282,10 +285,11 @@ const AppContent: React.FC<{
 
           {/* Bottom Nav (Mobile) */}
           <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-gray-100 dark:border-slate-800 pt-2.5 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-300">
-            <div className="flex justify-around items-center px-2">
+            <div className="flex justify-around items-center px-1">
               <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} />
               <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} />
               <NavItem view="lessons" icon={BookOpen} label={t('lessons')} />
+              <NavItem view="contests" icon={Swords} label={t('contests')} />
               <NavItem view="rewards" icon={Gift} label={t('giftShop')} />
             </div>
           </nav>

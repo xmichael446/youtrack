@@ -18,6 +18,13 @@ import {
     QuizSubmitResponse,
     QuizReviewResponse,
     QuizSubmission,
+    ContestListResponse,
+    ContestDetailResponse,
+    ContestRegisterResponse,
+    ContestStartResponse,
+    ContestSubmission,
+    ContestSubmitResponse,
+    ContestResultsResponse,
 } from './apiTypes';
 
 class ApiService {
@@ -685,6 +692,44 @@ class ApiService {
         const body: Record<string, number | null> = {};
         if (enrollmentId != null) body.enrollment_id = enrollmentId;
         return (await this.post<HeatmapResponse>('/api/profile/heatmap/', body)).data;
+    }
+
+    // --- Contest Methods ---
+
+    /** List all visible contests for the student's course */
+    async getContestList(): Promise<ContestListResponse> {
+        return (await this.post<ContestListResponse>('/api/contest/list/')).data;
+    }
+
+    /** Get full contest details including prizes and winners */
+    async getContestDetail(contestId: number): Promise<ContestDetailResponse> {
+        return (await this.post<ContestDetailResponse>('/api/contest/detail/', { contest_id: contestId })).data;
+    }
+
+    /** Register for a scheduled contest */
+    async registerForContest(contestId: number): Promise<ContestRegisterResponse> {
+        return (await this.post<ContestRegisterResponse>('/api/contest/register/', { contest_id: contestId })).data;
+    }
+
+    /** Start an open contest and receive shuffled questions */
+    async startContest(contestId: number): Promise<ContestStartResponse> {
+        return (await this.post<ContestStartResponse>('/api/contest/start/', { contest_id: contestId })).data;
+    }
+
+    /** Submit answers for the current contest attempt */
+    async submitContest(data: ContestSubmission): Promise<ContestSubmitResponse> {
+        return (await this.post<ContestSubmitResponse>('/api/contest/submit/', data)).data;
+    }
+
+    /** Get full contest leaderboard and personal review (finalized only) */
+    async getContestResults(contestId: number): Promise<ContestResultsResponse> {
+        return (await this.post<ContestResultsResponse>('/api/contest/results/', { contest_id: contestId })).data;
+    }
+
+    /** Get live contest leaderboard (available when open, closed, or finalized) */
+    async getContestLeaderboard(contestId: number): Promise<ContestLeaderboardEntry[]> {
+        const response = await this.post<any>('/api/contest/leaderboard/', { contest_id: contestId });
+        return response.data.leaderboard || response.data.data || response.data;
     }
 
     /**
