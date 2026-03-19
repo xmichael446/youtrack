@@ -1198,8 +1198,13 @@ const LessonsContent: React.FC = () => {
   const attendance = lessonsData?.attendance;
   const assignments = lessonsData?.assignments;
   const currentAssignment = assignments?.current;
+  
+  // Hide current assignment if it belongs to the active lesson (the one in attendance)
+  const isCurrentLessonActive = attendance && currentAssignment && String(attendance.number) === String(currentAssignment.number);
+  const showCurrentAssignment = currentAssignment && !isCurrentLessonActive;
+
   const previousAssignments = assignments?.previous || [];
-  const hasAnyAssignments = !!currentAssignment || previousAssignments.length > 0;
+  const hasAnyAssignments = showCurrentAssignment || previousAssignments.length > 0;
 
   return (
     <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500 pb-10">
@@ -1250,7 +1255,7 @@ const LessonsContent: React.FC = () => {
 
         {hasAnyAssignments ? (
           <div className="space-y-4">
-            {currentAssignment && (
+            {showCurrentAssignment && (
               <CurrentAssignmentSection
                 assignment={currentAssignment}
                 onSubmit={() => setIsModalOpen(true)}
@@ -1259,7 +1264,7 @@ const LessonsContent: React.FC = () => {
             )}
             {previousAssignments.length > 0 && (
               <div className="space-y-3">
-                {currentAssignment && (
+                {showCurrentAssignment && (
                   <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px] px-1 pt-2 flex items-center gap-2">
                     <HistoryIcon className="w-3.5 h-3.5" />{t('portfolioHistory')}
                   </p>
@@ -1284,7 +1289,7 @@ const LessonsContent: React.FC = () => {
         )}
       </section>
 
-      {currentAssignment && (
+      {showCurrentAssignment && (
         <SubmissionModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

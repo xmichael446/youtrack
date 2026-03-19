@@ -13,20 +13,6 @@ import type { ProfileData, ActivityEntry, HeatmapEntry, Achievement } from '../s
 // Constants & helpers
 // ---------------------------------------------------------------------------
 
-const ALL_ACHIEVEMENTS: { key: string; icon: string; name: string; description: string; rarity: 'common' | 'rare' | 'epic' | 'legendary' }[] = [
-  { key: 'streak_7',     icon: '🔥', name: 'On Fire',          description: 'Maintained a 7-day streak.',          rarity: 'common'    },
-  { key: 'streak_14',    icon: '⚡', name: 'Unstoppable',       description: 'Maintained a 14-day streak.',         rarity: 'rare'      },
-  { key: 'streak_30',    icon: '👑', name: 'Legendary Streak',  description: 'Maintained a 30-day streak.',         rarity: 'legendary' },
-  { key: 'perfect_week', icon: '📅', name: 'Perfect Week',      description: 'Attended all lessons in a week.',     rarity: 'rare'      },
-  { key: 'hw_hero_5',    icon: '📚', name: 'Homework Hero',     description: 'Submitted 5 assignments.',            rarity: 'common'    },
-  { key: 'hw_hero_10',   icon: '🎓', name: 'Assignment Master', description: 'Submitted 10 assignments.',           rarity: 'epic'      },
-  { key: 'first_blood',  icon: '🏁', name: 'First Blood',       description: 'Submitted your first assignment.',    rarity: 'rare'      },
-  { key: 'top_3',        icon: '🏆', name: 'Podium Finish',     description: 'Reached top 3 in rankings.',         rarity: 'epic'      },
-  { key: 'shopaholic_3', icon: '🛍️', name: 'Shopaholic',        description: 'Claimed 3 rewards.',                  rarity: 'common'    },
-  { key: 'level_5',      icon: '⭐', name: 'Rising Star',       description: 'Reached level 5.',                   rarity: 'rare'      },
-  { key: 'level_10',     icon: '💎', name: 'Elite Scholar',     description: 'Reached level 10.',                  rarity: 'legendary' },
-];
-
 const RARITY_COLORS: Record<string, string> = {
   common:    '#9ca3af',
   rare:      '#3b82f6',
@@ -45,8 +31,10 @@ function getProgressColor(pct: number) {
   if (pct >= 50) return '#f59e0b';
   return '#ef4444';
 }
-function formatRelative(dateStr: string) {
+function formatRelative(dateStr: string | null) {
+  if (!dateStr) return '—';
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '—';
   const diffMs = Date.now() - date.getTime();
   const s = Math.floor(diffMs / 1000);
   const m = Math.floor(s / 60);
@@ -119,7 +107,7 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error' }> = ({ messa
 );
 
 // ---------------------------------------------------------------------------
-// ProfileHero — includes avatar, bio, streak, and level bar
+// ProfileHero — includes avatar, bio, streak, compact stats and level bar
 // ---------------------------------------------------------------------------
 
 const ProfileHero: React.FC<{
@@ -133,7 +121,8 @@ const ProfileHero: React.FC<{
   const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
   const avatarUrl = profile.avatar ? `${baseUrl}${profile.avatar}` : null;
   const id = enrollmentId ?? 0;
-  const { level } = profile;
+  const { level, stats } = profile;
+  const hasAttendance = 'attendance_pct' in stats;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
@@ -185,25 +174,55 @@ const ProfileHero: React.FC<{
           <p className="text-[12px] text-gray-500 dark:text-slate-400 font-medium mt-0.5">
             {profile.group_name} &middot; {profile.course_name}
           </p>
-          {profile.streak > 0 && (
-            <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
-              <Flame className="w-3 h-3" />
-              {profile.streak}d streak
-            </span>
-          )}
-          <div className="mt-3">
-            {profile.bio ? (
-              <p className="text-[13px] text-gray-600 dark:text-slate-300 leading-relaxed">{profile.bio}</p>
-            ) : profile.is_own_profile ? (
-              <button onClick={onEdit}
-                className="text-[12px] text-brand-primary/70 italic hover:text-brand-primary transition-colors">
-                {t('bioPlaceholder')}
-              </button>
-            ) : (
-              <p className="text-[12px] text-gray-400 dark:text-slate-500 italic">{t('noBioPeer')}</p>
+          
+          {/* Pills Row: Streak, Coins, XP */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            {profile.streak > 0 && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
+                <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
+                <span className="text-[11px] font-bold font-mono text-amber-600 dark:text-amber-400 tabular-nums">{profile.streak}d streak</span>
+              </div>
             )}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
+              <Coins className="w-3.5 h-3.5 text-amber-500" />
+              <span className="text-[11px] font-bold font-mono text-amber-600 dark:text-amber-400 tabular-nums">{stats.balance ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-brand-primary/10 border border-brand-primary/20 shadow-sm">
+              <Zap className="w-3.5 h-3.5 text-brand-primary fill-brand-primary/20" />
+              <span className="text-[11px] font-bold font-mono text-brand-primary tabular-nums">{stats.total_points} XP</span>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Attendance & Assignments Info Row — Simple & Clean */}
+      <div className="px-5 pb-4 flex items-center gap-6 divide-x divide-gray-100 dark:divide-slate-800">
+        {hasAttendance && (
+          <div className="flex flex-col">
+            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">Attendance</span>
+            <span className="text-sm font-bold text-brand-dark dark:text-white font-mono tabular-nums">{Math.round(stats.attendance_pct!)}%</span>
+          </div>
+        )}
+        {hasAttendance && (
+          <div className="flex flex-col pl-6">
+            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">Assignments</span>
+            <span className="text-sm font-bold text-brand-dark dark:text-white font-mono tabular-nums">{Math.round(stats.assignment_pct ?? 0)}%</span>
+          </div>
+        )}
+      </div>
+
+      {/* Bio */}
+      <div className="px-5 pb-4">
+        {profile.bio ? (
+          <p className="text-[13px] text-gray-600 dark:text-slate-300 leading-relaxed">{profile.bio}</p>
+        ) : profile.is_own_profile ? (
+          <button onClick={onEdit}
+            className="text-[12px] text-brand-primary/70 italic hover:text-brand-primary transition-colors">
+            {t('bioPlaceholder')}
+          </button>
+        ) : (
+          <p className="text-[12px] text-gray-400 dark:text-slate-500 italic">{t('noBioPeer')}</p>
+        )}
       </div>
 
       {/* Level bar */}
@@ -250,17 +269,18 @@ const ProfileHero: React.FC<{
 const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achievements }) => {
   const { t } = useLanguage();
   const [selected, setSelected] = useState<string | null>(null);
-  const earnedKeys = new Set(achievements.map(a => a.key));
-  const earnedMap = new Map(achievements.map(a => [a.key, a]));
 
-  const sorted = [
-    ...ALL_ACHIEVEMENTS.filter(a => earnedKeys.has(a.key)),
-    ...ALL_ACHIEVEMENTS.filter(a => !earnedKeys.has(a.key)),
-  ];
+  // Sort: Earned first
+  const sorted = [...achievements].sort((a, b) => {
+    const aEarned = !!a.earned_at;
+    const bEarned = !!b.earned_at;
+    if (aEarned && !bEarned) return -1;
+    if (!aEarned && bEarned) return 1;
+    return 0;
+  });
 
   const selectedDef = sorted.find(d => d.key === selected);
-  const selectedData = selected ? earnedMap.get(selected) : undefined;
-  const selectedEarned = selected ? earnedKeys.has(selected) : false;
+  const earnedCount = achievements.filter(a => !!a.earned_at).length;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
@@ -269,51 +289,57 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
           {t('achievements')}
         </p>
         <span className="text-[10px] font-mono text-gray-400 dark:text-slate-500">
-          {achievements.length}/{ALL_ACHIEVEMENTS.length}
+          {earnedCount}/{achievements.length}
         </span>
       </div>
 
-      {/* Badge cards — horizontal scroll, each always shows icon + name + rarity */}
-      <div className="flex gap-2.5 overflow-x-auto pb-2 no-scrollbar">
-        {sorted.map(def => {
-          const earned = earnedKeys.has(def.key);
-          const data = earnedMap.get(def.key);
-          const effectiveRarity = earned && data ? data.rarity : def.rarity;
-          const borderColor = RARITY_COLORS[effectiveRarity];
+      {/* Badge cards — horizontal scroll */}
+      <div className="flex gap-2.5 overflow-x-auto pb-2 no-scrollbar items-stretch">
+        {sorted.map((def, idx) => {
+          const earned = !!def.earned_at;
+          const prevEarned = idx > 0 ? !!sorted[idx - 1].earned_at : true;
+          
+          // Show separator if this one is NOT earned but the previous one WAS earned
+          const showSeparator = idx > 0 && !earned && prevEarned;
+
+          const borderColor = RARITY_COLORS[def.rarity] || '#9ca3af';
           const isSelected = selected === def.key;
-          const displayName = earned && data ? data.name : def.name;
-          const displayIcon = earned && data ? data.icon : def.icon;
 
           return (
-            <button
-              key={def.key}
-              onClick={() => setSelected(isSelected ? null : def.key)}
-              className="shrink-0 w-[88px] flex flex-col items-center gap-1.5 p-2.5 rounded-xl transition-all duration-200 text-left"
-              style={{
-                border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : '#e5e7eb'}`,
-                backgroundColor: isSelected
-                  ? `${borderColor}18`
-                  : earned ? `${borderColor}08` : undefined,
-                filter: earned ? 'none' : 'grayscale(1) opacity(0.45)',
-                boxShadow: isSelected ? `0 0 0 3px ${borderColor}20` : undefined,
-              }}
-            >
-              <span className="text-2xl leading-none mt-0.5">{displayIcon}</span>
-              <p className="text-[10px] font-bold text-center leading-tight text-gray-700 dark:text-slate-200 line-clamp-2 w-full">
-                {displayName}
-              </p>
-              <span className="text-[7px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full leading-none"
-                style={{ backgroundColor: `${borderColor}20`, color: borderColor }}>
-                {effectiveRarity}
-              </span>
-              {earned && data ? (
-                <p className="text-[8px] font-mono text-brand-primary leading-none">
-                  ✓ {formatRelative(data.earned_at)}
-                </p>
-              ) : (
-                <Lock className="w-3 h-3 text-gray-300 dark:text-slate-600" />
+            <React.Fragment key={def.key}>
+              {showSeparator && (
+                <div className="w-px self-stretch bg-gray-100 dark:bg-slate-800 mx-1" />
               )}
-            </button>
+              <button
+                onClick={() => setSelected(isSelected ? null : def.key)}
+                className="shrink-0 w-[88px] flex flex-col items-center gap-1.5 p-2.5 rounded-xl transition-all duration-200 text-left relative"
+                style={{
+                  border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : '#e5e7eb'}`,
+                  backgroundColor: isSelected
+                    ? `${borderColor}18`
+                    : earned ? `${borderColor}08` : undefined,
+                  boxShadow: isSelected ? `0 0 0 3px ${borderColor}20` : undefined,
+                }}
+              >
+                <span className="text-2xl leading-none mt-0.5">{def.icon}</span>
+                <p className="text-[10px] font-bold text-center leading-tight text-gray-700 dark:text-slate-200 line-clamp-2 w-full">
+                  {def.name}
+                </p>
+                <span className="text-[7px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full leading-none"
+                  style={{ backgroundColor: `${borderColor}20`, color: borderColor }}>
+                  {def.rarity}
+                </span>
+                {earned ? (
+                  <p className="text-[8px] font-mono text-brand-primary leading-none">
+                    ✓ {formatRelative(def.earned_at)}
+                  </p>
+                ) : (
+                  <div className="absolute top-1.5 right-1.5 bg-white/80 dark:bg-slate-900/80 rounded-full p-0.5 shadow-sm">
+                    <Lock className="w-2.5 h-2.5 text-gray-400" />
+                  </div>
+                )}
+              </button>
+            </React.Fragment>
           );
         })}
       </div>
@@ -322,32 +348,32 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
       {selectedDef && (
         <div className="mt-3 p-3.5 rounded-xl border animate-in fade-in duration-200"
           style={{
-            borderColor: `${RARITY_COLORS[selectedEarned && selectedData ? selectedData.rarity : selectedDef.rarity]}40`,
-            backgroundColor: `${RARITY_COLORS[selectedEarned && selectedData ? selectedData.rarity : selectedDef.rarity]}08`,
+            borderColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}40`,
+            backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}08`,
           }}>
           <div className="flex items-start gap-3">
             <span className="text-3xl leading-none shrink-0 mt-0.5">
-              {selectedEarned && selectedData ? selectedData.icon : selectedDef.icon}
+              {selectedDef.icon}
             </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
                 <p className="text-[13px] font-bold text-brand-dark dark:text-white">
-                  {selectedEarned && selectedData ? selectedData.name : selectedDef.name}
+                  {selectedDef.name}
                 </p>
                 <span className="text-[8px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full"
                   style={{
-                    backgroundColor: `${RARITY_COLORS[selectedEarned && selectedData ? selectedData.rarity : selectedDef.rarity]}25`,
-                    color: RARITY_COLORS[selectedEarned && selectedData ? selectedData.rarity : selectedDef.rarity],
+                    backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}25`,
+                    color: RARITY_COLORS[def.rarity] || '#9ca3af',
                   }}>
-                  {selectedEarned && selectedData ? selectedData.rarity : selectedDef.rarity}
+                  {selectedDef.rarity}
                 </span>
               </div>
               <p className="text-[12px] text-gray-500 dark:text-slate-400 leading-relaxed">
-                {selectedEarned && selectedData ? selectedData.description : selectedDef.description}
+                {selectedDef.description}
               </p>
-              {selectedEarned && selectedData ? (
+              {selectedDef.earned_at ? (
                 <p className="text-[10px] text-brand-primary font-mono mt-1.5 font-bold">
-                  ✓ Earned {formatRelative(selectedData.earned_at)}
+                  ✓ Earned {formatRelative(selectedDef.earned_at)}
                 </p>
               ) : (
                 <p className="text-[10px] text-gray-400 dark:text-slate-500 font-mono mt-1.5">
@@ -358,75 +384,6 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
           </div>
         </div>
       )}
-    </div>
-  );
-};
-
-// ---------------------------------------------------------------------------
-// StatsCards — 2×2 grid with proper icons, spacious rings
-// ---------------------------------------------------------------------------
-
-const StatsCards: React.FC<{ profile: ProfileData }> = ({ profile }) => {
-  const { stats } = profile;
-  const hasAttendance = 'attendance_pct' in stats;
-
-  return (
-    <div className="grid grid-cols-2 gap-3">
-      {/* Attendance */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 flex flex-col items-center gap-3 shadow-sm min-h-[9rem]">
-        <p className="text-[10px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500 self-start">Attendance</p>
-        {hasAttendance ? (
-          <div className="relative flex-1 flex items-center justify-center">
-            <CircularRing pct={stats.attendance_pct!} color={getProgressColor(stats.attendance_pct!)} size={80} />
-            <span className="absolute inset-0 flex items-center justify-center text-[16px] font-bold font-mono text-gray-800 dark:text-slate-100">
-              {Math.round(stats.attendance_pct!)}%
-            </span>
-          </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <span className="text-[12px] font-mono text-gray-300 dark:text-slate-600 italic">Hidden</span>
-          </div>
-        )}
-      </div>
-
-      {/* Assignments */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 flex flex-col items-center gap-3 shadow-sm min-h-[9rem]">
-        <p className="text-[10px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500 self-start">Assignments</p>
-        {hasAttendance ? (
-          <div className="relative flex-1 flex items-center justify-center">
-            <CircularRing pct={stats.assignment_pct ?? 0} color={getProgressColor(stats.assignment_pct ?? 0)} size={80} />
-            <span className="absolute inset-0 flex items-center justify-center text-[16px] font-bold font-mono text-gray-800 dark:text-slate-100">
-              {Math.round(stats.assignment_pct ?? 0)}%
-            </span>
-          </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <span className="text-[12px] font-mono text-gray-300 dark:text-slate-600 italic">Hidden</span>
-          </div>
-        )}
-      </div>
-
-      {/* Coins */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 flex flex-col items-center gap-2 shadow-sm min-h-[8rem] justify-center">
-        <Coins className="w-7 h-7 text-amber-500" />
-        {stats.balance !== null ? (
-          <span className="text-3xl font-bold font-mono text-brand-dark dark:text-white tabular-nums leading-none">
-            {stats.balance}
-          </span>
-        ) : (
-          <span className="text-[12px] font-mono text-gray-300 dark:text-slate-600 italic">Hidden</span>
-        )}
-        <p className="text-[10px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500">Coins</p>
-      </div>
-
-      {/* XP */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 flex flex-col items-center gap-2 shadow-sm min-h-[8rem] justify-center">
-        <Zap className="w-7 h-7 text-brand-primary" />
-        <span className="text-3xl font-bold font-mono text-brand-dark dark:text-white tabular-nums leading-none">
-          {stats.total_points}
-        </span>
-        <p className="text-[10px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500">Total XP</p>
-      </div>
     </div>
   );
 };
@@ -834,7 +791,6 @@ const Profile: React.FC = () => {
           <ProfileHero profile={profile} enrollmentId={profileEnrollmentId}
             onEdit={() => setSubView('edit')} onSettings={() => setSubView('settings')} />
           <AchievementShowcase achievements={profile.achievements} />
-          <StatsCards profile={profile} />
           {showActivity && (
             <>
               <ActivityHeatmap entries={heatmap} />

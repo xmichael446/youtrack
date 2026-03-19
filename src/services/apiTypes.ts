@@ -459,7 +459,7 @@ export interface Achievement {
     description: string;
     icon: string;
     rarity: 'common' | 'rare' | 'epic' | 'legendary';
-    earned_at: string;
+    earned_at: string | null;
 }
 
 export interface ProfilePrivacy {
