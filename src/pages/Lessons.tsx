@@ -1199,8 +1199,14 @@ const LessonsContent: React.FC = () => {
   const assignments = lessonsData?.assignments;
   const currentAssignment = assignments?.current;
   
-  // Hide current assignment if it belongs to the active lesson (the one in attendance)
-  const isCurrentLessonActive = attendance && currentAssignment && String(attendance.number) === String(currentAssignment.number);
+  // Hide current assignment only if the attendance window for that lesson is still open AND student hasn't marked attendance
+  const isAttendanceOpen = attendance && new Date() < new Date(attendance.closes_at);
+  const hasMarkedAttendance = attendance && attendance.status !== null;
+  
+  const isCurrentLessonActive = attendance && currentAssignment && 
+                               String(attendance.number) === String(currentAssignment.number) && 
+                               isAttendanceOpen && !hasMarkedAttendance;
+  
   const showCurrentAssignment = currentAssignment && !isCurrentLessonActive;
 
   const previousAssignments = assignments?.previous || [];
