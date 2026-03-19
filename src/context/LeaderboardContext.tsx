@@ -81,7 +81,7 @@ export const LeaderboardProvider: React.FC<{
 
     const value: LeaderboardContextType = {
         leaderboardData: data,
-        loading,
+        loading: loading || (!data && !error),
         error,
         refetch,
         enrollment,

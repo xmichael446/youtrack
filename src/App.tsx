@@ -9,10 +9,10 @@ import Profile from './pages/Profile';
 import { Contests } from './pages/Contests';
 import Login from './pages/Login';
 import Footer from './components/Footer';
+import LoadingScreen from './components/LoadingScreen';
 import { LayoutDashboard, Trophy, BookOpen, Gift, Swords } from 'lucide-react';
 import { useLanguage } from './context/LanguageContext';
 import { DashboardProvider, useDashboard } from './context/DashboardContext';
-import { LeaderboardProvider } from './context/LeaderboardContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { NavigationContext } from './context/NavigationContext';
 
@@ -98,8 +98,13 @@ const App: React.FC = () => {
     return <Login onLogin={handleLogin} isDark={isDark} toggleTheme={toggleTheme} />;
   }
 
+  const navigateTo = (view: ViewState) => {
+    setCurrentView(view);
+    setProfileEnrollmentId(null);
+  };
+
   return (
-    <NavigationContext.Provider value={{ profileEnrollmentId, navigateToProfile, navigateBack }}>
+    <NavigationContext.Provider value={{ profileEnrollmentId, navigateToProfile, navigateBack, navigateTo }}>
       <DashboardProvider>
         <NotificationProvider>
           <AppContent
@@ -158,7 +163,7 @@ const AppContent: React.FC<{
     })();
 
     return (
-      <div key={currentView} className="animate-view-entry w-full">
+      <div key={currentView} className="w-full">
         {View}
       </div>
     );
@@ -186,30 +191,10 @@ const AppContent: React.FC<{
             <div className="absolute -inset-2 bg-brand-primary/15 blur-lg rounded-full md:hidden"></div>
           )}
         </div>
-        <span className={`text-[9px] md:text-[12px] font-bold mt-1 md:mt-0 md:ml-3.5 tracking-wide uppercase md:capitalize font-mono transition-all ${isActive ? 'text-brand-primary' : ''}`}>
+        <span className={`text-[9px] md:text-[12px] font-semibold mt-1 md:mt-0 md:ml-3.5 tracking-wide uppercase md:capitalize font-mono transition-all ${isActive ? 'text-brand-primary' : ''}`}>
           {label}
         </span>
       </button>
-    );
-  };
-
-  const LoadingScreen = () => {
-    const { loading } = useDashboard();
-    if (!loading) return null;
-
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-50 dark:bg-slate-950">
-        <div className="flex flex-col items-center gap-5">
-          <div className="relative w-16 h-16">
-            <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>
-            <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin"></div>
-            <div className="absolute inset-2 border-[2px] border-transparent border-t-brand-primary/40 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.7s' }}></div>
-          </div>
-          <p className="text-[10px] font-mono font-[800] text-gray-400 dark:text-slate-500 uppercase tracking-[5px] animate-pulse">
-            Syncing YouTrack
-          </p>
-        </div>
-      </div>
     );
   };
 
@@ -221,7 +206,7 @@ const AppContent: React.FC<{
         <div className="absolute bottom-0 left-0 w-20 h-20 bg-brand-primary/10 rounded-full -ml-8 -mb-8 blur-xl"></div>
         <div className="relative z-10">
           <p className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-1.5">{t('overallProgress')}</p>
-          <p className="font-bold text-base leading-tight mb-4 text-white/90">{course?.name || 'Loading...'}</p>
+          <p className="font-semibold text-base leading-tight mb-4 text-white/90">{course?.name || 'Loading...'}</p>
           <div className="flex items-center gap-3 mb-2">
             <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
               <div
@@ -229,16 +214,17 @@ const AppContent: React.FC<{
                 style={{ width: `${course?.completion || 0}%` }}
               ></div>
             </div>
-            <span className="text-[11px] font-mono font-bold text-white/60 tabular-nums">{course?.completion || 0}%</span>
+            <span className="text-[11px] font-mono font-semibold text-white/60 tabular-nums">{course?.completion || 0}%</span>
           </div>
         </div>
       </div>
     );
   };
 
+  const { loading } = useDashboard();
+
   return (
-    <LeaderboardProvider accessCode={user?.accessCode} enrollmentId={user?.id}>
-      <LoadingScreen />
+    <>
       <div className="h-dvh w-full bg-gray-50 dark:bg-slate-950 flex flex-col md:flex-row font-sans text-gray-900 dark:text-slate-100 overflow-hidden">
         {/* Sidebar (Desktop) */}
         <aside className="hidden md:flex flex-col w-60 lg:w-64 bg-white dark:bg-slate-900 border-r border-gray-100 dark:border-slate-800 h-full z-40 p-4 lg:p-5 shrink-0">
@@ -278,7 +264,7 @@ const AppContent: React.FC<{
             ref={mainRef}
             className="flex-1 overflow-y-auto p-4 md:p-8 pt-[calc(5.5rem+env(safe-area-inset-top))] md:pt-8 pb-[calc(90px+env(safe-area-inset-bottom))] md:pb-8 custom-scrollbar bg-gray-50 dark:bg-slate-950 flex flex-col"
           >
-            <div className="max-w-5xl mx-auto w-full flex-1">
+            <div className="max-w-5xl mx-auto w-full flex-1 relative">
               {renderView()}
             </div>
           </main>
@@ -295,7 +281,7 @@ const AppContent: React.FC<{
           </nav>
         </div>
       </div>
-    </LeaderboardProvider>
+    </>
   );
 };
 

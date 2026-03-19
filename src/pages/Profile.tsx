@@ -6,6 +6,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigation } from '../context/NavigationContext';
 import { apiService } from '../services/ApiService';
+import LoadingScreen from '../components/LoadingScreen';
 import type { ProfileData, ActivityEntry, HeatmapEntry, Achievement } from '../services/apiTypes';
 
 // ---------------------------------------------------------------------------
@@ -110,7 +111,7 @@ const CircularRing: React.FC<{ pct: number; color: string; size?: number }> = ({
 };
 
 const Toast: React.FC<{ message: string; type: 'success' | 'error' }> = ({ message, type }) => (
-  <div className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-white text-sm font-medium font-mono animate-in fade-in slide-in-from-bottom-2 duration-300
+  <div className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-white text-sm font-medium font-mono animate-in fade-in duration-300
     ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}>
     {type === 'success' ? <CheckCircle className="w-4 h-4 shrink-0" /> : <XCircle className="w-4 h-4 shrink-0" />}
     {message}
@@ -178,7 +179,7 @@ const ProfileHero: React.FC<{
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl font-[800] text-brand-dark dark:text-white tracking-tight leading-tight">
+          <h2 className="text-xl font-bold text-brand-dark dark:text-white tracking-tight leading-tight">
             {profile.full_name}
           </h2>
           <p className="text-[12px] text-gray-500 dark:text-slate-400 font-medium mt-0.5">
@@ -319,7 +320,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
 
       {/* Inline detail panel — shown when a badge is selected */}
       {selectedDef && (
-        <div className="mt-3 p-3.5 rounded-xl border animate-in fade-in slide-in-from-top-1 duration-200"
+        <div className="mt-3 p-3.5 rounded-xl border animate-in fade-in duration-200"
           style={{
             borderColor: `${RARITY_COLORS[selectedEarned && selectedData ? selectedData.rarity : selectedDef.rarity]}40`,
             backgroundColor: `${RARITY_COLORS[selectedEarned && selectedData ? selectedData.rarity : selectedDef.rarity]}08`,
@@ -409,7 +410,7 @@ const StatsCards: React.FC<{ profile: ProfileData }> = ({ profile }) => {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 flex flex-col items-center gap-2 shadow-sm min-h-[8rem] justify-center">
         <Coins className="w-7 h-7 text-amber-500" />
         {stats.balance !== null ? (
-          <span className="text-3xl font-[800] font-mono text-brand-dark dark:text-white tabular-nums leading-none">
+          <span className="text-3xl font-bold font-mono text-brand-dark dark:text-white tabular-nums leading-none">
             {stats.balance}
           </span>
         ) : (
@@ -421,7 +422,7 @@ const StatsCards: React.FC<{ profile: ProfileData }> = ({ profile }) => {
       {/* XP */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 flex flex-col items-center gap-2 shadow-sm min-h-[8rem] justify-center">
         <Zap className="w-7 h-7 text-brand-primary" />
-        <span className="text-3xl font-[800] font-mono text-brand-dark dark:text-white tabular-nums leading-none">
+        <span className="text-3xl font-bold font-mono text-brand-dark dark:text-white tabular-nums leading-none">
           {stats.total_points}
         </span>
         <p className="text-[10px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500">Total XP</p>
@@ -586,7 +587,7 @@ const ProfileEdit: React.FC<{
           <ArrowLeft className="w-4 h-4" />
           {t('back')}
         </button>
-        <h2 className="text-lg font-[800] text-brand-dark dark:text-white">{t('editProfile')}</h2>
+        <h2 className="text-lg font-bold text-brand-dark dark:text-white">{t('editProfile')}</h2>
       </div>
 
       <form onSubmit={async e => { e.preventDefault(); await onSave(bio, avatar ?? undefined); }}
@@ -687,7 +688,7 @@ const PrivacySettings: React.FC<{
           <ArrowLeft className="w-4 h-4" />
           {t('back')}
         </button>
-        <h2 className="text-lg font-[800] text-brand-dark dark:text-white">{t('privacySettings')}</h2>
+        <h2 className="text-lg font-bold text-brand-dark dark:text-white">{t('privacySettings')}</h2>
       </div>
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm px-5">
         <ToggleRow field="hide_balance" label={t('hideBalance')} desc={t('hideBalanceDesc')} />
@@ -788,17 +789,7 @@ const Profile: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative w-14 h-14">
-            <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full" />
-            <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin" />
-          </div>
-          <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[4px] animate-pulse">Loading</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Syncing Profile..." />;
   }
 
   if (error || !profile) {
@@ -826,7 +817,7 @@ const Profile: React.FC = () => {
   const showActivity = profile.is_own_profile || !profile.privacy.hide_activity;
 
   return (
-    <div className="space-y-4 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-4 pb-10 animate-in fade-in duration-700">
       {toast && <Toast message={toast.message} type={toast.type} />}
 
       {subView === 'edit' && (

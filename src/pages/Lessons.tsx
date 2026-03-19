@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../context/LanguageContext';
+import LoadingScreen from '../components/LoadingScreen';
 import { LessonsProvider, useLessons } from '../context/LessonsContext';
 import { useDashboard } from '../context/DashboardContext';
 import {
@@ -50,7 +51,7 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () 
   }, [onClose]);
 
   return createPortal(
-    <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-4 duration-300 ${type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+    <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in duration-300 ${type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
       {type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
       <span className="text-sm font-bold font-mono uppercase tracking-wider">{message}</span>
     </div>,
@@ -130,7 +131,7 @@ const SubmissionModal: React.FC<{
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
       <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
-      <div className="bg-white dark:bg-slate-900 rounded-t-[24px] md:rounded-[24px] shadow-2xl w-full max-w-2xl relative z-10 flex flex-col border border-gray-100 dark:border-slate-800 overflow-hidden max-h-[90vh] animate-in slide-in-from-bottom-[40px] duration-300 ease-out">
+      <div className="bg-white dark:bg-slate-900 rounded-t-[24px] md:rounded-[24px] shadow-2xl w-full max-w-2xl relative z-10 flex flex-col border border-gray-100 dark:border-slate-800 overflow-hidden max-h-[90vh] animate-in duration-300 ease-out">
         <div className="p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50">
           <div>
             <h3 className="text-lg md:text-xl font-bold text-brand-dark dark:text-white">{t('submitAssignment')}</h3>
@@ -306,7 +307,7 @@ const QuizSection: React.FC<{
           <X className="w-6 h-6" />
         </button>
         <div className="flex flex-col items-center">
-          <span className="text-[10px] font-mono font-[800] text-brand-primary uppercase tracking-[3px] opacity-70">{t('quizLevel')} {questionsData!.vocab_level}</span>
+          <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[3px] opacity-70">{t('quizLevel')} {questionsData!.vocab_level}</span>
           <span className="text-sm font-bold text-brand-dark dark:text-white mt-0.5">{t('sourceArticle')}</span>
         </div>
         <div className="w-10" />
@@ -440,7 +441,7 @@ const QuizSection: React.FC<{
               <div className="h-full bg-brand-primary transition-all duration-500 ease-out shadow-[0_0_10px_rgba(18,194,220,0.5)]" style={{ width: `${((currentQuestionIndex + 1) / questionsData!.questions.length) * 100}%` }} />
             </div>
           </div>
-          <div className="text-[11px] font-mono font-[800] text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
+          <div className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
             {currentQuestionIndex + 1} / {questionsData!.questions.length}
           </div>
         </div>
@@ -449,8 +450,8 @@ const QuizSection: React.FC<{
           <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 py-2">
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-[24px] p-5 md:p-10 text-center border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-primary opacity-50"></div>
-              <span className="text-[10px] md:text-[11px] font-mono font-[800] text-brand-primary uppercase tracking-[3px] mb-2 block opacity-70">Question</span>
-              <h3 className={`${isLongText ? 'text-lg md:text-2xl' : 'text-xl md:text-3xl'} font-[800] text-brand-dark dark:text-white leading-tight mb-4`}>
+              <span className="text-[10px] md:text-[11px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-2 block opacity-70">Question</span>
+              <h3 className={`${isLongText ? 'text-lg md:text-2xl' : 'text-xl md:text-3xl'} font-bold text-brand-dark dark:text-white leading-tight mb-4`}>
                 {questionText}
               </h3>
               <p className="text-[12px] md:text-sm font-medium text-gray-500 dark:text-slate-400 max-w-lg mx-auto italic opacity-80">Choose the correct answer from the options below</p>
@@ -521,10 +522,10 @@ const QuizSection: React.FC<{
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-3xl md:text-5xl font-[800] text-brand-dark dark:text-white uppercase tracking-tight">{lastSubmissionResult!.passed ? t('passed') : t('failed')}</h3>
+          <h3 className="text-3xl md:text-5xl font-bold text-brand-dark dark:text-white uppercase tracking-tight">{lastSubmissionResult!.passed ? t('passed') : t('failed')}</h3>
           <div className="flex flex-col items-center">
             <span className="text-[10px] md:text-[11px] font-mono font-bold text-gray-500 uppercase tracking-[3px] mb-1">Final Score</span>
-            <p className="text-5xl md:text-7xl font-mono font-[800] text-brand-primary drop-shadow-sm tabular-nums">{lastSubmissionResult!.score}<span className="text-2xl md:text-3xl text-gray-300 dark:text-slate-800 mx-2">/</span>{lastSubmissionResult!.total}</p>
+            <p className="text-5xl md:text-7xl font-mono font-bold text-brand-primary drop-shadow-sm tabular-nums">{lastSubmissionResult!.score}<span className="text-2xl md:text-3xl text-gray-300 dark:text-slate-800 mx-2">/</span>{lastSubmissionResult!.total}</p>
           </div>
         </div>
 
@@ -535,13 +536,13 @@ const QuizSection: React.FC<{
                 <div className="w-14 h-14 rounded-2xl bg-brand-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
                   <Zap className="w-7 h-7 text-brand-primary fill-brand-primary" />
                 </div>
-                <span className="text-xl md:text-2xl font-[800] tracking-tight">+{lastSubmissionResult!.xp} XP</span>
+                <span className="text-xl md:text-2xl font-bold tracking-tight">+{lastSubmissionResult!.xp} XP</span>
               </div>
               <div className="flex flex-col items-center gap-3 group">
                 <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
                   <Coins className="w-7 h-7 text-amber-500 fill-amber-500" />
                 </div>
-                <span className="text-xl md:text-2xl font-[800] tracking-tight">+{lastSubmissionResult!.coins} Coins</span>
+                <span className="text-xl md:text-2xl font-bold tracking-tight">+{lastSubmissionResult!.coins} Coins</span>
               </div>
             </div>
           ) : (
@@ -573,9 +574,9 @@ const QuizSection: React.FC<{
     return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-950 animate-in fade-in duration-500">
       <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
-        <h4 className="font-[800] text-lg md:text-xl text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
+        <h4 className="font-bold text-lg md:text-xl text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
         <div className="flex items-center gap-4">
-          <div className="text-[11px] font-mono font-[800] text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
+          <div className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
             {currentQuestionIndex + 1} / {reviewData.length}
           </div>
           <button onClick={() => setMode('info')} className="p-2 -mr-2 text-gray-400 hover:text-brand-primary transition-colors">
@@ -659,7 +660,7 @@ const QuizSection: React.FC<{
     if (mode === 'info') return null;
 
     return createPortal(
-      <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-500">
+      <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-hidden flex flex-col animate-in duration-500">
         {mode === 'article' && renderArticleMode()}
         {mode === 'solving' && renderSolvingMode()}
         {mode === 'results' && renderResultsMode()}
@@ -750,7 +751,7 @@ const QuizSection: React.FC<{
         )}
 
         {showReviewWarning !== null && (
-          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-[16px] p-5 md:p-6 flex flex-col md:flex-row gap-5 items-center text-center md:text-left animate-in fade-in slide-in-from-top-2">
+          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-[16px] p-5 md:p-6 flex flex-col md:flex-row gap-5 items-center text-center md:text-left animate-in fade-in">
             <AlertTriangle className="w-10 h-10 text-amber-500 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-bold text-amber-700 dark:text-amber-400 mb-3">{t('reviewWarning')}</p>
@@ -954,10 +955,10 @@ const AssignmentHistoryCard: React.FC<{
       <div onClick={onExpand} className="p-4 md:p-6 cursor-pointer flex items-center gap-4">
         <div className="w-12 h-12 rounded-[12px] bg-gray-50 dark:bg-slate-800 flex flex-col items-center justify-center shrink-0 border border-gray-100 dark:border-slate-700">
           <span className="text-[10px] font-mono font-bold text-gray-400 uppercase leading-none mb-1">LSN</span>
-          <span className="font-mono font-[800] text-lg leading-none">{assignment.number}</span>
+          <span className="font-mono font-bold text-lg leading-none">{assignment.number}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-[15px] text-brand-dark dark:text-white truncate mb-1">{assignment.lesson_topic}</h3>
+          <h3 className="font-semibold text-brand-dark dark:text-white truncate mb-1">{assignment.lesson_topic}</h3>
           <p className="text-sm font-medium text-gray-500 flex items-center gap-2">
             <Calendar className="w-3.5 h-3.5" />{new Date(assignment.start_datetime).toLocaleDateString()}
           </p>
@@ -973,7 +974,7 @@ const AssignmentHistoryCard: React.FC<{
       </div>
 
       {isExpanded && (
-        <div className="border-t border-gray-50 dark:border-slate-800 bg-gray-50/30 dark:bg-slate-800/10 animate-in slide-in-from-top-4 duration-300">
+        <div className="border-t border-gray-50 dark:border-slate-800 bg-gray-50/30 dark:bg-slate-800/10 animate-in duration-300">
           <div className="p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 flex justify-center md:justify-start">
             <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-[14px] items-center shadow-inner border border-gray-200/50 dark:border-slate-800 w-full max-w-[280px]">
               <button
@@ -1108,7 +1109,7 @@ const ActiveAttendanceCard: React.FC<{
       <div className="p-5 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex-1 min-w-0 text-center md:text-left">
           <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-2 opacity-80">Current Lesson</span>
-          <h3 className="text-lg md:text-xl font-[800] text-brand-dark dark:text-white leading-tight mb-3">
+          <h3 className="text-lg md:text-xl font-bold text-brand-dark dark:text-white leading-tight mb-3">
             Lesson {attendance.number}: {attendance.lesson_topic}
           </h3>
           <div className="flex items-center justify-center md:justify-start gap-4 text-[12px] font-mono font-bold text-gray-500">
@@ -1191,17 +1192,7 @@ const LessonsContent: React.FC = () => {
 
   const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
 
-  if (loading && !lessonsData) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="flex flex-col items-center gap-5">
-        <div className="relative w-14 h-14">
-          <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>
-          <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin"></div>
-        </div>
-        <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest animate-pulse">Loading...</p>
-      </div>
-    </div>
-  );
+  if (loading && !lessonsData) return <LoadingScreen message="Loading lessons..." />;
   if (error) return <div className="text-center py-20 text-red-500 font-bold text-sm">{error}</div>;
 
   const attendance = lessonsData?.attendance;
@@ -1220,7 +1211,7 @@ const LessonsContent: React.FC = () => {
           <BookOpen className="w-7 h-7 md:w-8 md:h-8 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white">
             {t('lessons')}
           </h1>
           <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
@@ -1235,7 +1226,7 @@ const LessonsContent: React.FC = () => {
           <div className="w-9 h-9 rounded-xl bg-brand-primary/10 border border-brand-primary/10 flex items-center justify-center shrink-0">
             <Clock className="w-[18px] h-[18px] text-brand-primary" />
           </div>
-          <h2 className="text-[12px] font-mono font-bold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('lessonAttendance')}</h2>
+          <h2 className="text-[12px] font-mono font-semibold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('lessonAttendance')}</h2>
         </div>
 
         {attendance ? (
@@ -1254,7 +1245,7 @@ const LessonsContent: React.FC = () => {
           <div className="w-9 h-9 rounded-xl bg-brand-primary/10 border border-brand-primary/10 flex items-center justify-center shrink-0">
             <ClipboardList className="w-[18px] h-[18px] text-brand-primary" />
           </div>
-          <h2 className="text-[12px] font-mono font-bold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('assignments')}</h2>
+          <h2 className="text-[12px] font-mono font-semibold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('assignments')}</h2>
         </div>
 
         {hasAnyAssignments ? (

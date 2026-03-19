@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../context/LanguageContext';
+import LoadingScreen from '../components/LoadingScreen';
 import { ContestProvider, useContests } from '../context/ContestContext';
 import { useNavigation } from '../context/NavigationContext';
 import {
@@ -38,7 +39,7 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () 
     return () => clearTimeout(t);
   }, [onClose]);
   return createPortal(
-    <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-4 duration-300 ${type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+    <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in duration-300 ${type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
       {type === 'success' ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
       <span className="text-sm font-bold font-mono uppercase tracking-wider">{message}</span>
     </div>,
@@ -362,7 +363,7 @@ const ContestCard: React.FC<{
       <div className="p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
-            <h3 className="font-bold text-sm text-gray-900 dark:text-slate-100 group-hover:text-brand-primary transition-colors duration-200 tracking-tight">
+            <h3 className="font-semibold text-sm text-gray-900 dark:text-slate-100 group-hover:text-brand-primary transition-colors duration-200 tracking-tight">
               {t('vocabContest')} #{item.number}
             </h3>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -445,7 +446,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Header */}
@@ -473,7 +474,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
 
       {/* Content */}
       {loading && contests.length === 0 ? (
-        <ContestListSkeleton />
+        <LoadingScreen message="Finding battles..." />
       ) : error ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
           <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -502,7 +503,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
           {contests.map((item, idx) => (
             <div
               key={item.id}
-              className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both"
+              className="animate-in fade-in fill-mode-both"
               style={{ animationDelay: `${idx * 50}ms` }}
             >
               <ContestCard
@@ -599,14 +600,13 @@ const ContestDetailView: React.FC<{
   };
 
   if (loading) return (
-    <div className="space-y-5 animate-in fade-in duration-300">
-      <BackBtn label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
-      <DetailSkeleton />
+    <div className="space-y-5 animate-in fade-in duration-300 min-h-[60vh] flex flex-col items-center justify-center">
+      <LoadingScreen message="Inspecting battle..." />
     </div>
   );
 
   if (error || !detail) return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-in fade-in duration-500">
       <BackBtn label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
       <div className="flex flex-col items-center gap-3 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
         <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -618,7 +618,7 @@ const ContestDetailView: React.FC<{
   );
 
   return (
-    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-5 animate-in fade-in duration-500">
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
       <BackBtn label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
@@ -1055,16 +1055,7 @@ const ContestPlayView: React.FC<{
     }
   };
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center py-32 gap-5">
-      <div className="relative w-14 h-14">
-        <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full" />
-        <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin" />
-        <div className="absolute inset-2 border-[2px] border-transparent border-t-brand-primary/40 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.7s' }} />
-      </div>
-      <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[4px] animate-pulse">Loading contest...</p>
-    </div>
-  );
+  if (loading) return <LoadingScreen message="Initializing Battle..." />;
 
   if (error === 'already_started') return (
     <div className="space-y-4 animate-in fade-in duration-300">
@@ -1204,7 +1195,7 @@ const ContestPlayView: React.FC<{
   const ts = timerStyles[timerUrgency];
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-500">
+    <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-hidden flex flex-col animate-in duration-500">
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Sticky header: close + progress + counter + timer */}
@@ -1396,7 +1387,7 @@ const ContestResultsView: React.FC<{
     : 'text-brand-primary';
 
   return (
-    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-5 animate-in fade-in duration-500">
       <BackBtn label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
 
       {/* My result card — light theme */}

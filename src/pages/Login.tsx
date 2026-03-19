@@ -12,7 +12,7 @@ interface LoginProps {
     toggleTheme: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
     const { t, language, setLanguage } = useLanguage();
     const [studentCode, setStudentCode] = useState('');
     const [authStep, setAuthStep] = useState<'login' | 'polling'>('login');
@@ -105,7 +105,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none ${isDark ? 'bg-violet-500/5' : 'bg-violet-500/3'}`}></div>
 
             {/* Top Controls */}
-            <div className="absolute top-[calc(env(safe-area-inset-top)+1.25rem)] right-5 z-50 flex items-center gap-2.5 animate-in fade-in slide-in-from-top-3 duration-500">
+            <div className="absolute top-[calc(env(safe-area-inset-top)+1.25rem)] right-5 z-50 flex items-center gap-2.5 animate-in fade-in duration-500">
                 <button
                     onClick={toggleTheme}
                     className={`p-2.5 rounded-xl transition-all duration-300 backdrop-blur-xl shadow-sm hover:scale-105 active:scale-95 border ${isDark ? 'bg-slate-900/60 border-white/8 text-yellow-400 hover:bg-slate-800/60' : 'bg-white/80 border-gray-200/60 text-slate-500 hover:bg-white'}`}
@@ -131,7 +131,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
             </div>
 
             {/* Main Card */}
-            <div className="w-full max-w-sm md:max-w-4xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out">
+            <div className="w-full max-w-sm md:max-w-4xl z-10 animate-in fade-in duration-700 ease-out">
                 <div className={`backdrop-blur-2xl border rounded-3xl md:rounded-[32px] shadow-2xl relative overflow-hidden transition-all duration-500 ${isDark ? 'bg-slate-900/50 border-transparent shadow-black/40' : 'bg-white/85 border-gray-200/60 shadow-black/8'}`}>
 
                     {/* Subtle grid texture */}
@@ -152,14 +152,14 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
                                 />
                             </div>
 
-                            <h4 className={`text-xl md:text-2xl font-[800] tracking-tight mb-2 ${isDark ? 'text-white' : 'text-slate-950'}`}>
+                            <h4 className={`text-xl md:text-2xl font-bold tracking-tight mb-2 ${isDark ? 'text-white' : 'text-slate-950'}`}>
                                 {t('loginYourSpace')}
                             </h4>
                             <p className={`font-medium text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                                 {language === 'uz' ? (
                                     <><span className="text-brand-primary font-bold">YouTrack</span> {t('welcomeTo')}!</>
                                 ) : (
-                                    <>{t('welcomeTo')} <span className="text-brand-primary font-[800]">YouTrack</span>!</>
+                                    <>{t('welcomeTo')} <span className="text-brand-primary font-bold">YouTrack</span>!</>
                                 )}
                             </p>
                         </div>
@@ -205,7 +205,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) => {
                                     </div>
 
                                     {apiError && (
-                                        <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="animate-in fade-in duration-200">
                                             <div className="flex items-center gap-2 bg-red-500/10 text-red-500 py-3 px-4 rounded-2xl border border-red-500/20">
                                                 <AlertCircle className="w-4 h-4 shrink-0" />
                                                 <p className="text-[11px] font-mono font-bold uppercase tracking-wider">

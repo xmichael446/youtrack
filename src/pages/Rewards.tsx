@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Coins, History, Check, Lock, ExternalLink, Loader2, ShoppingBag, Gift } from 'lucide-react';
 import CoinsHistory from '../components/CoinsHistory';
+import LoadingScreen from '../components/LoadingScreen';
 import { useLanguage } from '../context/LanguageContext';
 import { ShopProvider, useShop } from '../context/ShopContext';
 import { useDashboard } from '../context/DashboardContext';
@@ -57,7 +58,12 @@ const RewardsContent: React.FC = () => {
   };
 
   const handleClaimLevel = async (reward: LevelReward) => {
-    if (!reward.unlocked || reward.granted) return;
+    if (reward.granted) {
+      openTelegramLink(`https://t.me/ytrck_bot?start=reward_${reward.id}`);
+      return;
+    }
+
+    if (!reward.unlocked) return;
 
     setProcessingId(reward.id);
     try {
@@ -71,14 +77,7 @@ const RewardsContent: React.FC = () => {
   };
 
   if (loading && rewards.length === 0 && levelRewards.length === 0) {
-    return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="relative w-12 h-12">
-          <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>
-          <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin"></div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Opening Shop..." />;
   }
 
   if (error && rewards.length === 0 && levelRewards.length === 0) {
@@ -90,7 +89,7 @@ const RewardsContent: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-10">
 
       {/* Page Header */}
       <div className="flex items-start gap-4 px-1">
@@ -98,7 +97,7 @@ const RewardsContent: React.FC = () => {
           <Gift className="w-7 h-7 md:w-8 md:h-8 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white">
             {t('rewardsShop')}
           </h1>
           <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
@@ -167,7 +166,7 @@ const RewardsContent: React.FC = () => {
                 {/* Content */}
                 <div className="p-5 md:p-6 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="font-[800] text-brand-dark dark:text-white text-lg leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                    <h3 className="font-semibold text-brand-dark dark:text-white text-lg leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
                     <span className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold font-mono border
                       ${affordable || reward.claimed
                         ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
@@ -187,7 +186,7 @@ const RewardsContent: React.FC = () => {
                     <button
                       disabled={(reward.claimed ? false : !affordable) || isProcessing}
                       onClick={() => handleClaim(reward)}
-                      className={`w-full py-3.5 rounded-2xl font-bold text-[11px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3.5 rounded-2xl font-semibold text-[11px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95
                         ${reward.claimed
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : affordable
@@ -271,7 +270,7 @@ const RewardsContent: React.FC = () => {
                 {/* Content */}
                 <div className="p-5 md:p-6 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="font-[800] text-brand-dark dark:text-white text-lg leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                    <h3 className="font-semibold text-brand-dark dark:text-white text-lg leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
                     <span
                       className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold font-mono border"
                       style={{
@@ -292,11 +291,11 @@ const RewardsContent: React.FC = () => {
 
                   <div className="mt-auto">
                     <button
-                      disabled={(!isUnlocked || isGranted) || isProcessing}
+                      disabled={(!isUnlocked && !isGranted) || isProcessing}
                       onClick={() => handleClaimLevel(reward)}
-                      className={`w-full py-3.5 rounded-2xl font-bold text-[11px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3.5 rounded-2xl font-semibold text-[11px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95
                         ${isGranted
-                          ? 'bg-emerald-500 text-white cursor-default'
+                          ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : isUnlocked
                             ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02]'
                             : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 cursor-not-allowed border border-gray-200 dark:border-slate-700'
@@ -305,7 +304,10 @@ const RewardsContent: React.FC = () => {
                       {isProcessing ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : isGranted ? (
-                        <><Check className="w-3.5 h-3.5" /> {t('alreadyGranted')}</>
+                        <>
+                          {t('claimed') || 'Claimed'}
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </>
                       ) : isUnlocked ? (
                         t('claimFree')
                       ) : (
@@ -321,13 +323,13 @@ const RewardsContent: React.FC = () => {
       )}
 
       {/* Coins History */}
-      <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
+      <section className="animate-in fade-in duration-700 delay-200 fill-mode-both">
         <div className="flex items-center gap-3 px-1 mb-5">
           <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
             <History className="w-[18px] h-[18px] text-amber-500" />
           </div>
           <div>
-            <h2 className="text-[12px] font-mono font-bold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('coinsHistory')}</h2>
+            <h2 className="text-[12px] font-mono font-semibold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('coinsHistory')}</h2>
             <p className="text-[11px] font-medium text-gray-500 dark:text-slate-400">{t('trackingEarnings')}</p>
           </div>
         </div>

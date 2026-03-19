@@ -6,15 +6,20 @@ import {
   TrendingDown,
   Flame,
   Award,
+  Swords,
+  ChevronRight,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
+import { useNavigation } from '../context/NavigationContext';
+import LoadingScreen from '../components/LoadingScreen';
 import Curriculum from '../components/Curriculum';
 import { openExternalLink } from '../utils/telegram';
 
 const Dashboard: React.FC = () => {
   const { t } = useLanguage();
-  const { user, course, upcomingLesson, loading, enrollment } = useDashboard();
+  const { user, course, event, loading, enrollment } = useDashboard();
+  const { navigateTo } = useNavigation();
   const BASE_URL = import.meta.env.VITE_API_URL || "https://api.youtrack.cc/";
 
   const [timeLeft, setTimeLeft] = React.useState({
@@ -34,8 +39,8 @@ const Dashboard: React.FC = () => {
   React.useEffect(() => {
     let deadline: Date;
 
-    if (upcomingLesson?.starts) {
-      deadline = new Date(upcomingLesson.starts);
+    if (event?.starts) {
+      deadline = new Date(event.starts);
     } else {
       deadline = new Date();
       deadline.setDate(deadline.getDate() + 3);
@@ -49,6 +54,7 @@ const Dashboard: React.FC = () => {
 
       if (difference <= 0) {
         clearInterval(timer);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       } else {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24));
         const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
@@ -59,10 +65,10 @@ const Dashboard: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [upcomingLesson]);
+  }, [event]);
 
-  if (loading || !user.name || !course.name) {
-    return null;
+  if (!user.name || !course.name) {
+    return <LoadingScreen message="Syncing Dashboard..." />;
   }
 
   // Rank change helpers
@@ -88,13 +94,13 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-10">
 
       {/* ── 1. HERO GRID: Competitive Card + Countdown ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         {/* Competitive Hero Card — theme-adaptive */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 relative overflow-hidden group animate-in fade-in slide-in-from-left-4 duration-700 border border-gray-100 dark:border-slate-800 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 relative overflow-hidden group animate-in fade-in duration-700 border border-gray-100 dark:border-slate-800 shadow-sm">
           {/* Ambient glow */}
           <div className="absolute top-0 left-1/3 w-96 h-48 pointer-events-none bg-brand-primary/5 dark:bg-brand-primary/8 rounded-full blur-3xl" />
           <div className="absolute -bottom-16 -right-16 w-56 h-56 rounded-full pointer-events-none group-hover:scale-110 transition-transform duration-1000 bg-brand-primary/5 dark:bg-brand-primary/8 blur-3xl" />
@@ -105,15 +111,15 @@ const Dashboard: React.FC = () => {
               <p className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-2 opacity-80">
                 WELCOME BACK
               </p>
-              <h1 className="text-2xl md:text-3xl font-[800] tracking-tight text-brand-dark dark:text-white leading-tight">
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white leading-tight">
                 {user.name}
               </h1>
               {streak > 0 ? (
-                <p className="text-sm font-semibold mt-1.5 text-amber-500 dark:text-amber-400">
+                <p className="text-sm font-medium mt-1.5 text-amber-500 dark:text-amber-400">
                   Keep the streak alive. Keep climbing.
                 </p>
               ) : (
-                <p className="text-sm font-semibold text-gray-400 dark:text-slate-500 mt-1.5">
+                <p className="text-sm font-medium text-gray-400 dark:text-slate-500 mt-1.5">
                   Start your streak today — consistency wins.
                 </p>
               )}
@@ -130,8 +136,8 @@ const Dashboard: React.FC = () => {
                   <p className="text-[10px] font-mono font-bold uppercase tracking-[2px] text-gray-400 dark:text-slate-500">
                     {t('streak')}
                   </p>
-                  <p className="text-3xl md:text-4xl font-[800] tabular-nums text-amber-500 dark:text-amber-400 leading-none">
-                    {streak}<span className="text-base font-bold ml-1 opacity-50">d</span>
+                  <p className="text-3xl md:text-4xl font-bold tabular-nums text-amber-500 dark:text-amber-400 leading-none">
+                    {streak}<span className="text-base font-medium ml-1 opacity-50">d</span>
                   </p>
                 </div>
               </div>
@@ -146,7 +152,7 @@ const Dashboard: React.FC = () => {
                     {t('yourRank')}
                   </p>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-3xl md:text-4xl font-[800] tabular-nums text-brand-primary leading-none">
+                    <p className="text-3xl md:text-4xl font-bold tabular-nums text-brand-primary leading-none">
                       #{enrollment?.rank ?? '—'}
                     </p>
                     <RankBadge delta={courseRankDelta} />
@@ -162,62 +168,79 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column — Countdown */}
+        {/* Right Column — Event Card */}
         <div className="flex flex-col gap-5">
-          {/* Countdown */}
-          <div className="bg-gradient-to-br from-brand-primary via-brand-primary to-brand-secondary rounded-3xl p-5 md:p-6 text-white shadow-2xl shadow-brand-primary/30 relative overflow-hidden group animate-in fade-in slide-in-from-right-4 duration-700">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
-            <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mb-20" />
+          {event && (
+            <div className={`bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-5 md:p-6 shadow-sm relative overflow-hidden group animate-in fade-in duration-700`}>
+              {/* Conditional background accents based on event type */}
+              {event.is_active ? (
+                <div className="absolute inset-0 bg-emerald-500/5 pointer-events-none" />
+              ) : event.type === 'contest' ? (
+                <div className="absolute inset-0 bg-violet-500/5 pointer-events-none" />
+              ) : (
+                <div className="absolute inset-0 bg-brand-primary/5 pointer-events-none" />
+              )}
+              
+              <div className="relative z-10 h-full flex flex-col">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className={`w-1.5 h-1.5 rounded-full ${event.is_active ? 'bg-emerald-500 animate-ping' : event.type === 'contest' ? 'bg-violet-500' : 'bg-brand-primary'} ${!event.is_active && 'animate-pulse'}`} />
+                  <span className={`text-[9px] font-mono font-bold uppercase tracking-[2px] ${event.is_active ? 'text-emerald-600 dark:text-emerald-400' : event.type === 'contest' ? 'text-violet-600 dark:text-violet-400' : 'text-brand-primary'}`}>
+                    {event.is_active ? t('liveNow') || 'Live Now' : event.type === 'contest' ? t('upcomingContest') || 'Upcoming Contest' : t('upcomingEvent')}
+                  </span>
+                </div>
+                
+                <h3 className="text-base md:text-lg font-bold leading-snug mb-2 tracking-tight text-brand-dark dark:text-white">
+                  {event.type === 'lesson' && event.number ? `Lesson ${event.number}: ` : ''}{event.topic}
+                </h3>
 
-            <div className="relative z-10 h-full flex flex-col">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="text-[9px] font-mono font-bold text-white/70 uppercase tracking-[2px]">
-                  {t('upcomingEvent')}
-                </span>
-              </div>
-              <h3 className="text-base md:text-lg font-bold leading-snug mb-2 tracking-tight">
-                {upcomingLesson?.topic}
-              </h3>
-              <p className="text-[11px] text-white/70 font-medium flex items-center gap-1.5 mb-4">
-                <Calendar className="w-3.5 h-3.5 shrink-0" />
-                {new Date(upcomingLesson.starts).toLocaleString('en-US', {
-                  month: 'short',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: false,
-                }).replace(',', '')}
-              </p>
+                <p className="text-[11px] text-gray-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mb-4">
+                  {event.type === 'contest' ? <Swords className="w-3.5 h-3.5 shrink-0" /> : <Calendar className="w-3.5 h-3.5 shrink-0" />}
+                  {new Date(event.starts).toLocaleString('en-US', {
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  }).replace(',', '')}
+                </p>
 
-              {/* Countdown */}
-              <div className="grid grid-cols-3 gap-2 mt-auto">
-                {[
-                  { label: t('hours'), value: timeLeft.days * 24 + timeLeft.hours },
-                  { label: t('minutes'), value: timeLeft.minutes },
-                  { label: t('seconds'), value: timeLeft.seconds },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="bg-white/10 backdrop-blur-sm rounded-2xl p-2.5 flex flex-col items-center border border-white/10"
+                {event.is_active ? (
+                  <button 
+                    onClick={() => navigateTo('lessons')}
+                    className="mt-auto w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 group/btn"
                   >
-                    <span className="text-xl md:text-2xl font-bold tabular-nums leading-none font-mono">
-                      {item.value.toString().padStart(2, '0')}
-                    </span>
-                    <span className="text-[8px] font-mono font-bold text-white/50 uppercase tracking-wider mt-1">
-                      {item.label}
-                    </span>
+                    <span className="text-xs font-bold uppercase tracking-wider">{t('markAttendance') || 'Mark Attendance'}</span>
+                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+                  </button>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2 mt-auto">
+                    {[
+                      { label: t('hours'), value: timeLeft.days * 24 + timeLeft.hours },
+                      { label: t('minutes'), value: timeLeft.minutes },
+                      { label: t('seconds'), value: timeLeft.seconds },
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="bg-gray-50 dark:bg-slate-800 rounded-2xl p-2.5 flex flex-col items-center border border-gray-100 dark:border-slate-700"
+                      >
+                        <span className={`text-xl md:text-2xl font-bold tabular-nums leading-none font-mono ${event.type === 'contest' ? 'text-violet-500' : 'text-brand-primary'}`}>
+                          {item.value.toString().padStart(2, '0')}
+                        </span>
+                        <span className="text-[8px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mt-1">
+                          {item.label}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             </div>
-          </div>
-
+          )}
         </div>
       </div>
 
       {/* ── 3. COURSE INFO STRIP ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-500 delay-75 fill-mode-both">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden animate-in fade-in duration-500 delay-75 fill-mode-both">
         <div className="flex flex-col md:flex-row">
 
           {/* Image / Logo — full bleed on both axes */}
@@ -239,7 +262,7 @@ const Dashboard: React.FC = () => {
             <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px] mb-1">
               {t('curriculum')}
             </p>
-            <h2 className="text-lg font-[800] text-brand-dark dark:text-white tracking-tight leading-snug mb-1.5">
+            <h2 className="text-lg font-bold text-brand-dark dark:text-white tracking-tight leading-snug mb-1.5">
               {course.name}
             </h2>
             {course.description && (
@@ -275,7 +298,7 @@ const Dashboard: React.FC = () => {
 
       {/* ── 4. LEVEL & STREAK CARDS ── */}
       {enrollment?.level && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-100 fill-mode-both">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 animate-in fade-in duration-500 delay-100 fill-mode-both">
           {/* Level Card */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 md:p-6 border border-gray-100 dark:border-slate-800 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
@@ -292,7 +315,7 @@ const Dashboard: React.FC = () => {
                 <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">
                   {t('currentLevel')}
                 </p>
-                <p className="font-bold text-brand-dark dark:text-white text-base leading-tight truncate">
+                <p className="font-semibold text-brand-dark dark:text-white text-base leading-tight truncate">
                   Lvl {enrollment.level.number} · {enrollment.level.name}
                 </p>
               </div>
@@ -332,9 +355,9 @@ const Dashboard: React.FC = () => {
               </p>
               <div className="flex items-center gap-3 mb-2">
                 <Flame className="w-8 h-8 text-white fill-white/30" />
-                <span className="text-5xl font-[800] tabular-nums">{streak}</span>
+                <span className="text-5xl font-bold tabular-nums">{streak}</span>
               </div>
-              <p className="text-sm font-bold text-white/80">
+              <p className="text-sm font-medium text-white/80">
                 {t('streakDays').replace('{count}', String(streak))}
               </p>
             </div>
@@ -348,7 +371,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* ── 6. TUTORIAL / VIDEO BANNER (moved to bottom) ── */}
-      <div className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in zoom-in-95 duration-700 delay-300 fill-mode-both">
+      <div className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in duration-700 delay-300 fill-mode-both">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/8 to-transparent pointer-events-none" />
         <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-brand-primary/15 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000 pointer-events-none" />
 

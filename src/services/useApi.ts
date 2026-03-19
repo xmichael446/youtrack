@@ -11,7 +11,7 @@ export function useApiState<T>(key: string, initialValue: T) {
         const existingState = apiService.getState<T>(key);
         return existingState || {
             data: initialValue,
-            loading: false,
+            loading: true, // Default to true to prevent initial flicker
             error: null,
             lastUpdated: null,
         };

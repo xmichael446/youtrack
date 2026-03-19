@@ -92,7 +92,7 @@ const Curriculum: React.FC = () => {
                     <BookOpen className="w-[18px] h-[18px] text-brand-primary" />
                 </div>
                 <div>
-                    <h2 className="text-[12px] font-mono font-bold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('courseCurriculum')}</h2>
+                    <h2 className="text-[12px] font-mono font-semibold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('courseCurriculum')}</h2>
                     <p className="text-[11px] font-medium text-gray-500 dark:text-slate-400">{t('curriculumDesc')}</p>
                 </div>
             </div>
@@ -130,7 +130,7 @@ const Curriculum: React.FC = () => {
                                                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${isUpcoming ? 'bg-brand-primary/8 text-brand-primary group-hover/row:bg-brand-primary group-hover/row:text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
                                                     <BookOpen className="w-4 h-4" />
                                                 </div>
-                                                <span className="text-[14px] font-bold text-brand-dark dark:text-white tracking-tight">{item.topic}</span>
+                                                <span className="text-[14px] font-semibold text-brand-dark dark:text-white tracking-tight">{item.topic}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 whitespace-nowrap">
@@ -179,7 +179,7 @@ const Curriculum: React.FC = () => {
                                             </div>
                                             {getStatusBadge(item.status, item.start_datetime)}
                                         </div>
-                                        <h3 className="text-[14px] font-bold text-brand-dark dark:text-white leading-snug tracking-tight truncate">
+                                        <h3 className="text-[14px] font-semibold text-brand-dark dark:text-white leading-snug tracking-tight truncate">
                                             {item.topic}
                                         </h3>
                                     </div>

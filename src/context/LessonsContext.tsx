@@ -29,7 +29,7 @@ const LessonsContext = createContext<LessonsContextType | undefined>(undefined);
 
 export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [lessonsData, setLessonsData] = useState<LessonsResponse['data'] | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
 

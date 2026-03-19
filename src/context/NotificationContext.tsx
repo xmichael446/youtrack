@@ -54,9 +54,26 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     useEffect(() => {
         fetchNotifications();
-        // Optional: Set up polling every minute to check for new notifications
-        const interval = setInterval(fetchNotifications, 60000);
-        return () => clearInterval(interval);
+        
+        // Polling every 5 minutes if tab is visible
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                fetchNotifications();
+            }
+        }, 300000);
+        
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                fetchNotifications();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, [fetchNotifications]);
 
     const markAsRead = async (id: number) => {

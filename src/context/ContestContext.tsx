@@ -19,7 +19,7 @@ const ContestContext = createContext<ContestContextType | undefined>(undefined);
 
 export const ContestProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [contests, setContests] = useState<ContestListItem[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const fetchContests = useCallback(async () => {

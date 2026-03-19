@@ -27,6 +27,7 @@ const ProfileEditModal: React.FC<{
   onSaved: (url: string | null) => void;
 }> = React.memo(({ isOpen, onClose, initials, avatarBg, onSaved }) => {
   const { t } = useLanguage();
+  const { refetch } = useDashboard();
   const [profileLoading, setProfileLoading] = useState(false);
   const [bio, setBio] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -58,6 +59,7 @@ const ProfileEditModal: React.FC<{
       const url = res.data.avatar ? `${baseUrl}${res.data.avatar}` : null;
       setAvatarPreview(url);
       setAvatarFile(null);
+      refetch();
       onSaved(url);
       onClose();
     } catch (err: any) {
@@ -81,9 +83,9 @@ const ProfileEditModal: React.FC<{
   return (
     <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !saving && onClose()} />
-      <div className="relative w-full sm:max-w-md bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="relative w-full sm:max-w-md bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden animate-in fade-in duration-300">
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 dark:border-slate-800">
-          <h2 className="text-[15px] font-[800] text-brand-dark dark:text-white">{t('editProfile')}</h2>
+          <h2 className="text-[15px] font-bold text-brand-dark dark:text-white">{t('editProfile')}</h2>
           <button onClick={() => !saving && onClose()}
             className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white transition-colors">
             <X className="w-4 h-4" />
@@ -163,12 +165,13 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const [headerAvatarUrl, setHeaderAvatarUrl] = useState<string | null>(null);
   const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 
-  // Fetch avatar on mount for header display
+  // Fetch avatar from dashboard on mount
   React.useEffect(() => {
-    apiService.getProfile().then(res => {
-      if (res.data.avatar) setHeaderAvatarUrl(`${baseUrl}${res.data.avatar}`);
-    }).catch(() => {});
-  }, []);
+    if (user?.avatar && user.avatar !== '/avatar.png') {
+        const url = user.avatar.startsWith('http') ? user.avatar : `${baseUrl}${user.avatar}`;
+        setHeaderAvatarUrl(url);
+    }
+  }, [user?.avatar, baseUrl]);
 
   const openEditModal = () => {
     setShowEditModal(true);
@@ -238,7 +241,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
             {/* Streak chip */}
             <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 rounded-xl px-2.5 py-1.5 shrink-0">
               <Flame className={`w-3.5 h-3.5 shrink-0 ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-500' : 'text-gray-300 dark:text-slate-600'}`} />
-              <span className={`font-bold text-[12px] whitespace-nowrap font-mono tabular-nums leading-none ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-slate-500'}`}>
+              <span className={`font-semibold text-[12px] whitespace-nowrap font-mono tabular-nums leading-none ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-slate-500'}`}>
                 {enrollment?.streak ?? 0}d
               </span>
             </div>
@@ -253,7 +256,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
               ) : (
                 <Zap className="w-3.5 h-3.5 text-brand-primary shrink-0" />
               )}
-              <span className="font-bold text-[12px] text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums leading-none">
+              <span className="font-semibold text-[12px] text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums leading-none">
                 {enrollment?.level
                   ? <>Lvl&nbsp;{enrollment.level.number}<span className="hidden sm:inline text-gray-400 dark:text-slate-500">&nbsp;·&nbsp;{user?.xp || 0}&nbsp;<span className="text-[10px]">XP</span></span></>
                   : <>{user?.xp || 0}&nbsp;<span className="text-gray-400 dark:text-slate-500 text-[10px]">XP</span></>}
@@ -263,7 +266,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
             {/* Coins chip */}
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-800/70 border border-gray-100 dark:border-slate-700/50 rounded-xl px-2.5 py-1.5 shrink-0">
               <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-              <span className="font-bold text-[12px] text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums leading-none">
+              <span className="font-semibold text-[12px] text-gray-700 dark:text-slate-200 whitespace-nowrap font-mono tabular-nums leading-none">
                 {user?.coins || 0}
               </span>
             </div>
@@ -284,7 +287,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
               </button>
 
               {showNotifications && (
-                <div className="absolute top-full right-0 mt-2.5 w-[280px] md:w-[340px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full right-0 mt-2.5 w-[280px] md:w-[340px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200">
                   <div className="px-4 py-3 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
                     <h3 className="text-[11px] font-mono font-bold uppercase tracking-wider text-gray-900 dark:text-white">{t('notifications')}</h3>
                     <button onClick={() => markAllAsRead()}
@@ -349,7 +352,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
               </button>
 
               {showProfileMenu && (
-                <div className="absolute top-full right-0 mt-2.5 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full right-0 mt-2.5 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200">
                   {/* Profile Header */}
                   <div className="p-4 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex items-center gap-3">
                     {headerAvatarUrl ? (
@@ -362,7 +365,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                       </div>
                     )}
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-brand-dark dark:text-white truncate">{user?.name || 'Student'}</h3>
+                      <h3 className="text-sm font-semibold text-brand-dark dark:text-white truncate">{user?.name || 'Student'}</h3>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="bg-brand-primary/10 text-brand-primary text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-mono">{t('student')}</span>
                         <span className="text-[10px] font-mono text-gray-400 dark:text-slate-500">{user?.accessCode}</span>

@@ -18,12 +18,23 @@ interface Teacher {
     channel_link: string;
 }
 
+interface DashboardEvent {
+    type: 'lesson' | 'contest';
+    is_active?: boolean;
+    id: number;
+    number?: number;
+    topic: string;
+    starts: string;
+    ends?: string;
+}
+
 interface DashboardData {
     success: boolean;
     data: {
         enrollment: {
             id: number;
             full_name: string;
+            avatar: string | null;
             total_points: number;
             balance: number;
             rank: number;
@@ -57,12 +68,7 @@ interface DashboardData {
                 completion: number;
             };
             curriculum: Lesson[];
-            upcoming_lesson?: {
-                id: number;
-                number: number;
-                topic: string;
-                starts: string;
-            };
+            event?: DashboardEvent;
         };
     };
 }
@@ -103,8 +109,8 @@ interface DashboardContextType {
         teachers: Teacher[];
     };
 
-    // Upcoming lesson
-    upcomingLesson: DashboardData['data']['enrollment']['upcoming_lesson'] | null;
+    // Current/Upcoming event
+    event: DashboardEvent | null;
 
     // Curriculum
     curriculum: Lesson[];
@@ -134,7 +140,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         name: enrollment?.full_name,
         coins: enrollment?.balance,
         xp: enrollment?.total_points,
-        avatar: CURRENT_USER.avatar,
+        avatar: enrollment?.avatar || CURRENT_USER.avatar,
         rank: enrollment?.rank,
         accessCode: enrollment?.access_code,
     };
@@ -157,8 +163,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         teachers: courseData?.teachers || [],
     };
 
-    // Upcoming lesson
-    const upcomingLesson = enrollment?.upcoming_lesson || null;
+    // Current/Upcoming event
+    const event = enrollment?.event || null;
 
     // Curriculum
     const curriculum = enrollment?.curriculum || [];
@@ -176,7 +182,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         refetch,
         user,
         course,
-        upcomingLesson,
+        event,
         curriculum,
     };
 
