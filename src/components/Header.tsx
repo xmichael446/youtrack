@@ -3,6 +3,7 @@ import { Bell, Coins, Zap, Sun, Moon, LogOut, Flame, X, Camera, AlertCircle, Edi
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useNavigation } from '../context/NavigationContext';
 import { apiService } from '../services/ApiService';
 
 interface HeaderProps {
@@ -157,6 +158,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const { t, language, setLanguage } = useLanguage();
   const { user, enrollment } = useDashboard();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
+  const { navigateTo } = useNavigation();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -167,9 +169,11 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
 
   // Fetch avatar from dashboard on mount
   React.useEffect(() => {
-    if (user?.avatar && user.avatar !== '/avatar.png') {
+    if (user?.avatar && !user.avatar.includes('picsum.photos') && user.avatar !== '/avatar.png') {
         const url = user.avatar.startsWith('http') ? user.avatar : `${baseUrl}${user.avatar}`;
         setHeaderAvatarUrl(url);
+    } else {
+        setHeaderAvatarUrl(null);
     }
   }, [user?.avatar, baseUrl]);
 
@@ -328,33 +332,38 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
 
             {/* Profile */}
             <div className="relative">
-              <button
-                onClick={() => { setShowProfileMenu(!showProfileMenu); setShowNotifications(false); }}
-                className="flex items-center gap-2.5 pl-2.5 md:pl-3.5 border-l border-gray-200 dark:border-slate-700/70 group transition-all active:scale-95"
-              >
-                <div className="hidden sm:block text-right">
-                  <p className="text-[12px] font-bold text-gray-900 dark:text-white leading-none truncate max-w-[110px]">{user?.name || 'Student'}</p>
-                  <p className="text-[9px] font-mono font-bold text-gray-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider">{t('student')}</p>
-                </div>
-                {/* Avatar */}
-                <div className="relative">
-                  {headerAvatarUrl ? (
-                    <img src={headerAvatarUrl} alt="avatar"
-                      className="w-9 h-9 rounded-xl object-cover border-2 border-white dark:border-slate-800 shadow-sm ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all" />
-                  ) : (
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-bold border-2 border-white dark:border-slate-800 shadow-sm ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all"
-                      style={{ backgroundColor: avatarBg }}>
-                      {initials}
-                    </div>
-                  )}
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
-                </div>
-              </button>
+              <div className="flex items-center">
+                <button
+                  onClick={() => { setShowProfileMenu(!showProfileMenu); setShowNotifications(false); }}
+                  className="flex items-center gap-2.5 pl-2.5 md:pl-3.5 border-l border-gray-200 dark:border-slate-700/70 group transition-all active:scale-95"
+                >
+                  <div className="hidden sm:block text-right hover:opacity-80 transition-opacity cursor-pointer" onClick={(e) => { e.stopPropagation(); navigateTo('profile'); setShowProfileMenu(false); }}>
+                    <p className="text-[12px] font-bold text-gray-900 dark:text-white leading-none truncate max-w-[110px]">{user?.name || 'Student'}</p>
+                    <p className="text-[9px] font-mono font-bold text-gray-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider">{t('student')}</p>
+                  </div>
+                  {/* Avatar */}
+                  <div className="relative cursor-pointer hover:ring-brand-primary/40 transition-all" onClick={(e) => { e.stopPropagation(); navigateTo('profile'); setShowProfileMenu(false); }}>
+                    {headerAvatarUrl ? (
+                      <img src={headerAvatarUrl} alt="avatar"
+                        className="w-9 h-9 rounded-xl object-cover border-2 border-white dark:border-slate-800 shadow-sm ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-bold border-2 border-white dark:border-slate-800 shadow-sm ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all"
+                        style={{ backgroundColor: avatarBg }}>
+                        {initials}
+                      </div>
+                    )}
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
+                  </div>
+                </button>
+              </div>
 
               {showProfileMenu && (
                 <div className="absolute top-full right-0 mt-2.5 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200">
                   {/* Profile Header */}
-                  <div className="p-4 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex items-center gap-3">
+                  <div 
+                    className="p-4 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex items-center gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                    onClick={() => { navigateTo('profile'); setShowProfileMenu(false); }}
+                  >
                     {headerAvatarUrl ? (
                       <img src={headerAvatarUrl} alt="avatar"
                         className="w-12 h-12 rounded-xl object-cover shrink-0" />
