@@ -1069,6 +1069,7 @@ const ActiveAttendanceCard: React.FC<{
   const [timeLeft, setTimeLeft] = useState('00:00:00');
   const [isExpired, setIsExpired] = useState(false);
   const [attendanceCode, setAttendanceCode] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!attendance.closes_at || attendance.status !== null) return;
@@ -1091,9 +1092,17 @@ const ActiveAttendanceCard: React.FC<{
   }, [attendance.closes_at, attendance.status]);
 
   const handleMarkAttendance = async () => {
-    if (!attendanceCode) return;
+    const trimmedCode = attendanceCode.trim();
+    if (!trimmedCode) {
+      showToast('Please enter a keyword', 'error');
+      return;
+    }
+
+    if (isSubmitting) return;
+
     try {
-      const res = await markAttendance(attendanceCode);
+      setIsSubmitting(true);
+      const res = await markAttendance(trimmedCode);
       if (res.success) {
         showToast(`Earned ${res.data.xp} XP and ${res.data.coins} Coins!`, 'success');
         setAttendanceCode('');
@@ -1101,6 +1110,8 @@ const ActiveAttendanceCard: React.FC<{
       }
     } catch (err: any) {
       showToast(err.message || 'Invalid keyword', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1154,9 +1165,10 @@ const ActiveAttendanceCard: React.FC<{
               />
               <button
                 onClick={handleMarkAttendance}
-                className="w-full h-[52px] px-7 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono"
+                disabled={isSubmitting || !attendanceCode.trim()}
+                className="w-full h-[52px] px-7 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t('mark')}
+                {isSubmitting ? 'Marking...' : t('mark')}
               </button>
             </div>
           </div>
