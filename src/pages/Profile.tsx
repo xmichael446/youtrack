@@ -363,7 +363,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                 <span className="text-[8px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full"
                   style={{
                     backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}25`,
-                    color: RARITY_COLORS[def.rarity] || '#9ca3af',
+                    color: RARITY_COLORS[selectedDef.rarity] || '#9ca3af',
                   }}>
                   {selectedDef.rarity}
                 </span>
