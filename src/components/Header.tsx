@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Coins, Zap, Sun, Moon, LogOut, Flame, X, Camera, AlertCircle, Edit3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Coins, Zap, Sun, Moon, LogOut, Flame } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -19,141 +19,6 @@ function getAvatarBg(id: number) {
   return `hsl(${(id * 137) % 360}, 60%, 50%)`;
 }
 
-// Isolated modal component — owns all edit state so typing doesn't re-render Header
-const ProfileEditModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  initials: string;
-  avatarBg: string;
-  onSaved: (url: string | null) => void;
-}> = React.memo(({ isOpen, onClose, initials, avatarBg, onSaved }) => {
-  const { t } = useLanguage();
-  const { refetch } = useDashboard();
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [bio, setBio] = useState('');
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
-
-  useEffect(() => {
-    if (!isOpen) return;
-    setSaveError(null);
-    setAvatarFile(null);
-    setProfileLoading(true);
-    apiService.getProfile()
-      .then(res => {
-        setBio(res.data.bio ?? '');
-        setAvatarPreview(res.data.avatar ? `${baseUrl}${res.data.avatar}` : null);
-      })
-      .catch(() => { setBio(''); setAvatarPreview(null); })
-      .finally(() => setProfileLoading(false));
-  }, [isOpen]);
-
-  const handleSave = async () => {
-    setSaving(true);
-    setSaveError(null);
-    try {
-      const res = await apiService.updateProfile(bio, avatarFile ?? undefined);
-      const url = res.data.avatar ? `${baseUrl}${res.data.avatar}` : null;
-      setAvatarPreview(url);
-      setAvatarFile(null);
-      refetch();
-      onSaved(url);
-      onClose();
-    } catch (err: any) {
-      setSaveError(err?.data?.message ?? err?.message ?? 'Update failed');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { setSaveError(t('avatarTooBig')); return; }
-    setSaveError(null);
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !saving && onClose()} />
-      <div className="relative w-full sm:max-w-md bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden animate-in fade-in duration-300">
-        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 dark:border-slate-800">
-          <h2 className="text-[15px] font-bold text-brand-dark dark:text-white">{t('editProfile')}</h2>
-          <button onClick={() => !saving && onClose()}
-            className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {profileLoading ? (
-          <div className="flex items-center justify-center py-14">
-            <div className="w-8 h-8 border-2 border-brand-primary border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
-            <div className="flex flex-col items-center gap-3">
-              <div className="relative cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
-                {avatarPreview ? (
-                  <img src={avatarPreview} alt="avatar"
-                    className="w-24 h-24 rounded-2xl object-cover ring-2 ring-gray-100 dark:ring-slate-700" />
-                ) : (
-                  <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-white text-2xl font-bold ring-2 ring-gray-100 dark:ring-slate-700"
-                    style={{ backgroundColor: avatarBg }}>
-                    {initials}
-                  </div>
-                )}
-                <div className="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-7 h-7 text-white" />
-                </div>
-              </div>
-              <button type="button" onClick={() => fileInputRef.current?.click()}
-                className="text-[12px] text-brand-primary font-bold font-mono uppercase tracking-wide hover:text-brand-primary/80 transition-colors">
-                {t('uploadPhoto')}
-              </button>
-              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileChange} />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-2">
-                {t('bio')}
-              </label>
-              <textarea
-                value={bio}
-                onChange={e => setBio(e.target.value.slice(0, 280))}
-                placeholder={t('bioPlaceholder')}
-                rows={3}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-[14px] text-brand-dark dark:text-white placeholder-gray-300 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary resize-none font-sans transition-all"
-              />
-              <p className="text-right text-[10px] font-mono text-gray-300 dark:text-slate-600 mt-1">{bio.length} / 280</p>
-            </div>
-
-            {saveError && (
-              <div className="flex items-center gap-2 text-red-500 text-[12px] font-mono bg-red-50 dark:bg-red-500/10 rounded-xl px-3 py-2.5">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                {saveError}
-              </div>
-            )}
-
-            <button onClick={handleSave} disabled={saving}
-              className="w-full h-12 rounded-xl bg-brand-primary text-white font-bold text-[13px] uppercase tracking-wider font-mono hover:bg-brand-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20">
-              {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-              {t('saveChanges')}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-});
-
 const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const { t, language, setLanguage } = useLanguage();
   const { user, enrollment } = useDashboard();
@@ -161,26 +26,30 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const { navigateTo } = useNavigation();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-
-  // Edit Profile modal state
-  const [showEditModal, setShowEditModal] = useState(false);
   const [headerAvatarUrl, setHeaderAvatarUrl] = useState<string | null>(null);
   const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 
-  // Fetch avatar from dashboard on mount
-  React.useEffect(() => {
-    if (user?.avatar && !user.avatar.includes('picsum.photos') && user.avatar !== '/avatar.png') {
-        const url = user.avatar.startsWith('http') ? user.avatar : `${baseUrl}${user.avatar}`;
-        setHeaderAvatarUrl(url);
-    } else {
-        setHeaderAvatarUrl(null);
-    }
-  }, [user?.avatar, baseUrl]);
-
-  const openEditModal = () => {
-    setShowEditModal(true);
-    setShowProfileMenu(false);
-  };
+  // Fetch avatar from PROFILE API on mount and when dashboard user changes
+  useEffect(() => {
+    apiService.getProfile()
+      .then(res => {
+        if (res.data.avatar && !res.data.avatar.includes('picsum.photos') && res.data.avatar !== '/avatar.png') {
+            const url = res.data.avatar.startsWith('http') ? res.data.avatar : `${baseUrl}${res.data.avatar}`;
+            setHeaderAvatarUrl(url);
+        } else {
+            setHeaderAvatarUrl(null);
+        }
+      })
+      .catch(() => {
+        // Fallback to dashboard user avatar if profile API fails
+        if (user?.avatar && !user.avatar.includes('picsum.photos') && user.avatar !== '/avatar.png') {
+            const url = user.avatar.startsWith('http') ? user.avatar : `${baseUrl}${user.avatar}`;
+            setHeaderAvatarUrl(url);
+        } else {
+            setHeaderAvatarUrl(null);
+        }
+      });
+  }, [user?.id, baseUrl]);
 
   const getNotificationTypeInfo = (type: string) => {
     switch (type) {
@@ -332,34 +201,37 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
 
             {/* Profile */}
             <div className="relative">
-              <div className="flex items-center">
+              <div className="flex items-center gap-2.5 pl-2.5 md:pl-3.5 border-l border-gray-200 dark:border-slate-700/70">
+                {/* Clickable Name -> Profile */}
+                <div 
+                  className="hidden sm:block text-right hover:opacity-70 transition-opacity cursor-pointer active:scale-95" 
+                  onClick={() => { navigateTo('profile'); setShowProfileMenu(false); }}
+                >
+                  <p className="text-[12px] font-bold text-gray-900 dark:text-white leading-none truncate max-w-[110px]">{user?.name || 'Student'}</p>
+                  <p className="text-[9px] font-mono font-bold text-gray-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider">{t('student')}</p>
+                </div>
+                
+                {/* Clickable Avatar -> Dropdown */}
                 <button
                   onClick={() => { setShowProfileMenu(!showProfileMenu); setShowNotifications(false); }}
-                  className="flex items-center gap-2.5 pl-2.5 md:pl-3.5 border-l border-gray-200 dark:border-slate-700/70 group transition-all active:scale-95"
+                  className="relative group active:scale-95 transition-all"
                 >
-                  <div className="hidden sm:block text-right hover:opacity-80 transition-opacity cursor-pointer" onClick={(e) => { e.stopPropagation(); navigateTo('profile'); setShowProfileMenu(false); }}>
-                    <p className="text-[12px] font-bold text-gray-900 dark:text-white leading-none truncate max-w-[110px]">{user?.name || 'Student'}</p>
-                    <p className="text-[9px] font-mono font-bold text-gray-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider">{t('student')}</p>
-                  </div>
-                  {/* Avatar */}
-                  <div className="relative cursor-pointer hover:ring-brand-primary/40 transition-all" onClick={(e) => { e.stopPropagation(); navigateTo('profile'); setShowProfileMenu(false); }}>
-                    {headerAvatarUrl ? (
-                      <img src={headerAvatarUrl} alt="avatar"
-                        className="w-9 h-9 rounded-xl object-cover border-2 border-white dark:border-slate-800 shadow-sm ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all" />
-                    ) : (
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-bold border-2 border-white dark:border-slate-800 shadow-sm ring-2 ring-brand-primary/10 group-hover:ring-brand-primary/30 transition-all"
-                        style={{ backgroundColor: avatarBg }}>
-                        {initials}
-                      </div>
-                    )}
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
-                  </div>
+                  {headerAvatarUrl ? (
+                    <img src={headerAvatarUrl} alt="avatar"
+                      className={`w-9 h-9 rounded-xl object-cover border-2 border-white dark:border-slate-800 shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`} />
+                  ) : (
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-bold border-2 border-white dark:border-slate-800 shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`}
+                      style={{ backgroundColor: avatarBg }}>
+                      {initials}
+                    </div>
+                  )}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
                 </button>
               </div>
 
               {showProfileMenu && (
                 <div className="absolute top-full right-0 mt-2.5 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200">
-                  {/* Profile Header */}
+                  {/* Profile Header (Name also clickable here) */}
                   <div 
                     className="p-4 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex items-center gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                     onClick={() => { navigateTo('profile'); setShowProfileMenu(false); }}
@@ -383,17 +255,6 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   </div>
 
                   <div className="p-2 space-y-0.5">
-                    {/* Edit Profile */}
-                    <button
-                      onClick={openEditModal}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0">
-                        <Edit3 className="w-4 h-4" />
-                      </div>
-                      <span>{t('editProfile')}</span>
-                    </button>
-
                     {/* Night Mode */}
                     <button
                       onClick={toggleTheme}
@@ -449,14 +310,6 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
           </div>
         </div>
       </header>
-
-      <ProfileEditModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        initials={initials}
-        avatarBg={avatarBg}
-        onSaved={(url) => setHeaderAvatarUrl(url)}
-      />
     </>
   );
 };
