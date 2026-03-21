@@ -94,13 +94,13 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-10">
+    <div className="space-y-5 md:space-y-6 animate-in fade-in duration-700 pb-10">
 
       {/* ── 1. HERO GRID: Competitive Card + Countdown ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         {/* Competitive Hero Card — theme-adaptive */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 relative overflow-hidden group animate-in fade-in duration-700 border border-gray-100 dark:border-slate-800 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-5 md:p-6 relative overflow-hidden group animate-in fade-in duration-700 border border-gray-100 dark:border-slate-800 shadow-sm">
           {/* Ambient glow */}
           <div className="absolute top-0 left-1/3 w-96 h-48 pointer-events-none bg-brand-primary/5 dark:bg-brand-primary/8 rounded-full blur-3xl" />
           <div className="absolute -bottom-16 -right-16 w-56 h-56 rounded-full pointer-events-none group-hover:scale-110 transition-transform duration-1000 bg-brand-primary/5 dark:bg-brand-primary/8 blur-3xl" />
@@ -171,7 +171,7 @@ const Dashboard: React.FC = () => {
         {/* Right Column — Event Card */}
         <div className="flex flex-col gap-5">
           {event && (
-            <div className={`bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-5 md:p-6 shadow-sm relative overflow-hidden group animate-in fade-in duration-700`}>
+            <div className={`bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-4 md:p-5 shadow-sm relative overflow-hidden group animate-in fade-in duration-700`}>
               {/* Conditional background accents based on event type */}
               {event.is_active ? (
                 <div className="absolute inset-0 bg-emerald-500/5 pointer-events-none" />
@@ -190,7 +190,12 @@ const Dashboard: React.FC = () => {
                 </div>
                 
                 <h3 className="text-base md:text-lg font-bold leading-snug mb-2 tracking-tight text-brand-dark dark:text-white">
-                  {event.type === 'lesson' && event.number ? `Lesson ${event.number}: ` : ''}{event.topic}
+                  {event.type === 'lesson' && event.number != null && (
+                    <span className="inline-flex items-center bg-slate-900 dark:bg-white/10 text-white px-1 py-px rounded-[4px] text-[10px] font-mono font-bold uppercase tracking-wide mr-1 align-middle">
+                      LSN {event.number}
+                    </span>
+                  )}
+                  {event.topic}
                 </h3>
 
                 <p className="text-[11px] text-gray-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mb-4">
@@ -296,74 +301,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* ── 4. LEVEL & STREAK CARDS ── */}
-      {enrollment?.level && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 animate-in fade-in duration-500 delay-100 fill-mode-both">
-          {/* Level Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 md:p-6 border border-gray-100 dark:border-slate-800 shadow-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-                style={{
-                  backgroundColor: `${enrollment.level.badge_color}20`,
-                  border: `1px solid ${enrollment.level.badge_color}40`,
-                }}
-              >
-                {enrollment.level.icon}
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">
-                  {t('currentLevel')}
-                </p>
-                <p className="font-semibold text-brand-dark dark:text-white text-base leading-tight truncate">
-                  Lvl {enrollment.level.number} · {enrollment.level.name}
-                </p>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-[10px] font-mono font-bold mb-1.5">
-                <span className="text-gray-400 dark:text-slate-500 uppercase tracking-wider">
-                  {t('xpProgress')}
-                </span>
-                <span style={{ color: enrollment.level.badge_color }}>
-                  {enrollment.level.xp_current} / {enrollment.level.xp_next} XP
-                </span>
-              </div>
-              <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${enrollment.level.progress_percent}%`,
-                    backgroundColor: enrollment.level.badge_color,
-                  }}
-                />
-              </div>
-              {enrollment.level.description && (
-                <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1.5 font-mono">
-                  {enrollment.level.description}
-                </p>
-              )}
-            </div>
-          </div>
 
-          {/* Streak Card */}
-          <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-3xl p-5 md:p-6 text-white shadow-lg shadow-amber-500/20 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
-            <div className="relative z-10">
-              <p className="text-[10px] font-mono font-bold text-white/70 uppercase tracking-[2px] mb-3">
-                {t('streak')}
-              </p>
-              <div className="flex items-center gap-3 mb-2">
-                <Flame className="w-8 h-8 text-white fill-white/30" />
-                <span className="text-5xl font-bold tabular-nums">{streak}</span>
-              </div>
-              <p className="text-sm font-medium text-white/80">
-                {t('streakDays').replace('{count}', String(streak))}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── 5. CURRICULUM ── */}
       <div id="curriculum">

@@ -28,6 +28,7 @@ import {
   ContestStartResponse,
   ContestSubmitResponse,
   ContestResultsData,
+  ContestLeaderboardEntry,
   QuizQuestion,
   ContestAnswer,
 } from '../services/apiTypes';
@@ -445,6 +446,11 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
     }
   };
 
+  // Show full-screen loader before any contests are loaded (hides header too)
+  if (loading && contests.length === 0) {
+    return <LoadingScreen message="Finding battles..." />;
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
@@ -473,9 +479,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
       </div>
 
       {/* Content */}
-      {loading && contests.length === 0 ? (
-        <LoadingScreen message="Finding battles..." />
-      ) : error ? (
+      {error ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
           <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
             <AlertCircle className="w-5 h-5 text-red-400" />

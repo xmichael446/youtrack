@@ -51,9 +51,9 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () 
   }, [onClose]);
 
   return createPortal(
-    <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in duration-300 ${type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
-      {type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-      <span className="text-sm font-bold font-mono uppercase tracking-wider">{message}</span>
+    <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-4 py-2.5 md:px-6 md:py-3 rounded-2xl shadow-xl flex items-center gap-2.5 animate-in duration-300 max-w-[90vw] ${type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+      {type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+      <span className="text-xs md:text-sm font-bold font-mono uppercase tracking-wide leading-snug">{message}</span>
     </div>,
     document.body
   );
@@ -91,7 +91,7 @@ const SubmissionModal: React.FC<{
       setAttachments(prev => [...prev, ...newFiles]);
     }
     if (e.target) {
-        e.target.value = '';
+      e.target.value = '';
     }
   };
 
@@ -114,7 +114,7 @@ const SubmissionModal: React.FC<{
       });
 
       await onSubmit({
-        student_comment: comment,
+        comment: comment,
         attachments: finalAttachments.length > 0 ? finalAttachments : undefined,
         files: finalFiles.length > 0 ? finalFiles : undefined
       });
@@ -225,17 +225,17 @@ const SubmissionModal: React.FC<{
         <div className="p-4 md:p-6 border-t border-gray-100 dark:border-slate-800 flex gap-3 bg-gray-50/50 dark:bg-slate-800/50">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3.5 rounded-[12px] text-[15px] font-bold text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            className="flex-1 px-3 py-3 md:px-4 md:py-3.5 rounded-[12px] text-[13px] md:text-[15px] font-bold text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-1 px-4 py-3.5 rounded-[12px] text-[15px] font-bold text-white bg-gradient-to-r from-brand-primary to-brand-accent hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 px-3 py-3 md:px-4 md:py-3.5 rounded-[12px] text-[13px] md:text-[15px] font-bold text-white bg-gradient-to-r from-brand-primary to-brand-accent hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
-            {t('submitAssignment')}
+            <span className="truncate">{t('submitAssignment')}</span>
           </button>
         </div>
       </div>
@@ -257,7 +257,7 @@ const QuizSection: React.FC<{
   const [quizSummary, setQuizSummary] = useState<QuizSessionData | null>(initialData || null);
   const [questionsData, setQuestionsData] = useState<QuizQuestionsData | null>(null);
   const [loading, setLoading] = useState(false);
-  
+
   const [mode, setMode] = useState<'info' | 'article' | 'solving' | 'results' | 'review'>('info');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -388,8 +388,8 @@ const QuizSection: React.FC<{
       if (res.success) {
         setLastSubmissionResult(res.data);
         setMode('results');
-        refetchDashboard(); 
-        fetchLessons(); 
+        refetchDashboard();
+        fetchLessons();
       }
     } catch (err: any) {
       showToast(err.message || "Failed to submit quiz", 'error');
@@ -464,11 +464,10 @@ const QuizSection: React.FC<{
                   <button
                     key={option.id}
                     onClick={() => handleSelectOption(questionsData!.questions[currentQuestionIndex].id, option.id)}
-                    className={`w-full p-4 md:p-6 rounded-[20px] border-2 text-left flex items-center gap-4 transition-all duration-200 group/opt ${
-                      isSelected 
-                        ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10 ring-4 ring-brand-primary/10 scale-[1.01]' 
+                    className={`w-full p-4 md:p-6 rounded-[20px] border-2 text-left flex items-center gap-4 transition-all duration-200 group/opt ${isSelected
+                        ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10 ring-4 ring-brand-primary/10 scale-[1.01]'
                         : 'border-gray-100 dark:border-slate-800/50 hover:border-brand-primary/40 bg-white dark:bg-slate-900 shadow-sm'
-                    }`}
+                      }`}
                   >
                     <div className={`w-6 h-6 rounded-[8px] flex items-center justify-center border-2 shrink-0 transition-all ${isSelected ? 'border-brand-primary bg-brand-primary text-white scale-110' : 'border-gray-200 dark:border-slate-700 group-hover/opt:border-brand-primary/50'}`}>
                       {isSelected && <CheckCircle2 className="w-4 h-4" />}
@@ -511,12 +510,12 @@ const QuizSection: React.FC<{
     <div className="flex flex-col h-full bg-white dark:bg-slate-950 p-6 md:p-12 overflow-y-auto animate-in zoom-in-95 duration-500 custom-scrollbar pt-[calc(env(safe-area-inset-top)+2rem)] md:pt-12">
       <div className="max-w-4xl mx-auto w-full text-center py-8 space-y-8 md:space-y-12 pb-[calc(env(safe-area-inset-bottom)+2rem)]">
         <div className="relative inline-block">
-           <div className={`w-28 h-28 md:w-40 md:h-40 mx-auto rounded-full flex items-center justify-center mb-6 shadow-2xl ${lastSubmissionResult!.passed ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30' : 'bg-gradient-to-br from-brand-primary to-brand-accent shadow-brand-primary/30'}`}>
+          <div className={`w-28 h-28 md:w-40 md:h-40 mx-auto rounded-full flex items-center justify-center mb-6 shadow-2xl ${lastSubmissionResult!.passed ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30' : 'bg-gradient-to-br from-brand-primary to-brand-accent shadow-brand-primary/30'}`}>
             <span className="text-5xl md:text-7xl">{lastSubmissionResult!.passed ? '🎉' : '💪'}</span>
           </div>
           {lastSubmissionResult!.passed && (
             <div className="absolute -top-4 -right-4 animate-bounce">
-               <Trophy className="w-12 h-12 md:w-16 md:h-16 text-amber-500 drop-shadow-lg" />
+              <Trophy className="w-12 h-12 md:w-16 md:h-16 text-amber-500 drop-shadow-lg" />
             </div>
           )}
         </div>
@@ -547,10 +546,10 @@ const QuizSection: React.FC<{
             </div>
           ) : (
             <p className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-[2px] leading-relaxed max-w-[240px] mx-auto opacity-70">
-              {lastSubmissionResult!.already_awarded 
-                ? 'Reward already earned for this quiz' 
-                : lastSubmissionResult!.score < lastSubmissionResult!.passing_score 
-                  ? `Score below passing requirement (${lastSubmissionResult!.passing_score})` 
+              {lastSubmissionResult!.already_awarded
+                ? 'Reward already earned for this quiz'
+                : lastSubmissionResult!.score < lastSubmissionResult!.passing_score
+                  ? `Score below passing requirement (${lastSubmissionResult!.passing_score})`
                   : 'Ineligible for rewards for this attempt'}
             </p>
           )}
@@ -572,27 +571,27 @@ const QuizSection: React.FC<{
     if (!reviewData || reviewData.length === 0) return null;
     const item = reviewData[currentQuestionIndex];
     return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-950 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
-        <h4 className="font-bold text-lg md:text-xl text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
-        <div className="flex items-center gap-4">
-          <div className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
-            {currentQuestionIndex + 1} / {reviewData.length}
+      <div className="flex flex-col h-full bg-white dark:bg-slate-950 animate-in fade-in duration-500">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
+          <h4 className="font-bold text-lg md:text-xl text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
+          <div className="flex items-center gap-4">
+            <div className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
+              {currentQuestionIndex + 1} / {reviewData.length}
+            </div>
+            <button onClick={() => setMode('info')} className="p-2 -mr-2 text-gray-400 hover:text-brand-primary transition-colors">
+              <X className="w-6 h-6" />
+            </button>
           </div>
-          <button onClick={() => setMode('info')} className="p-2 -mr-2 text-gray-400 hover:text-brand-primary transition-colors">
-            <X className="w-6 h-6" />
-          </button>
         </div>
-      </div>
 
-      <div className="flex-1 overflow-y-auto p-3 md:p-5 custom-scrollbar">
-        <div className="max-w-4xl mx-auto py-2">
+        <div className="flex-1 overflow-y-auto p-3 md:p-5 custom-scrollbar">
+          <div className="max-w-4xl mx-auto py-2">
             <div className={`rounded-[24px] border-2 overflow-hidden transition-all shadow-sm ${item.is_correct ? 'border-emerald-500/20 bg-emerald-50/5' : 'border-red-500/20 bg-red-50/5'}`}>
               <div className="p-4 md:p-6 space-y-4">
                 <div className="flex justify-between items-start gap-4">
                   <div className="space-y-1.5">
-                     <span className={`text-[10px] font-mono font-bold uppercase tracking-[2px] ${item.is_correct ? 'text-emerald-500' : 'text-red-500'}`}>Question {currentQuestionIndex + 1}</span>
-                     <h5 className="font-bold text-[16px] md:text-lg text-brand-dark dark:text-white leading-snug">{item.question_text}</h5>
+                    <span className={`text-[10px] font-mono font-bold uppercase tracking-[2px] ${item.is_correct ? 'text-emerald-500' : 'text-red-500'}`}>Question {currentQuestionIndex + 1}</span>
+                    <h5 className="font-bold text-[16px] md:text-lg text-brand-dark dark:text-white leading-snug">{item.question_text}</h5>
                   </div>
                   <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0 shadow-sm ${item.is_correct ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}>
                     {item.is_correct ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
@@ -616,7 +615,7 @@ const QuizSection: React.FC<{
                     );
                   })}
                 </div>
-                
+
                 {item.explanation && (
                   <div className="bg-white/80 dark:bg-slate-900/50 p-4 rounded-[16px] border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary opacity-30"></div>
@@ -626,35 +625,36 @@ const QuizSection: React.FC<{
                 )}
               </div>
             </div>
+          </div>
         </div>
-      </div>
 
-      <div className="p-3 md:p-5 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-5">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <button
-            onClick={() => currentQuestionIndex > 0 && setCurrentQuestionIndex(prev => prev - 1)}
-            disabled={currentQuestionIndex === 0}
-            className="flex-1 md:flex-none px-6 md:px-10 py-3 rounded-[12px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
-          >
-            <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span><span className="md:hidden">Back</span>
-          </button>
-
-          {currentQuestionIndex === reviewData.length - 1 ? (
-            <button onClick={() => setMode('info')} className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
-              {t('backToOverview')}
-            </button>
-          ) : (
+        <div className="p-3 md:p-5 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-5">
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             <button
-              onClick={() => currentQuestionIndex < reviewData.length - 1 && setCurrentQuestionIndex(prev => prev + 1)}
-              className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[12px] font-bold text-[14px] hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+              onClick={() => currentQuestionIndex > 0 && setCurrentQuestionIndex(prev => prev - 1)}
+              disabled={currentQuestionIndex === 0}
+              className="flex-1 md:flex-none px-6 md:px-10 py-3 rounded-[12px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
             >
-              {t('nextQuestion') || 'Next'} <ChevronRight className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span><span className="md:hidden">Back</span>
             </button>
-          )}
+
+            {currentQuestionIndex === reviewData.length - 1 ? (
+              <button onClick={() => setMode('info')} className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
+                {t('backToOverview')}
+              </button>
+            ) : (
+              <button
+                onClick={() => currentQuestionIndex < reviewData.length - 1 && setCurrentQuestionIndex(prev => prev + 1)}
+                className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[12px] font-bold text-[14px] hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+              >
+                {t('nextQuestion') || 'Next'} <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  )};
+    )
+  };
 
   const renderQuizOverlay = () => {
     if (mode === 'info') return null;
@@ -673,32 +673,35 @@ const QuizSection: React.FC<{
   return (
     <>
       {renderQuizOverlay()}
-      <div className="space-y-8">
-        <div className="text-center md:text-left flex flex-col md:flex-row items-center gap-6 bg-gray-50 dark:bg-slate-800/50 p-5 md:p-8 rounded-[16px] border border-gray-100 dark:border-slate-700">
-          <div className="w-16 h-16 bg-brand-primary/10 rounded-[16px] flex items-center justify-center shrink-0">
-            <ClipboardList className="w-8 h-8 text-brand-primary" />
+      <div className="space-y-5">
+        {/* Quiz info block \u2014 full width, buttons below */}
+        <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-[14px] border border-gray-100 dark:border-slate-700">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-brand-primary/10 rounded-[8px] flex items-center justify-center shrink-0 mt-0.5">
+              <ClipboardList className="text-brand-primary" style={{width:'16px',height:'16px'}} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-bold text-brand-dark dark:text-white leading-snug">{t('quizReadyTitle')}</p>
+              <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">
+                {t('quizReadyDesc').replace('{count}', quizSummary.question_count.toString())}
+              </p>
+            </div>
           </div>
-          <div className="flex-1">
-            <h4 className="text-lg font-bold text-brand-dark dark:text-white mb-1.5">{t('quizReadyTitle')}</h4>
-            <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
-              {t('quizReadyDesc').replace('{count}', quizSummary.question_count.toString())}
-            </p>
-          </div>
-          <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          <div className="flex gap-2 mt-3">
             <button
               onClick={() => startQuiz('article')}
               disabled={loading}
-              className="w-full md:w-auto px-6 py-4 bg-white dark:bg-slate-900 text-brand-primary border-2 border-brand-primary/20 rounded-[12px] font-bold text-[15px] hover:bg-brand-primary/5 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-slate-900 text-brand-primary border border-brand-primary/20 rounded-[10px] font-bold text-[12px] hover:bg-brand-primary/5 transition-all disabled:opacity-50 active:scale-95"
             >
-              <BookOpen className="w-5 h-5" />
+              <BookOpen style={{width:'14px',height:'14px'}} />
               Article
             </button>
             <button
               onClick={() => startQuiz('solving')}
               disabled={loading}
-              className="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[12px] font-bold text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[10px] font-bold text-[12px] hover:shadow-md hover:shadow-brand-primary/20 transition-all disabled:opacity-50 active:scale-95"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <PlayCircle className="w-5 h-5" />}
+              {loading ? <Loader2 style={{width:'14px',height:'14px'}} className="animate-spin" /> : <PlayCircle style={{width:'14px',height:'14px'}} />}
               {t('startQuiz')}
             </button>
           </div>
@@ -707,7 +710,7 @@ const QuizSection: React.FC<{
         {quizSummary.previous_attempts && quizSummary.previous_attempts.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-               <h5 className="text-[11px] font-mono font-medium text-gray-500 uppercase tracking-[2px] flex items-center gap-2">
+              <h5 className="text-[11px] font-mono font-medium text-gray-500 uppercase tracking-[2px] flex items-center gap-2">
                 <Clock className="w-4 h-4 text-brand-primary" />
                 {t('previousAttempts')}
               </h5>
@@ -716,12 +719,12 @@ const QuizSection: React.FC<{
                 <span className="text-sm font-mono font-bold text-brand-primary">{quizSummary.passing_score}</span>
               </div>
             </div>
-            
+
             <div className="flex flex-wrap gap-6 items-end">
               {[...quizSummary.previous_attempts].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map(attempt => {
                 const isPassed = attempt.score >= (quizSummary.passing_score || 0);
                 const barHeight = Math.min(40, (attempt.score / attempt.total) * 40);
-                
+
                 return (
                   <div key={attempt.id} className="flex flex-col items-center gap-3 group relative">
                     <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-mono py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
@@ -729,16 +732,15 @@ const QuizSection: React.FC<{
                     </div>
                     <button
                       onClick={() => handleReviewClick(attempt.id)}
-                      className={`w-[36px] h-[36px] rounded-full flex items-center justify-center text-sm font-mono font-bold border-2 transition-all ${
-                        isPassed 
-                          ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400' 
+                      className={`w-[36px] h-[36px] rounded-full flex items-center justify-center text-sm font-mono font-bold border-2 transition-all ${isPassed
+                          ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400'
                           : 'bg-red-50 dark:bg-red-500/10 border-red-500 text-red-600 dark:text-red-400'
-                      } hover:scale-110`}
+                        } hover:scale-110`}
                     >
                       {attempt.score}
                     </button>
                     <div className="w-1.5 bg-gray-100 dark:bg-slate-800 rounded-full h-[40px] relative overflow-hidden">
-                      <div 
+                      <div
                         className={`absolute bottom-0 left-0 right-0 rounded-full transition-all duration-500 ${isPassed ? 'bg-emerald-500' : 'bg-red-500'}`}
                         style={{ height: `${barHeight}px` }}
                       />
@@ -768,11 +770,15 @@ const QuizSection: React.FC<{
 };
 
 // --- Shared status color helper ---
+const humanizeStatus = (status: string): string => {
+  return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+};
+
 const assignmentStatusColor = (status: string) => {
   const s = status.toLowerCase();
   if (s === 'approved') return 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
   if (s === 'rejected' || s === 'missed') return 'bg-red-50 dark:bg-red-500/10 text-red-600 border-red-500/20';
-  if (s === 'submitted' || s === 'pending') return 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 border-amber-500/20';
+  if (s === 'submitted' || s === 'pending' || s.includes('awaiting')) return 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 border-amber-500/20';
   return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 border-indigo-500/20';
 };
 
@@ -812,7 +818,7 @@ const CurrentAssignmentSection: React.FC<{
         </h3>
         <div className="flex flex-wrap items-center gap-2 justify-end">
           {statusBadge}
-          <span className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-3 py-1 rounded-[10px] text-[11px] font-mono font-bold uppercase tracking-[2px] hidden sm:inline-block">
+          <span className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-3 py-1 rounded-[10px] text-[11px] font-mono font-bold uppercase tracking-[2px]">
             LSN {assignment.number}
           </span>
         </div>
@@ -835,29 +841,34 @@ const CurrentAssignmentSection: React.FC<{
         </div>
       </div>
 
-      <div className="p-4 md:p-8">
+      <div className="p-4 md:p-6">
         {activeTab === 'assignment' ? (
-          <div className="space-y-8 animate-in fade-in duration-300">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 bg-gray-50 dark:bg-slate-800/50 p-5 md:p-8 rounded-[16px] border border-gray-100 dark:border-slate-700">
-              <div className="w-16 h-16 bg-brand-primary/10 rounded-[16px] flex items-center justify-center shrink-0">
-                <FileText className="w-8 h-8 text-brand-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-1.5 block">Active Topic</span>
-                <h4 className="text-xl font-bold text-brand-dark dark:text-white mb-2 leading-tight">{assignment.lesson_topic}</h4>
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                  <span className="flex items-center gap-2 text-sm font-mono text-gray-500"><Calendar className="w-4 h-4" />{new Date(assignment.start_datetime).toLocaleDateString()}</span>
-                  <span className="flex items-center gap-2 text-sm font-bold text-red-500">
-                    <Clock className="w-4 h-4" />Due {new Date(assignment.deadline).toLocaleDateString()}, {new Date(assignment.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+          <div className="space-y-5 animate-in fade-in duration-300">
+            {/* Topic info block — full width, button below on mobile */}
+            <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-[14px] border border-gray-100 dark:border-slate-700">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-brand-primary/10 rounded-[8px] flex items-center justify-center shrink-0 mt-0.5">
+                  <FileText style={{width:'16px',height:'16px'}} className="text-brand-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[3px] block leading-none mb-1">Active Topic</span>
+                  <h4 className="text-[14px] font-bold text-brand-dark dark:text-white leading-snug mb-2">{assignment.lesson_topic}</h4>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <span className="flex items-center gap-1.5 text-[11px] font-mono text-gray-400">
+                      <Calendar className="w-3 h-3 shrink-0" />{new Date(assignment.start_datetime).toLocaleDateString()}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[11px] font-mono font-semibold text-red-500">
+                      <Clock className="w-3 h-3 shrink-0" />Due {new Date(assignment.deadline).toLocaleDateString()}, {new Date(assignment.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
                 </div>
               </div>
               {canSubmit && (
                 <button
                   onClick={onSubmit}
-                  className="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[12px] font-bold text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 shrink-0"
+                  className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[10px] font-bold text-[13px] hover:shadow-md hover:shadow-brand-primary/20 transition-all active:scale-[0.99]"
                 >
-                  <UploadCloud className="w-5 h-5" />
+                  <UploadCloud className="w-4 h-4" />
                   {latestSubmission ? t('resubmit') : t('startSubmission')}
                 </button>
               )}
@@ -896,25 +907,23 @@ const CurrentAssignmentSection: React.FC<{
                 </label>
                 <div className="grid grid-cols-1 gap-4">
                   {assignment.submissions.map((sub, idx) => (
-                    <div key={idx} className="bg-gray-50/50 dark:bg-slate-800/30 border border-gray-100 dark:border-slate-700 rounded-[16px] p-5 md:p-6 space-y-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                           <span className="text-[13px] font-mono font-bold text-gray-500">{new Date(sub.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
-                        </div>
-                        <span className={`px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border ${assignmentStatusColor(sub.status)}`}>{sub.status}</span>
+                    <div key={idx} className="bg-gray-50/50 dark:bg-slate-800/30 border border-gray-100 dark:border-slate-700 rounded-[16px] p-4 md:p-6 space-y-3">
+                      <div className="flex justify-between items-center gap-3">
+                        <span className="text-[11px] md:text-[13px] font-mono font-bold text-gray-500 shrink-0">{new Date(sub.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                        <span className={`px-2.5 py-1 rounded-[20px] text-[10px] font-mono font-bold uppercase tracking-wider border shrink-0 ${assignmentStatusColor(sub.status)}`}>{humanizeStatus(sub.status)}</span>
                       </div>
-                      
+
                       {sub.student_comment && (
                         <div className="pl-4 border-l-4 border-brand-primary/30">
-                           <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-widest block mb-1">Your Comment</span>
-                           <p className="text-sm text-gray-600 dark:text-slate-400 font-medium italic">"{sub.student_comment}"</p>
+                          <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-widest block mb-1">Your Comment</span>
+                          <p className="text-sm text-gray-600 dark:text-slate-400 font-medium italic">"{sub.student_comment}"</p>
                         </div>
                       )}
 
                       {sub.teacher_comment && (
                         <div className="pl-4 border-l-4 border-amber-500/30 bg-amber-500/5 p-4 rounded-r-xl">
-                           <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">Instructor Review</span>
-                           <p className="text-sm text-gray-700 dark:text-slate-300 font-bold italic">"{sub.teacher_comment}"</p>
+                          <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">Instructor Review</span>
+                          <p className="text-sm text-gray-700 dark:text-slate-300 font-bold italic">"{sub.teacher_comment}"</p>
                         </div>
                       )}
                     </div>
@@ -952,22 +961,21 @@ const AssignmentHistoryCard: React.FC<{
 
   return (
     <div className={`bg-white dark:bg-slate-900 rounded-[16px] border transition-all duration-300 overflow-hidden ${isExpanded ? 'border-brand-primary/40 shadow-xl ring-1 ring-brand-primary/10' : 'border-gray-100 dark:border-slate-800 hover:border-brand-primary/30'}`}>
-      <div onClick={onExpand} className="p-4 md:p-6 cursor-pointer flex items-center gap-4">
-        <div className="w-12 h-12 rounded-[12px] bg-gray-50 dark:bg-slate-800 flex flex-col items-center justify-center shrink-0 border border-gray-100 dark:border-slate-700">
-          <span className="text-[10px] font-mono font-bold text-gray-400 uppercase leading-none mb-1">LSN</span>
-          <span className="font-mono font-bold text-lg leading-none">{assignment.number}</span>
+      <div onClick={onExpand} className="p-4 md:p-6 cursor-pointer flex items-center gap-3">
+        {/* Lesson number pill */}
+        <div className="shrink-0 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[8px] px-2.5 py-1 flex flex-col items-center min-w-[36px]">
+          <span className="text-[8px] font-mono font-bold uppercase leading-none opacity-50">LSN</span>
+          <span className="font-mono font-bold text-sm leading-tight">{assignment.number}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-brand-dark dark:text-white truncate mb-1">{assignment.lesson_topic}</h3>
-          <p className="text-sm font-medium text-gray-500 flex items-center gap-2">
-            <Calendar className="w-3.5 h-3.5" />{new Date(assignment.start_datetime).toLocaleDateString()}
-          </p>
+          <h3 className="font-semibold text-[14px] text-brand-dark dark:text-white truncate leading-snug">{assignment.lesson_topic}</h3>
+          <p className="text-[11px] font-medium text-gray-400 mt-0.5">{new Date(assignment.start_datetime).toLocaleDateString()}</p>
         </div>
-        <div className="flex items-center gap-4 shrink-0">
-          <span className={`px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border ${assignmentStatusColor(statusLabel)}`}>
-            {statusLabel}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className={`px-2.5 py-1 rounded-[20px] text-[10px] font-mono font-bold uppercase tracking-wide border ${assignmentStatusColor(statusLabel)}`}>
+            {humanizeStatus(statusLabel)}
           </span>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 dark:bg-slate-800 transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-brand-primary/10 text-brand-primary' : 'text-gray-400'}`}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-gray-50 dark:bg-slate-800 transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-brand-primary/10 text-brand-primary' : 'text-gray-400'}`}>
             <ChevronDown className="w-4 h-4" />
           </div>
         </div>
@@ -996,7 +1004,7 @@ const AssignmentHistoryCard: React.FC<{
             {activeTab === 'assignment' ? (
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="space-y-4">
-                   <label className="text-[11px] font-mono font-medium text-gray-500 uppercase tracking-[2px] flex items-center gap-2">
+                  <label className="text-[11px] font-mono font-medium text-gray-500 uppercase tracking-[2px] flex items-center gap-2">
                     <FileText className="w-4 h-4 text-brand-primary" />{t('homeworkDescription')}
                   </label>
                   <div className="bg-white dark:bg-slate-900 rounded-[16px] p-5 border border-gray-100 dark:border-slate-700 shadow-sm">
@@ -1028,15 +1036,15 @@ const AssignmentHistoryCard: React.FC<{
                     </label>
                     <div className="grid grid-cols-1 gap-3">
                       {assignment.submissions.map((sub, idx) => (
-                        <div key={idx} className="bg-white dark:bg-slate-900 rounded-[16px] p-5 border border-gray-100 dark:border-slate-700 flex flex-col gap-4 shadow-sm">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-mono font-bold text-gray-500">{new Date(sub.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
-                            <span className={`px-2.5 py-1 rounded-[20px] text-[10px] font-mono font-bold uppercase tracking-wider border ${assignmentStatusColor(sub.status)}`}>{sub.status}</span>
+                        <div key={idx} className="bg-white dark:bg-slate-900 rounded-[16px] p-4 border border-gray-100 dark:border-slate-700 flex flex-col gap-3 shadow-sm">
+                          <div className="flex justify-between items-center gap-3">
+                            <span className="text-[11px] font-mono font-bold text-gray-500 shrink-0">{new Date(sub.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                            <span className={`px-2 py-0.5 rounded-[20px] text-[10px] font-mono font-bold uppercase tracking-wide border shrink-0 ${assignmentStatusColor(sub.status)}`}>{humanizeStatus(sub.status)}</span>
                           </div>
                           {sub.teacher_comment && (
                             <div className="pl-4 border-l-4 border-amber-500/30 bg-amber-500/5 p-4 rounded-r-xl">
-                               <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">Instructor Review</span>
-                               <p className="text-xs text-gray-700 dark:text-slate-300 font-bold italic">"{sub.teacher_comment}"</p>
+                              <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">Instructor Review</span>
+                              <p className="text-xs text-gray-700 dark:text-slate-300 font-bold italic">"{sub.teacher_comment}"</p>
                             </div>
                           )}
                         </div>
@@ -1117,73 +1125,79 @@ const ActiveAttendanceCard: React.FC<{
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-sm">
-      <div className="p-5 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="flex-1 min-w-0 text-center md:text-left">
-          <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-2 opacity-80">Current Lesson</span>
-          <h3 className="text-lg md:text-xl font-bold text-brand-dark dark:text-white leading-tight mb-3">
-            Lesson {attendance.number}: {attendance.lesson_topic}
-          </h3>
-          <div className="flex items-center justify-center md:justify-start gap-4 text-[12px] font-mono font-bold text-gray-500">
-            <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-brand-primary/50" /> {new Date(attendance.opens_at).toLocaleDateString()}</span>
-            <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-brand-primary/50" /> {new Date(attendance.opens_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+      {/* Flat dashboard-style layout */}
+      <div className="p-5 md:p-6">
+        {/* Top row: lesson pill + topic + status chip */}
+        <div className="flex items-center gap-3">
+          {/* Lesson number pill */}
+          <div className="shrink-0 bg-brand-primary/10 border border-brand-primary/20 rounded-[10px] px-2.5 py-1.5 flex flex-col items-center min-w-[40px]">
+            <span className="text-[8px] font-mono font-bold text-brand-primary uppercase leading-none opacity-70">LSN</span>
+            <span className="font-mono font-bold text-base leading-tight text-brand-primary">{attendance.number}</span>
           </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[2px] opacity-70">Current Lesson</span>
+            </div>
+            <h3 className="text-base font-bold text-brand-dark dark:text-white leading-snug truncate">
+              {attendance.lesson_topic}
+            </h3>
+          </div>
+          {/* Status chip */}
+          {attendance.status === 'attended' || attendance.status === 'marked' ? (
+            <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-emerald-500 text-white rounded-xl font-mono font-bold text-[11px] uppercase tracking-wide shadow-sm shadow-emerald-500/20">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t('attended') || 'Attended'}</span>
+            </div>
+          ) : (attendance.status !== null || isExpired) ? (
+            <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-xl font-mono font-bold text-[11px] uppercase tracking-wide shadow-sm shadow-red-500/20">
+              <XCircle className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t('missed') || 'Missed'}</span>
+            </div>
+          ) : (
+            /* Time remaining pill */
+            <div className="shrink-0 flex items-center gap-1.5 bg-slate-900 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-700">
+              <Clock className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+              <span className="text-sm font-bold text-brand-primary tabular-nums font-mono tracking-tight" style={{ textShadow: '0 0 12px rgba(18,194,220,0.4)' }}>{timeLeft}</span>
+            </div>
+          )}
         </div>
 
-        {attendance.status === null && !isExpired ? (
-          <div className="bg-gradient-to-br from-slate-900 to-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 flex flex-col items-center min-w-[150px] shadow-lg">
-            <p className="text-[9px] font-mono font-bold text-gray-500 uppercase tracking-widest mb-1.5">{t('timeRemaining')}</p>
-            <p className="text-2xl font-bold text-brand-primary tabular-nums tracking-tight font-mono" style={{ textShadow: '0 0 20px rgba(18,194,220,0.3)' }}>{timeLeft}</p>
-          </div>
-        ) : (
-          <div className="shrink-0 flex justify-center w-full md:w-auto">
-            {attendance.status === 'attended' || attendance.status === 'marked' ? (
-              <div className="flex items-center gap-2 px-5 py-3 bg-emerald-500 text-white rounded-2xl font-mono font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-emerald-500/20">
-                <CheckCircle2 className="w-4 h-4" /> {t('attended') || "Attended"}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 px-5 py-3 bg-red-500 text-white rounded-2xl font-mono font-bold text-[12px] uppercase tracking-widest shadow-lg shadow-red-500/20">
-                <XCircle className="w-4 h-4" /> {t('missed') || "Missed"}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+        {/* Meta row */}
+        <div className="flex items-center gap-4 mt-3 pl-[52px] text-[11px] font-mono text-gray-400">
+          <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {new Date(attendance.opens_at).toLocaleDateString()}</span>
+          <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {new Date(attendance.opens_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
 
-      <div className="px-5 pb-8 md:px-8">
+        {/* Keyword input — flat, inline */}
         {attendance.status === null && !isExpired && (
-          <div className="max-w-md mx-auto md:mx-0 space-y-3">
-            <label className="block text-[10px] font-mono font-bold text-gray-500 dark:text-slate-500 uppercase tracking-[2px] text-center md:text-left">
-              {t('enterKeyword')}
-            </label>
-            <div className="flex flex-col gap-2.5">
-              <input
-                type="text"
-                value={attendanceCode}
-                onChange={(e) => setAttendanceCode(e.target.value.toLowerCase())}
-                placeholder="e.g. apple"
-                className="w-full h-[52px] rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 px-5 text-sm font-mono font-bold focus:border-brand-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-brand-primary/8 transition-all lowercase tracking-wider"
-              />
-              <button
-                onClick={handleMarkAttendance}
-                disabled={isSubmitting || !attendanceCode.trim()}
-                className="w-full h-[52px] px-7 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Marking...' : t('mark')}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {quiz && (
-          <div className="pt-8 border-t border-gray-100 dark:border-slate-800 mt-8">
-            <div className="flex items-center justify-between mb-6">
-              <h4 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[3px]">{t('todaysPractice')}</h4>
-              <div className="h-px flex-1 bg-gray-100 dark:bg-slate-800 ml-6"></div>
-            </div>
-            <QuizSection lessonId={attendance.track_id} showToast={showToast} initialData={quiz} />
+          <div className="mt-4 flex gap-2">
+            <input
+              type="text"
+              value={attendanceCode}
+              onChange={(e) => setAttendanceCode(e.target.value.toLowerCase())}
+              placeholder={t('enterKeyword') || 'Enter keyword...'}
+              className="flex-1 h-11 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-4 text-sm font-mono font-bold focus:border-brand-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all lowercase"
+            />
+            <button
+              onClick={handleMarkAttendance}
+              disabled={isSubmitting || !attendanceCode.trim()}
+              className="shrink-0 h-11 px-5 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-xl font-bold text-[12px] uppercase tracking-wider shadow-md shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? '...' : t('mark')}
+            </button>
           </div>
         )}
       </div>
+
+      {quiz && (
+        <div className="px-5 pb-5 md:px-6 md:pb-6 border-t border-gray-100 dark:border-slate-800 pt-5">
+          <div className="flex items-center gap-3 mb-5">
+            <h4 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[3px]">{t('todaysPractice')}</h4>
+            <div className="h-px flex-1 bg-gray-100 dark:bg-slate-800"></div>
+          </div>
+          <QuizSection lessonId={attendance.track_id} showToast={showToast} initialData={quiz} />
+        </div>
+      )}
     </div>
   );
 };
@@ -1210,15 +1224,15 @@ const LessonsContent: React.FC = () => {
   const attendance = lessonsData?.attendance;
   const assignments = lessonsData?.assignments;
   const currentAssignment = assignments?.current;
-  
+
   // Hide current assignment only if the attendance window for that lesson is still open AND student hasn't marked attendance
   const isAttendanceOpen = attendance && new Date() < new Date(attendance.closes_at);
   const hasMarkedAttendance = attendance && attendance.status !== null;
-  
-  const isCurrentLessonActive = attendance && currentAssignment && 
-                               String(attendance.number) === String(currentAssignment.number) && 
-                               isAttendanceOpen && !hasMarkedAttendance;
-  
+
+  const isCurrentLessonActive = attendance && currentAssignment &&
+    String(attendance.number) === String(currentAssignment.number) &&
+    isAttendanceOpen && !hasMarkedAttendance;
+
   const showCurrentAssignment = currentAssignment && !isCurrentLessonActive;
 
   const previousAssignments = assignments?.previous || [];
