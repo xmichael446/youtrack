@@ -312,7 +312,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
               )}
               <button
                 onClick={() => setSelected(isSelected ? null : def.key)}
-                className="shrink-0 w-[88px] flex flex-col items-center gap-1.5 p-2.5 rounded-xl transition-all duration-200 text-left relative"
+                className="shrink-0 w-[88px] flex flex-col items-center p-2.5 rounded-xl transition-all duration-200 text-left relative"
                 style={{
                   border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : '#e5e7eb'}`,
                   backgroundColor: isSelected
@@ -321,16 +321,16 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                   boxShadow: isSelected ? `0 0 0 3px ${borderColor}20` : undefined,
                 }}
               >
-                <span className="text-2xl leading-none mt-0.5">{def.icon}</span>
-                <p className="text-[10px] font-bold text-center leading-tight text-gray-700 dark:text-slate-200 line-clamp-2 w-full">
+                <span className="text-2xl leading-none mt-0.5 mb-1.5">{def.icon}</span>
+                <p className="text-[10px] font-bold text-center leading-tight text-gray-700 dark:text-slate-200 line-clamp-2 w-full flex-1">
                   {def.name}
                 </p>
-                <span className="text-[7px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full leading-none"
+                <span className="mt-auto text-[7px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full leading-none"
                   style={{ backgroundColor: `${borderColor}20`, color: borderColor }}>
                   {def.rarity}
                 </span>
                 {earned ? (
-                  <p className="text-[8px] font-mono text-brand-primary leading-none">
+                  <p className="text-[8px] font-mono text-brand-primary leading-none mt-1">
                     ✓ {formatRelative(def.earned_at)}
                   </p>
                 ) : (
