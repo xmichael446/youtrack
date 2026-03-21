@@ -314,7 +314,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                 onClick={() => setSelected(isSelected ? null : def.key)}
                 className="shrink-0 w-[88px] flex flex-col items-center p-2.5 rounded-xl transition-all duration-200 text-left relative"
                 style={{
-                  border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : '#e5e7eb'}`,
+                  border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : 'transparent'}`,
                   backgroundColor: isSelected
                     ? `${borderColor}18`
                     : earned ? `${borderColor}08` : undefined,

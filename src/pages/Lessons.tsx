@@ -472,7 +472,7 @@ const QuizSection: React.FC<{
                     <div className={`w-6 h-6 rounded-[8px] flex items-center justify-center border-2 shrink-0 transition-all ${isSelected ? 'border-brand-primary bg-brand-primary text-white scale-110' : 'border-gray-200 dark:border-slate-700 group-hover/opt:border-brand-primary/50'}`}>
                       {isSelected && <CheckCircle2 className="w-4 h-4" />}
                     </div>
-                    <span className={`text-[14px] md:text-base font-bold flex-1 ${isSelected ? 'text-brand-dark dark:text-white' : 'text-gray-600 dark:text-slate-300'}`}>{option.content}</span>
+                    <span className={`text-[13px] md:text-[15px] font-bold flex-1 ${isSelected ? 'text-brand-dark dark:text-white' : 'text-gray-600 dark:text-slate-300'}`}>{option.content}</span>
                   </button>
                 );
               })}
@@ -494,7 +494,7 @@ const QuizSection: React.FC<{
               <button
                 onClick={handleSubmitQuiz}
                 disabled={submitting || Object.keys(answers).length < questionsData!.questions.length}
-                className="px-12 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[16px] font-bold text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+                className="px-12 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[16px] font-bold text-[13px] md:text-[15px] hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
               >
                 {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trophy className="w-5 h-5" />}
                 {t('finishQuiz')}
@@ -608,7 +608,7 @@ const QuizSection: React.FC<{
                     else if (isCorrect) stateClass = 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30';
 
                     return (
-                      <div key={option.id} className={`p-3 md:p-4 rounded-[12px] border text-[13px] md:text-[14px] font-bold flex items-center gap-3 transition-all ${stateClass}`}>
+                      <div key={option.id} className={`p-3 md:p-4 rounded-[12px] border text-[12px] md:text-[14px] font-bold flex items-center gap-3 transition-all ${stateClass}`}>
                         {isCorrect ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : isSelected ? <XCircle className="w-4 h-4 shrink-0" /> : <div className="w-2.5 h-2.5 rounded-full bg-current opacity-20 shrink-0" />}
                         <span>{option.content}</span>
                       </div>
@@ -620,7 +620,7 @@ const QuizSection: React.FC<{
                   <div className="bg-white/80 dark:bg-slate-900/50 p-4 rounded-[16px] border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary opacity-30"></div>
                     <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-1 opacity-70">Explanation</span>
-                    <p className="text-[13px] md:text-[14px] font-medium text-gray-600 dark:text-slate-400 italic leading-relaxed">{item.explanation}</p>
+                    <p className="text-[11px] md:text-[13px] font-medium text-gray-600 dark:text-slate-400 italic leading-relaxed">{item.explanation}</p>
                   </div>
                 )}
               </div>
@@ -793,11 +793,22 @@ const CurrentAssignmentSection: React.FC<{
 
   const latestSubmission = assignment.submissions?.[0] ?? null;
   const isApproved = latestSubmission?.status?.toLowerCase() === 'approved';
-  const canSubmit = !isApproved;
+  const isExpired = assignment.is_expired === true;
+  const isOverdue = assignment.is_overdue === true;
+  // Can still submit if: not approved AND the absolute deadline (deadline + 24h) hasn't passed
+  const canSubmit = !isApproved && !isExpired;
 
   const statusBadge = isApproved ? (
     <span className="inline-flex items-center bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border border-emerald-500/20 gap-1.5">
       <CheckCircle2 className="w-3.5 h-3.5" />{t('assignmentApproved')}
+    </span>
+  ) : isExpired ? (
+    <span className="inline-flex items-center bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border border-red-500/20 gap-1.5">
+      <XCircle className="w-3.5 h-3.5" />Expired
+    </span>
+  ) : isOverdue ? (
+    <span className="inline-flex items-center bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border border-orange-500/20 gap-1.5">
+      <AlertTriangle className="w-3.5 h-3.5" />Overdue
     </span>
   ) : latestSubmission ? (
     <span className="inline-flex items-center bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border border-amber-500/20 gap-1.5">
@@ -863,13 +874,29 @@ const CurrentAssignmentSection: React.FC<{
                   </div>
                 </div>
               </div>
+              {/* Overdue warning */}
+              {isOverdue && !isExpired && (
+                <div className="mt-3 flex items-start gap-2.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-[10px] px-3.5 py-3">
+                  <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[12px] font-bold text-orange-700 dark:text-orange-400 leading-snug">Late submission — 50% rewards</p>
+                    <p className="text-[11px] text-orange-600/80 dark:text-orange-400/70 mt-0.5">The original deadline has passed. You can still submit within the 24-hour grace period, but XP and coins will be halved.</p>
+                  </div>
+                </div>
+              )}
               {canSubmit && (
                 <button
                   onClick={onSubmit}
-                  className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-[10px] font-bold text-[13px] hover:shadow-md hover:shadow-brand-primary/20 transition-all active:scale-[0.99]"
+                  className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 font-bold text-[13px] rounded-[10px] transition-all active:scale-[0.99] ${
+                    isOverdue
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-md hover:shadow-orange-500/20'
+                      : 'bg-gradient-to-r from-brand-primary to-brand-accent text-white hover:shadow-md hover:shadow-brand-primary/20'
+                  }`}
                 >
                   <UploadCloud className="w-4 h-4" />
-                  {latestSubmission ? t('resubmit') : t('startSubmission')}
+                  {isOverdue
+                    ? (latestSubmission ? 'Resubmit (Late)' : 'Submit Late')
+                    : (latestSubmission ? t('resubmit') : t('startSubmission'))}
                 </button>
               )}
             </div>
@@ -879,7 +906,7 @@ const CurrentAssignmentSection: React.FC<{
                 <FileText className="w-4 h-4 text-brand-primary" />{t('homeworkDescription')}
               </label>
               <div className="bg-white dark:bg-slate-950 rounded-[16px] p-6 border border-gray-100 dark:border-slate-800 shadow-sm">
-                <p className="text-[15px] font-medium text-gray-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{assignment.description}</p>
+                <p className="text-[13px] md:text-[15px] font-medium text-gray-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{assignment.description}</p>
               </div>
             </div>
 

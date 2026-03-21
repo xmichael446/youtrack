@@ -108,7 +108,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
             <div className="absolute top-[calc(env(safe-area-inset-top)+1.25rem)] right-5 z-50 flex items-center gap-2.5 animate-in fade-in duration-500">
                 <button
                     onClick={toggleTheme}
-                    className={`p-2.5 rounded-xl transition-all duration-300 backdrop-blur-xl shadow-sm hover:scale-105 active:scale-95 border ${isDark ? 'bg-slate-900/60 border-white/8 text-yellow-400 hover:bg-slate-800/60' : 'bg-white/80 border-gray-200/60 text-slate-500 hover:bg-white'}`}
+                    className={`p-2.5 rounded-xl transition-all duration-300 backdrop-blur-xl shadow-sm hover:scale-105 active:scale-95 ${isDark ? 'bg-slate-900/60 text-yellow-400 hover:bg-slate-800/60 border border-white/5' : 'bg-white/80 border border-gray-200/60 text-slate-500 hover:bg-white'}`}
                 >
                     {isDark ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
@@ -117,7 +117,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                     )}
                 </button>
 
-                <div className={`flex items-center p-1 rounded-xl backdrop-blur-xl shadow-sm border transition-colors duration-300 gap-0.5 ${isDark ? 'bg-slate-900/60 border-white/8' : 'bg-white/80 border-gray-200/60'}`}>
+                <div className={`flex items-center p-1 rounded-xl backdrop-blur-xl shadow-sm transition-colors duration-300 gap-0.5 ${isDark ? 'bg-slate-900/60 border border-white/5' : 'bg-white/80 border border-gray-200/60'}`}>
                     {['uz', 'en'].map((lang) => (
                         <button
                             key={lang}

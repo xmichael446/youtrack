@@ -84,6 +84,8 @@ export interface AssignmentData {
     attachments: AssignmentAttachment[];
     submissions: Submission[];
     quiz?: QuizSessionData | null;
+    is_expired: boolean;   // true = absolute deadline passed (deadline + 24h), no more submissions
+    is_overdue: boolean;   // true = original deadline passed but within 24h grace period (50% rewards)
 }
 
 export interface AssignmentsData {

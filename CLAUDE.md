@@ -16,7 +16,7 @@ No test runner is configured in this project.
 
 Create a `.env` file:
 ```
-VITE_API_BASE_URL=https://yt-api.xmichael446.com
+VITE_API_BASE_URL=https://api.youtrack.com
 ```
 
 The API base URL is read by `ApiService` via `import.meta.env.VITE_API_BASE_URL`.
