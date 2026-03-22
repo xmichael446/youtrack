@@ -727,9 +727,8 @@ class ApiService {
     }
 
     /** Get live contest leaderboard (available when open, closed, or finalized) */
-    async getContestLeaderboard(contestId: number): Promise<ContestLeaderboardEntry[]> {
-        const response = await this.post<any>('/api/contest/leaderboard/', { contest_id: contestId });
-        return response.data.leaderboard || response.data.data || response.data;
+    async getContestLeaderboard(contestId: number): Promise<ContestLiveLeaderboardResponse> {
+        return (await this.post<ContestLiveLeaderboardResponse>('/api/contest/leaderboard/', { contest_id: contestId })).data;
     }
 
     /**

@@ -16,6 +16,62 @@ import { DashboardProvider, useDashboard } from './context/DashboardContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { NavigationContext } from './context/NavigationContext';
 
+const NavItem = ({
+  view, icon: Icon, label, currentView, onNavigate,
+}: {
+  view: ViewState; icon: React.ElementType; label: string;
+  currentView: ViewState; onNavigate: (view: ViewState) => void;
+}) => {
+  const isActive = currentView === view;
+  return (
+    <button
+      onClick={() => onNavigate(view)}
+      className={`flex flex-col md:flex-row items-center justify-center md:justify-start px-2 py-2.5 md:px-4 md:py-3.5 w-full md:w-auto rounded-2xl transition-all duration-300 group relative
+        ${isActive
+          ? 'text-brand-primary bg-brand-primary/8 dark:bg-brand-primary/12 md:bg-gradient-to-r md:from-brand-primary/10 md:to-transparent shadow-sm'
+          : 'text-gray-400 dark:text-slate-500 hover:text-brand-primary dark:hover:text-brand-primary hover:bg-gray-50 dark:hover:bg-slate-800/50'
+        }`}
+    >
+      {isActive && (
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-primary rounded-r-full hidden md:block shadow-[0_0_8px_rgba(18,194,220,0.6)]"></div>
+      )}
+      <div className={`relative transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+        <Icon className={`w-5 h-5 md:w-[18px] md:h-[18px] transition-all duration-300 ${isActive ? 'stroke-[2.5px] drop-shadow-[0_0_6px_rgba(18,194,220,0.5)]' : ''}`} />
+        {isActive && (
+          <div className="absolute -inset-2 bg-brand-primary/15 blur-lg rounded-full md:hidden"></div>
+        )}
+      </div>
+      <span className={`text-[9px] md:text-[12px] font-semibold mt-1 md:mt-0 md:ml-3.5 tracking-wide uppercase md:capitalize transition-all ${isActive ? 'text-brand-primary' : ''}`}>
+        {label}
+      </span>
+    </button>
+  );
+};
+
+const SidebarProgress = () => {
+  const { course } = useDashboard();
+  const { t } = useLanguage();
+  return (
+    <div className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden group border border-white/5">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/20 rounded-full -mr-12 -mt-12 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+      <div className="absolute bottom-0 left-0 w-20 h-20 bg-brand-primary/10 rounded-full -ml-8 -mb-8 blur-xl"></div>
+      <div className="relative z-10">
+        <p className="text-[9px] font-bold text-brand-primary uppercase tracking-[3px] mb-1.5">{t('overallProgress')}</p>
+        <p className="font-semibold text-base leading-tight mb-4 text-white/90">{course?.name || 'Loading...'}</p>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-brand-primary shadow-[0_0_8px_rgba(18,194,220,0.6)] transition-all duration-1000 rounded-full"
+              style={{ width: `${course?.completion || 0}%` }}
+            ></div>
+          </div>
+          <span className="text-[11px] font-mono font-semibold text-white/60 tabular-nums">{course?.completion || 0}%</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [previousView, setPreviousView] = useState<ViewState>('leaderboard');
@@ -169,60 +225,6 @@ const AppContent: React.FC<{
     );
   };
 
-  const NavItem = ({ view, icon: Icon, label }: { view: ViewState; icon: React.ElementType; label: string }) => {
-    const isActive = currentView === view;
-    return (
-      <button
-        onClick={() => setCurrentView(view)}
-        className={`flex flex-col md:flex-row items-center justify-center md:justify-start px-2 py-2.5 md:px-4 md:py-3.5 w-full md:w-auto rounded-2xl transition-all duration-300 group relative
-          ${isActive
-            ? 'text-brand-primary bg-brand-primary/8 dark:bg-brand-primary/12 md:bg-gradient-to-r md:from-brand-primary/10 md:to-transparent shadow-sm'
-            : 'text-gray-400 dark:text-slate-500 hover:text-brand-primary dark:hover:text-brand-primary hover:bg-gray-50 dark:hover:bg-slate-800/50'
-          }`}
-      >
-        {/* Active indicator bar (desktop) */}
-        {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-primary rounded-r-full hidden md:block shadow-[0_0_8px_rgba(18,194,220,0.6)]"></div>
-        )}
-
-        <div className={`relative transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
-          <Icon className={`w-5 h-5 md:w-[18px] md:h-[18px] transition-all duration-300 ${isActive ? 'stroke-[2.5px] drop-shadow-[0_0_6px_rgba(18,194,220,0.5)]' : ''}`} />
-          {isActive && (
-            <div className="absolute -inset-2 bg-brand-primary/15 blur-lg rounded-full md:hidden"></div>
-          )}
-        </div>
-        <span className={`text-[9px] md:text-[12px] font-semibold mt-1 md:mt-0 md:ml-3.5 tracking-wide uppercase md:capitalize font-mono transition-all ${isActive ? 'text-brand-primary' : ''}`}>
-          {label}
-        </span>
-      </button>
-    );
-  };
-
-  const SidebarProgress = () => {
-    const { course } = useDashboard();
-    return (
-      <div className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden group border border-white/5">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/20 rounded-full -mr-12 -mt-12 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-20 h-20 bg-brand-primary/10 rounded-full -ml-8 -mb-8 blur-xl"></div>
-        <div className="relative z-10">
-          <p className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-1.5">{t('overallProgress')}</p>
-          <p className="font-semibold text-base leading-tight mb-4 text-white/90">{course?.name || 'Loading...'}</p>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-brand-primary shadow-[0_0_8px_rgba(18,194,220,0.6)] transition-all duration-1000 rounded-full"
-                style={{ width: `${course?.completion || 0}%` }}
-              ></div>
-            </div>
-            <span className="text-[11px] font-mono font-semibold text-white/60 tabular-nums">{course?.completion || 0}%</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const { loading } = useDashboard();
-
   return (
     <>
       <div className="h-dvh w-full bg-gray-50 dark:bg-slate-950 flex flex-col md:flex-row font-sans text-gray-900 dark:text-slate-100 overflow-hidden">
@@ -239,11 +241,11 @@ const AppContent: React.FC<{
 
           {/* Nav Items */}
           <nav className="flex-1 space-y-1">
-            <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} />
-            <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} />
-            <NavItem view="lessons" icon={BookOpen} label={t('lessons')} />
-            <NavItem view="contests" icon={Swords} label={t('contests')} />
-            <NavItem view="rewards" icon={Gift} label={t('giftShop')} />
+            <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={setCurrentView} />
+            <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={setCurrentView} />
+            <NavItem view="lessons" icon={BookOpen} label={t('lessons')} currentView={currentView} onNavigate={setCurrentView} />
+            <NavItem view="contests" icon={Swords} label={t('contests')} currentView={currentView} onNavigate={setCurrentView} />
+            <NavItem view="rewards" icon={Gift} label={t('giftShop')} currentView={currentView} onNavigate={setCurrentView} />
           </nav>
 
           {/* Sidebar Footer */}
@@ -272,11 +274,11 @@ const AppContent: React.FC<{
           {/* Bottom Nav (Mobile) */}
           <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-gray-100 dark:border-slate-800 pt-2.5 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-300">
             <div className="flex justify-around items-center px-1">
-              <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} />
-              <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} />
-              <NavItem view="lessons" icon={BookOpen} label={t('lessons')} />
-              <NavItem view="contests" icon={Swords} label={t('contests')} />
-              <NavItem view="rewards" icon={Gift} label={t('giftShop')} />
+              <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={setCurrentView} />
+              <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={setCurrentView} />
+              <NavItem view="lessons" icon={BookOpen} label={t('lessons')} currentView={currentView} onNavigate={setCurrentView} />
+              <NavItem view="contests" icon={Swords} label={t('contests')} currentView={currentView} onNavigate={setCurrentView} />
+              <NavItem view="rewards" icon={Gift} label={t('giftShop')} currentView={currentView} onNavigate={setCurrentView} />
             </div>
           </nav>
         </div>

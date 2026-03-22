@@ -119,10 +119,10 @@ const SubmissionModal: React.FC<{
         files: finalFiles.length > 0 ? finalFiles : undefined
       });
 
-      showToast("Assignment submitted successfully!", "success");
+      showToast(t('assignmentSubmitted'), "success");
       onClose();
     } catch (err: any) {
-      showToast(err.message || "Failed to submit assignment", "error");
+      showToast(err.message || t('failedToSubmitAssignment'), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -135,7 +135,7 @@ const SubmissionModal: React.FC<{
         <div className="p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50">
           <div>
             <h3 className="text-lg md:text-xl font-bold text-brand-dark dark:text-white">{t('submitAssignment')}</h3>
-            <p className="text-[11px] font-mono font-medium text-gray-500 mt-1 uppercase tracking-widest">Lsn {assignment.number}: {assignment.lesson_topic}</p>
+            <p className="text-[11px] font-mono font-medium text-gray-500 mt-1 uppercase tracking-widest">{t('lsn')} {assignment.number}: {assignment.lesson_topic}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
             <X className="w-5 h-5 text-gray-500" />
@@ -167,13 +167,13 @@ const SubmissionModal: React.FC<{
                   onClick={handleAddLink}
                   className="px-4 py-1.5 rounded-[10px] text-[11px] font-mono font-bold tracking-wider transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 >
-                  + LINK
+                  {t('addLink')}
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="px-4 py-1.5 rounded-[10px] text-[11px] font-mono font-bold tracking-wider transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 >
-                  + FILE
+                  {t('addFile')}
                 </button>
                 <input
                   type="file"
@@ -215,7 +215,7 @@ const SubmissionModal: React.FC<{
               ))}
               {attachments.length === 0 && (
                 <div className="text-center py-6 text-sm text-gray-500 font-mono">
-                  No attachments added.
+                  {t('noAttachments')}
                 </div>
               )}
             </div>
@@ -293,7 +293,7 @@ const QuizSection: React.FC<{
         setMode(res.data.source_text && initialMode === 'article' ? 'article' : 'solving');
       }
     } catch (err: any) {
-      showToast(err.message || "Failed to load questions", 'error');
+      showToast(err.message || t('failedToLoadQuestions'), 'error');
     } finally {
       setLoading(false);
     }
@@ -340,7 +340,7 @@ const QuizSection: React.FC<{
           className="w-full max-w-4xl mx-auto py-4 rounded-[16px] font-bold text-[15px] bg-gradient-to-r from-brand-primary to-brand-accent text-white hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95 block"
         >
           <PlayCircle className="w-5 h-5" />
-          Back to Quiz
+          {t('backToQuiz')}
         </button>
       </div>
     </div>
@@ -370,7 +370,7 @@ const QuizSection: React.FC<{
     if (!quizSummary || !questionsData) return;
 
     if (Object.keys(answers).length < questionsData.questions.length) {
-      showToast("Please answer all questions", 'error');
+      showToast(t('answerAllQuestions'), 'error');
       return;
     }
 
@@ -392,7 +392,7 @@ const QuizSection: React.FC<{
         fetchLessons();
       }
     } catch (err: any) {
-      showToast(err.message || "Failed to submit quiz", 'error');
+      showToast(err.message || t('failedToSubmitQuiz'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -409,7 +409,7 @@ const QuizSection: React.FC<{
         setShowReviewWarning(null);
       }
     } catch (err: any) {
-      showToast(err.message || "Failed to load review", 'error');
+      showToast(err.message || t('failedToLoadReview'), 'error');
     } finally {
       setLoading(false);
     }
@@ -450,11 +450,11 @@ const QuizSection: React.FC<{
           <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 py-2">
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-[24px] p-5 md:p-10 text-center border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-primary opacity-50"></div>
-              <span className="text-[10px] md:text-[11px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-2 block opacity-70">Question</span>
+              <span className="text-[10px] md:text-[11px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-2 block opacity-70">{t('question')}</span>
               <h3 className={`${isLongText ? 'text-lg md:text-2xl' : 'text-xl md:text-3xl'} font-bold text-brand-dark dark:text-white leading-tight mb-4`}>
                 {questionText}
               </h3>
-              <p className="text-[12px] md:text-sm font-medium text-gray-500 dark:text-slate-400 max-w-lg mx-auto italic opacity-80">Choose the correct answer from the options below</p>
+              <p className="text-[12px] md:text-sm font-medium text-gray-500 dark:text-slate-400 max-w-lg mx-auto italic opacity-80">{t('chooseCorrectAnswer')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 pb-10">
@@ -487,7 +487,7 @@ const QuizSection: React.FC<{
               disabled={currentQuestionIndex === 0}
               className="px-6 md:px-10 py-4 rounded-[16px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
             >
-              <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion')}</span><span className="md:hidden">Back</span>
+              <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion')}</span><span className="md:hidden">{t('back')}</span>
             </button>
 
             {currentQuestionIndex === questionsData!.questions.length - 1 && (
@@ -523,7 +523,7 @@ const QuizSection: React.FC<{
         <div className="space-y-3">
           <h3 className="text-3xl md:text-5xl font-bold text-brand-dark dark:text-white uppercase tracking-tight">{lastSubmissionResult!.passed ? t('passed') : t('failed')}</h3>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] md:text-[11px] font-mono font-bold text-gray-500 uppercase tracking-[3px] mb-1">Final Score</span>
+            <span className="text-[10px] md:text-[11px] font-mono font-bold text-gray-500 uppercase tracking-[3px] mb-1">{t('finalScore')}</span>
             <p className="text-5xl md:text-7xl font-mono font-bold text-brand-primary drop-shadow-sm tabular-nums">{lastSubmissionResult!.score}<span className="text-2xl md:text-3xl text-gray-300 dark:text-slate-800 mx-2">/</span>{lastSubmissionResult!.total}</p>
           </div>
         </div>
@@ -547,10 +547,10 @@ const QuizSection: React.FC<{
           ) : (
             <p className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-[2px] leading-relaxed max-w-[240px] mx-auto opacity-70">
               {lastSubmissionResult!.already_awarded
-                ? 'Reward already earned for this quiz'
+                ? t('rewardAlreadyEarned')
                 : lastSubmissionResult!.score < lastSubmissionResult!.passing_score
-                  ? `Score below passing requirement (${lastSubmissionResult!.passing_score})`
-                  : 'Ineligible for rewards for this attempt'}
+                  ? t('scoreBelowPassingLabel').replace('{score}', String(lastSubmissionResult!.passing_score))
+                  : t('ineligibleForRewards')}
             </p>
           )}
         </div>
@@ -619,7 +619,7 @@ const QuizSection: React.FC<{
                 {item.explanation && (
                   <div className="bg-white/80 dark:bg-slate-900/50 p-4 rounded-[16px] border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary opacity-30"></div>
-                    <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-1 opacity-70">Explanation</span>
+                    <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-1 opacity-70">{t('explanation')}</span>
                     <p className="text-[11px] md:text-[13px] font-medium text-gray-600 dark:text-slate-400 italic leading-relaxed">{item.explanation}</p>
                   </div>
                 )}
@@ -635,7 +635,7 @@ const QuizSection: React.FC<{
               disabled={currentQuestionIndex === 0}
               className="flex-1 md:flex-none px-6 md:px-10 py-3 rounded-[12px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
             >
-              <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span><span className="md:hidden">Back</span>
+              <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion')}</span><span className="md:hidden">{t('back')}</span>
             </button>
 
             {currentQuestionIndex === reviewData.length - 1 ? (
@@ -647,7 +647,7 @@ const QuizSection: React.FC<{
                 onClick={() => currentQuestionIndex < reviewData.length - 1 && setCurrentQuestionIndex(prev => prev + 1)}
                 className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[12px] font-bold text-[14px] hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
               >
-                {t('nextQuestion') || 'Next'} <ChevronRight className="w-4 h-4" />
+                {t('nextQuestion')} <ChevronRight className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -694,7 +694,7 @@ const QuizSection: React.FC<{
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-slate-900 text-brand-primary border border-brand-primary/20 rounded-[10px] font-bold text-[12px] hover:bg-brand-primary/5 transition-all disabled:opacity-50 active:scale-95"
             >
               <BookOpen style={{width:'14px',height:'14px'}} />
-              Article
+              {t('article')}
             </button>
             <button
               onClick={() => startQuiz('solving')}
@@ -715,7 +715,7 @@ const QuizSection: React.FC<{
                 {t('previousAttempts')}
               </h5>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-gray-400 uppercase tracking-widest">Passing:</span>
+                <span className="text-[11px] font-mono text-gray-400 uppercase tracking-widest">{t('passing')}:</span>
                 <span className="text-sm font-mono font-bold text-brand-primary">{quizSummary.passing_score}</span>
               </div>
             </div>
@@ -804,11 +804,11 @@ const CurrentAssignmentSection: React.FC<{
     </span>
   ) : isExpired ? (
     <span className="inline-flex items-center bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border border-red-500/20 gap-1.5">
-      <XCircle className="w-3.5 h-3.5" />Expired
+      <XCircle className="w-3.5 h-3.5" />{t('assignmentExpired')}
     </span>
   ) : isOverdue ? (
     <span className="inline-flex items-center bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border border-orange-500/20 gap-1.5">
-      <AlertTriangle className="w-3.5 h-3.5" />Overdue
+      <AlertTriangle className="w-3.5 h-3.5" />{t('assignmentOverdue')}
     </span>
   ) : latestSubmission ? (
     <span className="inline-flex items-center bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 rounded-[20px] text-[11px] font-mono font-bold uppercase tracking-wider border border-amber-500/20 gap-1.5">
@@ -862,7 +862,7 @@ const CurrentAssignmentSection: React.FC<{
                   <FileText style={{width:'16px',height:'16px'}} className="text-brand-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[3px] block leading-none mb-1">Active Topic</span>
+                  <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[3px] block leading-none mb-1">{t('activeTopic')}</span>
                   <h4 className="text-[14px] font-bold text-brand-dark dark:text-white leading-snug mb-2">{assignment.lesson_topic}</h4>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     <span className="flex items-center gap-1.5 text-[11px] font-mono text-gray-400">
@@ -879,8 +879,8 @@ const CurrentAssignmentSection: React.FC<{
                 <div className="mt-3 flex items-start gap-2.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-[10px] px-3.5 py-3">
                   <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[12px] font-bold text-orange-700 dark:text-orange-400 leading-snug">Late submission — 50% rewards</p>
-                    <p className="text-[11px] text-orange-600/80 dark:text-orange-400/70 mt-0.5">The original deadline has passed. You can still submit within the 24-hour grace period, but XP and coins will be halved.</p>
+                    <p className="text-[12px] font-bold text-orange-700 dark:text-orange-400 leading-snug">{t('lateSubmission')}</p>
+                    <p className="text-[11px] text-orange-600/80 dark:text-orange-400/70 mt-0.5">{t('lateSubmissionDesc')}</p>
                   </div>
                 </div>
               )}
@@ -895,7 +895,7 @@ const CurrentAssignmentSection: React.FC<{
                 >
                   <UploadCloud className="w-4 h-4" />
                   {isOverdue
-                    ? (latestSubmission ? 'Resubmit (Late)' : 'Submit Late')
+                    ? (latestSubmission ? t('resubmitLate') : t('submitLate'))
                     : (latestSubmission ? t('resubmit') : t('startSubmission'))}
                 </button>
               )}
@@ -942,14 +942,14 @@ const CurrentAssignmentSection: React.FC<{
 
                       {sub.student_comment && (
                         <div className="pl-4 border-l-4 border-brand-primary/30">
-                          <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-widest block mb-1">Your Comment</span>
+                          <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-widest block mb-1">{t('yourComment')}</span>
                           <p className="text-sm text-gray-600 dark:text-slate-400 font-medium italic">"{sub.student_comment}"</p>
                         </div>
                       )}
 
                       {sub.teacher_comment && (
                         <div className="pl-4 border-l-4 border-amber-500/30 bg-amber-500/5 p-4 rounded-r-xl">
-                          <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">Instructor Review</span>
+                          <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">{t('instructorReview')}</span>
                           <p className="text-sm text-gray-700 dark:text-slate-300 font-bold italic">"{sub.teacher_comment}"</p>
                         </div>
                       )}
@@ -1070,7 +1070,7 @@ const AssignmentHistoryCard: React.FC<{
                           </div>
                           {sub.teacher_comment && (
                             <div className="pl-4 border-l-4 border-amber-500/30 bg-amber-500/5 p-4 rounded-r-xl">
-                              <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">Instructor Review</span>
+                              <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest block mb-1">{t('instructorReview')}</span>
                               <p className="text-xs text-gray-700 dark:text-slate-300 font-bold italic">"{sub.teacher_comment}"</p>
                             </div>
                           )}
@@ -1163,7 +1163,7 @@ const ActiveAttendanceCard: React.FC<{
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[2px] opacity-70">Current Lesson</span>
+              <span className="text-[9px] font-mono font-bold text-brand-primary uppercase tracking-[2px] opacity-70">{t('currentLesson')}</span>
             </div>
             <h3 className="text-base font-bold text-brand-dark dark:text-white leading-snug truncate">
               {attendance.lesson_topic}
@@ -1270,18 +1270,14 @@ const LessonsContent: React.FC = () => {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Page Title */}
-      <div className="flex items-start gap-4 px-1">
-        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center shadow-xl shadow-brand-primary/30 shrink-0 ring-2 ring-brand-primary/20">
-          <BookOpen className="w-7 h-7 md:w-8 md:h-8 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white">
-            {t('lessons')}
-          </h1>
-          <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
-            {t('lessonsSubtitle')}
-          </p>
-        </div>
+      <div className="px-1">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
+          <BookOpen className="w-6 h-6 text-brand-primary shrink-0" />
+          {t('lessons')}
+        </h1>
+        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+          {t('lessonsSubtitle')}
+        </p>
       </div>
 
       {/* Attendance Section */}

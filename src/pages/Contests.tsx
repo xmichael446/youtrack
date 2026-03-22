@@ -16,9 +16,13 @@ import {
   BookOpen,
   Medal,
   Coins,
+  Search,
+  X,
+  Crown,
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useDashboard } from '../context/DashboardContext';
 import LoadingScreen from '../components/LoadingScreen';
 import { ContestProvider, useContests } from '../context/ContestContext';
 import { useNavigation } from '../context/NavigationContext';
@@ -29,6 +33,7 @@ import {
   ContestSubmitResponse,
   ContestResultsData,
   ContestLeaderboardEntry,
+  ContestLiveLeaderboardResponse,
   QuizQuestion,
   ContestAnswer,
 } from '../services/apiTypes';
@@ -168,7 +173,7 @@ function StatusBadge({ status, t }: { status: string; t: (k: string) => string }
       dotCls: 'bg-gray-400 dark:bg-slate-500',
     },
     closed: {
-      label: 'Closed',
+      label: t('contestClosed'),
       cls: 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-700/30',
       dotCls: 'bg-orange-500',
     },
@@ -186,15 +191,30 @@ function StatusBadge({ status, t }: { status: string; t: (k: string) => string }
   );
 }
 
-// Place medal/icon
-function PlaceIcon({ place, className = "w-5 h-5" }: { place: number; className?: string }) {
-  if (place === 1) return <Medal className={`${className} text-amber-500`} />;
-  if (place === 2) return <Medal className={`${className} text-slate-400`} />;
-  if (place === 3) return <Medal className={`${className} text-orange-400`} />;
+// Place medal/icon for table list
+function PlaceIcon({ place, className = "w-8 h-8" }: { place: number; className?: string }) {
+  const isSmall = className.includes('w-3');
+  const medalSize = isSmall ? "w-2.5 h-2.5" : "w-4 h-4 sm:w-5 sm:h-5";
+  const fontSize = isSmall ? "text-[10px]" : "text-xs sm:text-sm";
+  if (place === 1) return <div className={`flex items-center justify-center ${className} rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-500 shadow-sm border border-amber-100 dark:border-amber-800/50`}><Medal className={medalSize} /></div>;
+  if (place === 2) return <div className={`flex items-center justify-center ${className} rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 shadow-sm border border-slate-100 dark:border-slate-700/50`}><Medal className={medalSize} /></div>;
+  if (place === 3) return <div className={`flex items-center justify-center ${className} rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-400 shadow-sm border border-orange-100 dark:border-orange-800/50`}><Medal className={medalSize} /></div>;
   return (
-    <span className={`${className} rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold font-mono text-gray-500 dark:text-slate-400`}>
+    <span className={`${className} rounded-full bg-gray-50 dark:bg-slate-800/50 flex items-center justify-center ${fontSize} font-bold font-mono text-gray-400 dark:text-slate-500 border border-gray-100 dark:border-slate-800/50`}>
       {place}
     </span>
+  );
+}
+
+function LeaderboardAvatar({ avatar, name, className = "w-7 h-7 sm:w-8 sm:h-8" }: { avatar?: string | null; name: string; className?: string }) {
+  if (avatar) {
+    const url = `${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/api\/?$/, '')}/${avatar.replace(/^\/+/, '')}`;
+    return <img src={url} alt={name} className={`${className} rounded-full object-cover shrink-0 bg-gray-100 dark:bg-slate-800 ring-1 ring-gray-200 dark:ring-slate-700`} />;
+  }
+  return (
+    <div className={`${className} rounded-full shrink-0 flex items-center justify-center text-[10px] sm:text-[12px] font-bold text-white bg-gradient-to-br from-brand-primary to-cyan-600 ring-1 ring-brand-primary/20`}>
+      {(name || '?').charAt(0).toUpperCase()}
+    </div>
   );
 }
 
@@ -223,7 +243,7 @@ function prizeGradient(place: number): { card: string; badge: string; value: str
 }
 
 // ── CONTEST LIST VIEW ──────────────────────────────────────────────────────────
-type ContestView = 'list' | 'detail' | 'play' | 'results';
+type ContestView = 'list' | 'detail' | 'play' | 'review';
 
 interface ContestNav {
   view: ContestView;
@@ -282,7 +302,7 @@ const ContestCard: React.FC<{
     } else if (item.status === 'open' && item.is_registered) {
       onNavigate({ view: 'play', contestId: item.id });
     } else if (item.status === 'finalized') {
-      onNavigate({ view: 'results', contestId: item.id });
+      onNavigate({ view: 'detail', contestId: item.id });
     }
   };
 
@@ -418,7 +438,7 @@ const ContestCard: React.FC<{
         {item.status === 'scheduled' && item.is_registered && (
           <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl px-3 py-2">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-            <span>You're registered! The "Enter Contest" button will appear here when it goes live.</span>
+            <span>{t('contestRegisteredHint')}</span>
           </div>
         )}
       </div>
@@ -440,7 +460,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
       const res = await registerForContest(id);
       setToast({ msg: res.message || t('contestRegistered'), type: 'success' });
     } catch (err: any) {
-      setToast({ msg: err?.data?.message || err?.message || 'Registration failed', type: 'error' });
+      setToast({ msg: err?.data?.message || err?.message || t('somethingWentWrong'), type: 'error' });
     } finally {
       setRegisteringId(null);
     }
@@ -448,7 +468,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
 
   // Show full-screen loader before any contests are loaded (hides header too)
   if (loading && contests.length === 0) {
-    return <LoadingScreen message="Finding battles..." />;
+    return <LoadingScreen message={t('findingBattles')} />;
   }
 
   return (
@@ -456,23 +476,19 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Header */}
-      <div className="flex items-start gap-4 px-1">
-        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-brand-primary to-cyan-600 flex items-center justify-center shadow-xl shadow-brand-primary/30 shrink-0 ring-2 ring-brand-primary/20">
-          <Swords className="w-7 h-7 md:w-8 md:h-8 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white">
-            {t('contests')}
-          </h1>
-          <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
-            {t('contestsSubtitle')}
-          </p>
-        </div>
+      <div className="px-1">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
+          <Swords className="w-6 h-6 text-brand-primary shrink-0" />
+          {t('contests')}
+        </h1>
+        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+          {t('contestsSubtitle')}
+        </p>
         <button
           onClick={fetchContests}
           disabled={loading}
           className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 dark:text-slate-500 hover:text-brand-primary transition-all duration-200 active:scale-90 mt-1"
-          title="Refresh"
+          title={t('refresh')}
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -499,7 +515,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-slate-400">{t('contestNoContests')}</p>
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Check back soon for upcoming contests</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('contestUpcomingHint')}</p>
           </div>
         </div>
       ) : (
@@ -531,6 +547,7 @@ const ContestDetailView: React.FC<{
   onNavigate: (nav: ContestNav) => void;
 }> = ({ contestId, onNavigate }) => {
   const { t } = useLanguage();
+  const { user } = useDashboard();
   const { navigateToProfile } = useNavigation();
   const { getContestDetail, registerForContest, getContestResults, getContestLeaderboard } = useContests();
   const [detail, setDetail] = useState<ContestDetailData | null>(null);
@@ -538,8 +555,15 @@ const ContestDetailView: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [registering, setRegistering] = useState(false);
   const [results, setResults] = useState<ContestResultsData | null>(null);
-  const [liveLeaderboard, setLiveLeaderboard] = useState<ContestLeaderboardEntry[] | null>(null);
+  const [liveLeaderboard, setLiveLeaderboard] = useState<ContestLiveLeaderboardResponse | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  // Find my entry in the leaderboard to get the rank
+  const myLeaderboardEntry = results?.leaderboard?.find(entry => {
+    const profileId = entry.id || entry.enrollment_id;
+    return profileId === user.id;
+  });
+  const myRank = results?.my_attempt?.rank || liveLeaderboard?.my_rank || myLeaderboardEntry?.rank;
 
   // Read submitted play state from localStorage once on mount
   const [localPlayState] = useState<ContestPlayState | null>(() => {
@@ -559,7 +583,7 @@ const ContestDetailView: React.FC<{
     setLoading(true);
     getContestDetail(contestId)
       .then(d => { setDetail(d); setError(null); })
-      .catch(e => setError(e?.message || 'Failed to load contest'))
+      .catch(e => setError(e?.message || t('contestNotFound')))
       .finally(() => setLoading(false));
   }, [contestId, getContestDetail]);
 
@@ -605,7 +629,7 @@ const ContestDetailView: React.FC<{
 
   if (loading) return (
     <div className="space-y-5 animate-in fade-in duration-300 min-h-[60vh] flex flex-col items-center justify-center">
-      <LoadingScreen message="Inspecting battle..." />
+      <LoadingScreen message={t('inspectingBattle')} />
     </div>
   );
 
@@ -616,7 +640,7 @@ const ContestDetailView: React.FC<{
         <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <AlertCircle className="w-5 h-5 text-red-400" />
         </div>
-        <p className="text-sm text-red-500 font-medium">{error || 'Contest not found'}</p>
+        <p className="text-sm text-red-500 font-medium">{error || t('contestNotFound')}</p>
       </div>
     </div>
   );
@@ -673,9 +697,67 @@ const ContestDetailView: React.FC<{
             </div>
           )}
 
-          {/* Prize name pills */}
-          {detail.prizes.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
+          {/* Prize name pills / Winners */}
+          {detail.status === 'finalized' && detail.winners && detail.winners.length > 0 ? (
+            <div className="space-y-2 mt-4">
+              {detail.winners.map((winner, idx) => {
+                const place = winner.place || idx + 1;
+                const name = winner.name || t('unknownStudent');
+                const avatar = (winner as any).avatar;
+                const rewardName = winner.reward_name;
+                const xp = winner.xp;
+                const coins = winner.coins;
+                const profileId = winner.id;
+                const isMe = !!profileId && profileId === user.id;
+                
+                return (
+                  <div key={profileId || idx} onClick={() => {
+                    if (isMe) navigateToProfile(null);
+                    else if (profileId) navigateToProfile(profileId);
+                  }} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700/50 shadow-sm transition-all hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer group">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="shrink-0">
+                        <RankBadge rank={place} />
+                      </div>
+                      <LeaderboardAvatar avatar={avatar} name={name} className="w-10 h-10" />
+                      <div className="min-w-0">
+                        <span className={`text-sm font-bold truncate block leading-tight ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors`}>{name}</span>
+                        {rewardName && (
+                          <span className="text-[10px] font-medium text-gray-500 dark:text-slate-400 block mt-0.5">{rewardName}</span>
+                        )}
+                      </div>
+                    </div>
+                    {(xp || coins) && (
+                      <div className={`flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-1.5 shrink-0 px-2 py-1 sm:py-1.5 rounded-lg border shadow-sm ${
+                        place === 1 ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/30' :
+                        place === 2 ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700' :
+                        'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700/30'
+                      }`}>
+                        <div className="flex items-center gap-1.5">
+                          {xp && <span className={`text-[10px] font-mono font-bold ${
+                            place === 1 ? 'text-amber-600 dark:text-amber-400' :
+                            place === 2 ? 'text-slate-600 dark:text-slate-400' :
+                            'text-orange-600 dark:text-orange-400'
+                          }`}>+{xp} XP</span>}
+                          {xp && coins && <div className={`hidden sm:block w-1 h-1 rounded-full ${
+                            place === 1 ? 'bg-amber-300 dark:bg-amber-700' :
+                            place === 2 ? 'bg-slate-300 dark:bg-slate-700' :
+                            'bg-orange-300 dark:bg-orange-700'
+                          }`} />}
+                          {coins && <span className={`text-[10px] font-mono font-bold flex items-center gap-1 ${
+                            place === 1 ? 'text-amber-600 dark:text-amber-400' :
+                            place === 2 ? 'text-slate-600 dark:text-slate-400' :
+                            'text-orange-600 dark:text-orange-400'
+                          }`}>+{coins} <Coins className="w-2.5 h-2.5" /></span>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : detail.prizes && detail.prizes.length > 0 ? (
+            <div className="flex items-center gap-2 flex-wrap mt-2">
               {detail.prizes.map(p => (
                 <div key={p.place} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
                   <PlaceIcon place={p.place} className="w-3.5 h-3.5" />
@@ -683,7 +765,7 @@ const ContestDetailView: React.FC<{
                 </div>
               ))}
             </div>
-          )}
+          ) : null}
 
           {/* Submitted — show score inside the card */}
           {isSubmitted && detail.status === 'open' && localPlayState?.score !== undefined && (
@@ -704,9 +786,9 @@ const ContestDetailView: React.FC<{
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+      <div className={detail.status === 'finalized' ? "space-y-6" : "grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8"}>
         {/* Left Column: Registrations or Live/Final Leaderboard */}
-        <div className="order-2 lg:order-1">
+        <div className={detail.status === 'finalized' ? "" : "order-2 lg:order-1"}>
           {detail.status === 'scheduled' ? (
             <div>
               <h3 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px] mb-3 flex items-center gap-2 px-1">
@@ -717,105 +799,133 @@ const ContestDetailView: React.FC<{
               </h3>
               {detail.registrations && detail.registrations.length > 0 ? (
                 <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-gray-50/50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400 font-mono uppercase tracking-wider">
-                      <tr>
-                        <th className="px-4 py-3 font-medium text-center w-12">#</th>
-                        <th className="px-4 py-3 font-medium">Student</th>
-                        <th className="px-4 py-3 font-medium text-right">XP</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-                      {detail.registrations.map((reg, idx) => (
-                        <tr key={reg.id} onClick={() => navigateToProfile(reg.id)} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
-                          <td className="px-4 py-3 text-center text-gray-400 dark:text-slate-500 font-mono">{idx + 1}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              {reg.avatar ? (
-                                <img src={`${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/api\/?$/, '')}/${reg.avatar.replace(/^\/+/, '')}`} alt={reg.full_name} className="w-8 h-8 rounded-full object-cover shrink-0 bg-gray-100 dark:bg-slate-800" />
-                              ) : (
-                                <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold text-white bg-gradient-to-br from-brand-primary to-cyan-600">
-                                  {reg.full_name.charAt(0)}
-                                </div>
-                              )}
-                              <span className="font-semibold text-gray-900 dark:text-slate-100 truncate">{reg.full_name}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {reg.level && (
-                                <span className="text-xs" title={reg.level.name}>{reg.level.icon}</span>
-                              )}
-                              <span className="text-[10px] font-mono font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-2 py-0.5 rounded-full">{reg.xp} XP</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <table className="w-full text-left text-sm"><thead className="bg-gray-50/50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400 font-mono uppercase tracking-wider"><tr><th className="px-4 py-3 font-medium text-center w-12">#</th><th className="px-4 py-3 font-medium">Student</th><th className="px-4 py-3 font-medium text-right">XP</th></tr></thead><tbody className="divide-y divide-gray-100 dark:divide-slate-800">
+                      {detail.registrations.map((reg, idx) => {
+                        const rawName = reg.full_name || (reg as any).name || (reg as any).student_name || (reg as any).student?.full_name || '';
+                        const name = typeof rawName === 'string' && rawName.trim() !== '' ? rawName.trim() : 'Unknown Student';
+                        const avatar = reg.avatar || (reg as any).student?.avatar;
+                        const profileId = reg.id || (reg as any).student_id || (reg as any).enrollment_id || (reg as any).student?.id;
+                        const isMe = (!!profileId && profileId === user.id) || (name === user.name);
+                        return (
+                          <tr key={profileId || idx} onClick={() => {
+                            if (isMe) navigateToProfile(null);
+                            else if (profileId) navigateToProfile(profileId);
+                          }} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                            <td className="px-2 sm:px-4 py-3 text-center text-gray-400 dark:text-slate-500 font-mono text-xs sm:text-sm">{idx + 1}</td>
+                            <td className="px-2 sm:px-4 py-3">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <LeaderboardAvatar avatar={avatar} name={name} />
+                                <span className={`font-semibold ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} truncate text-xs sm:text-sm group-hover:text-brand-primary transition-colors`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (isMe) navigateToProfile(null);
+                                    else if (profileId) navigateToProfile(profileId);
+                                  }}>{name}</span>
+                              </div>
+                            </td>
+                            <td className="px-2 sm:px-4 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                                {reg.level && (
+                                  <span className="text-[10px] sm:text-xs" title={reg.level.name}>{reg.level.icon}</span>
+                                )}
+                                <span className="text-[9px] sm:text-[10px] font-mono font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">{reg.xp} XP</span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}</tbody></table>
                 </div>
               ) : (
                 <p className="text-sm text-gray-400 dark:text-slate-500 italic py-2 px-1">No one registered yet.</p>
               )}
             </div>
-          ) : detail.status === 'finalized' && results ? (
-            <div>
-              <h3 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px] mb-3 flex items-center gap-2 px-1">
-                <div className="w-5 h-5 rounded-md bg-amber-500/10 flex items-center justify-center">
-                  <Trophy className="w-3 h-3 text-amber-500" />
-                </div>
-                {t('contestLeaderboard')}
-              </h3>
+          ) : detail.status === 'finalized' ? (
+            <div className="space-y-8 animate-in fade-in duration-700">
+              {/* My result section — redesigned to match lesson quiz style */}
+              {results?.my_attempt && (
+                <div className="bg-gray-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-brand-primary/10 rounded-xl flex items-center justify-center">
+                        <Trophy className="w-5 h-5 text-brand-primary" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white">{t('contestYourResult')}</h4>
+                        <p className="text-[10px] font-mono text-gray-500 uppercase tracking-wider mt-0.5">{myRank ? `Rank #${myRank}` : t('contestSubmitted')}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest block mb-1">{t('correctAnswers')}</span>
+                      <span className="text-2xl font-mono font-bold text-brand-primary">{results.my_attempt.score}<span className="text-gray-300 dark:text-slate-700 mx-1">/</span>{results.my_attempt.total}</span>
+                    </div>
+                  </div>
 
-              {/* My result chip */}
-              {results.my_attempt && (
-                <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-brand-primary/5 dark:bg-brand-primary/10 border border-brand-primary/20">
-                  <div className="w-1 self-stretch rounded-full bg-brand-primary shrink-0" />
-                  <span className="text-xs font-mono font-bold text-brand-primary uppercase tracking-wide">{t('contestYourResult')}</span>
-                  <span className="ml-auto text-base font-bold text-gray-900 dark:text-white tabular-nums">
-                    {results.my_attempt.score}/{results.my_attempt.total}
-                  </span>
-                  <span className="text-sm font-mono text-gray-500 dark:text-slate-400">#{results.my_attempt.rank}</span>
-                  {results.my_attempt.prize && (
-                    <span className="text-lg"><PlaceIcon place={results.my_attempt.prize.place} /></span>
-                  )}
+                  <button
+                    onClick={() => onNavigate({ view: 'review', contestId, answers: results.my_attempt?.answers || [] })}
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-white dark:bg-slate-900 text-brand-primary border border-brand-primary/20 rounded-xl font-bold text-sm hover:bg-brand-primary/5 transition-all shadow-sm active:scale-[0.98]"
+                  >
+                    <Search className="w-4 h-4" />
+                    {t('reviewAnswers')}
+                  </button>
                 </div>
               )}
 
-              <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50/50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400 font-mono uppercase tracking-wider">
-                    <tr>
-                      <th className="px-4 py-3 font-medium text-center w-14">Rank</th>
-                      <th className="px-4 py-3 font-medium">Student</th>
-                      <th className="px-4 py-3 font-medium text-right">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-                    {results.leaderboard.map(entry => {
-                      const isMe = results.my_attempt?.rank === entry.rank;
-                      return (
-                        <tr key={entry.enrollment_id} onClick={() => navigateToProfile(entry.enrollment_id)} className={`transition-colors cursor-pointer ${isMe ? 'bg-brand-primary/5 dark:bg-brand-primary/10' : 'hover:bg-gray-50/50 dark:hover:bg-slate-800/50'}`}>
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex justify-center"><PlaceIcon place={entry.rank} /></div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-semibold truncate ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'}`}>
-                                {entry.full_name || (entry as any).name}
-                              </span>
-                              {isMe && <span className="text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 px-1.5 py-0.5 rounded-full">YOU</span>}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className={`text-xs font-mono font-bold tabular-nums ${isMe ? 'text-brand-primary' : 'text-gray-500 dark:text-slate-400'}`}>{entry.score}/{entry.total}</span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <div>
+                <h3 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px] mb-3 flex items-center gap-2 px-1">
+                  <div className="w-5 h-5 rounded-md bg-amber-500/10 flex items-center justify-center">
+                    <Trophy className="w-3 h-3 text-amber-500" />
+                  </div>
+                  {t('contestLeaderboard')}
+                </h3>
+
+                <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                  <table className="w-full text-left text-sm"><thead className="bg-gray-50/50 dark:bg-slate-800/50 text-[10px] sm:text-xs text-gray-500 dark:text-slate-400 font-mono uppercase tracking-wider"><tr><th className="px-2 sm:px-4 py-3 font-medium text-center w-10 sm:w-14">Rank</th><th className="px-2 sm:px-4 py-3 font-medium">Student</th><th className="px-2 sm:px-4 py-3 font-medium text-right">Score</th></tr></thead><tbody className="divide-y divide-gray-100 dark:divide-slate-800">
+                      {(results?.leaderboard || []).map((entry: any, idx: number) => {
+                        const profileId = entry.id || entry.enrollment_id || entry.student_id || entry.student?.id;
+                        const name = entry.name || 'Unknown Student';
+                        const isMe = (!!profileId && profileId === user.id) || (name === user.name);
+                        const avatar = (entry as any).avatar;
+                        
+                        const place = entry.rank || idx + 1;
+                        const prize = entry.prize;
+                        
+                        return (
+                          <tr key={profileId || idx} onClick={() => {
+                            if (isMe) navigateToProfile(null);
+                            else if (profileId) navigateToProfile(profileId);
+                          }} className={`transition-colors cursor-pointer group ${isMe ? 'bg-brand-primary/5 dark:bg-brand-primary/10' : 'hover:bg-gray-50/5 dark:hover:bg-slate-800/50'}`}>
+                            <td className="px-2 sm:px-4 py-3 text-center">
+                              <div className="flex justify-center"><PlaceIcon place={place} /></div>
+                            </td>
+                            <td className="px-2 sm:px-4 py-3">
+                              <div className="flex items-center justify-between gap-2 sm:gap-3">
+                                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                  <LeaderboardAvatar avatar={avatar} name={name} />
+                                  <div className="flex items-center gap-1.5 min-w-0">
+                                    <span className={`font-semibold truncate text-xs sm:text-sm ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors cursor-pointer`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (isMe) navigateToProfile(null);
+                                        else if (profileId) navigateToProfile(profileId);
+                                      }}>{name as string}</span>
+                                    {isMe && <span className="text-[8px] sm:text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 px-1 sm:px-1.5 py-0.5 rounded-full shrink-0">YOU</span>}
+                                  </div>
+                                </div>
+                                {prize && (
+                                  <div className="flex items-center gap-1 shrink-0 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-700/30">
+                                    <PlaceIcon place={prize.place} className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                                    <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-300 hidden md:inline">{prize.reward_name}</span>
+                                    <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-300 md:hidden">{prize.reward_name.split(' ')[0]}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-2 sm:px-4 py-3 text-right">
+                              <span className={`text-[10px] sm:text-[11px] font-mono font-bold tabular-nums ${isMe ? 'text-brand-primary' : 'text-gray-400 dark:text-slate-500'}`}>{entry.score}/{entry.total}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}</tbody></table></div></div>
             </div>
           ) : detail.status === 'open' || detail.status === 'closed' ? (
             <div>
@@ -835,35 +945,45 @@ const ContestDetailView: React.FC<{
                     <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
                     <p className="text-xs text-gray-400 dark:text-slate-500 font-mono">Loading live rankings...</p>
                   </div>
-                ) : liveLeaderboard.length > 0 ? (
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-gray-50/50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400 font-mono uppercase tracking-wider">
-                      <tr>
-                        <th className="px-4 py-3 font-medium text-center w-14">Rank</th>
-                        <th className="px-4 py-3 font-medium">Student</th>
-                        <th className="px-4 py-3 font-medium text-right">Score</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-                      {liveLeaderboard.map((entry, idx) => (
-                        <tr key={entry.enrollment_id} onClick={() => navigateToProfile(entry.enrollment_id)} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors animate-in fade-in duration-300 cursor-pointer">
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex justify-center"><PlaceIcon place={entry.rank || idx + 1} /></div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="font-semibold text-gray-900 dark:text-slate-100 truncate">
-                              {entry.full_name || (entry as any).name}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="text-xs font-mono font-bold text-gray-500 dark:text-slate-400 tabular-nums">{entry.score}/{entry.total}</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                ) : liveLeaderboard.leaderboard.length > 0 ? (
+                  <table className="w-full text-left text-sm"><thead className="bg-gray-50/50 dark:bg-slate-800/50 text-[10px] sm:text-xs text-gray-500 dark:text-slate-400 font-mono uppercase tracking-wider"><tr><th className="px-2 sm:px-4 py-3 font-medium text-center w-10 sm:w-14">Rank</th><th className="px-2 sm:px-4 py-3 font-medium">Student</th><th className="px-2 sm:px-4 py-3 font-medium text-right">Score</th></tr></thead><tbody className="divide-y divide-gray-100 dark:divide-slate-800">
+                      {liveLeaderboard.leaderboard.map((entry, idx) => {
+                        const profileId = entry.id || entry.enrollment_id || (entry as any).student_id || (entry as any).student?.id;
+                        const name = entry.name || 'Unknown Student';
+                        const isMe = (!!profileId && profileId === user.id) || (name === user.name);
+
+                        return (
+                          <tr key={profileId || idx} onClick={() => {
+                            if (isMe) navigateToProfile(null);
+                            else if (profileId) navigateToProfile(profileId);
+                          }} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors animate-in fade-in duration-300 cursor-pointer group">
+                            <td className="px-2 sm:px-4 py-3 text-center">
+                              <div className="flex justify-center"><PlaceIcon place={entry.rank || idx + 1} /></div>
+                            </td>
+                            <td className="px-2 sm:px-4 py-3">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <LeaderboardAvatar avatar={(entry as any).avatar} name={name} />
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                    <span className={`font-semibold truncate text-xs sm:text-sm ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors cursor-pointer`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (isMe) navigateToProfile(null);
+                                        else if (profileId) navigateToProfile(profileId);
+                                      }}>
+                                      {name}
+                                    </span>
+                                    {isMe && <span className="text-[8px] sm:text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 px-1 sm:px-1.5 py-0.5 rounded-full shrink-0">YOU</span>}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-2 sm:px-4 py-3 text-right">
+                              <span className={`text-[10px] sm:text-[11px] font-mono font-bold tabular-nums ${isMe ? 'text-brand-primary' : 'text-gray-500 dark:text-slate-400'}`}>{entry.score}/{entry.total}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}</tbody></table>
                 ) : (
-                  <p className="text-sm text-gray-400 dark:text-slate-500 italic py-6 px-1 text-center">Waiting for submissions...</p>
+                  <p className="text-sm text-gray-400 dark:text-slate-500 italic py-6 px-1 text-center">{t('waitingSubmissions')}</p>
                 )}
               </div>
             </div>
@@ -871,8 +991,8 @@ const ContestDetailView: React.FC<{
         </div>
 
         {/* Right Column: Prizes */}
-        <div className="order-1 lg:order-2">
-          {detail.prizes.length > 0 && (
+        {detail.status !== 'finalized' && detail.prizes.length > 0 && (
+          <div className="order-1 lg:order-2">
             <div>
               <h3 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px] mb-3 flex items-center gap-2 px-1">
                 <div className="w-5 h-5 rounded-md bg-amber-500/10 flex items-center justify-center">
@@ -903,8 +1023,8 @@ const ContestDetailView: React.FC<{
                 })}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Action button — hidden if submitted */}
@@ -1338,225 +1458,127 @@ const ContestPlayView: React.FC<{
   );
 };
 
-// ── CONTEST RESULTS VIEW ───────────────────────────────────────────────────────
-const ContestResultsView: React.FC<{
-  contestId: number;
-  onNavigate: (nav: ContestNav) => void;
-}> = ({ contestId, onNavigate }) => {
-  const { t } = useLanguage();
-  const { getContestResults } = useContests();
-  const [results, setResults] = useState<ContestResultsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [reviewExpanded, setReviewExpanded] = useState(false);
-
-  useEffect(() => {
-    getContestResults(contestId)
-      .then(d => { setResults(d); setError(null); })
-      .catch(e => setError(e?.data?.message || e?.message || 'Results not available yet'))
-      .finally(() => setLoading(false));
-  }, [contestId, getContestResults]);
-
-  if (loading) return (
-    <div className="space-y-5 animate-in fade-in duration-300">
-      <BackBtn label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
-      <Shimmer className="h-40 w-full rounded-2xl" />
-      <Shimmer className="h-64 w-full rounded-2xl" />
+// Rank badge for winners list (matches Leaderboard.tsx podium style)
+const RankBadge: React.FC<{ rank: number }> = ({ rank }) => {
+  if (rank === 1) return (
+    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-[0_4px_12px_rgba(245,158,11,0.4)] ring-2 ring-amber-200 dark:ring-amber-500/30">
+      <Crown className="w-5 h-5 text-amber-900 fill-amber-900/20" />
     </div>
   );
+  if (rank === 2) return (
+    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-400 dark:from-slate-600 dark:to-slate-700 flex items-center justify-center shadow-[0_4px_12px_rgba(148,163,184,0.3)] ring-2 ring-slate-100 dark:ring-slate-500/30">
+      <span className="text-sm font-bold font-mono text-slate-700 dark:text-slate-100">2</span>
+    </div>
+  );
+  if (rank === 3) return (
+    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-200 to-orange-400 dark:from-orange-700 dark:to-orange-800 flex items-center justify-center shadow-[0_4px_12px_rgba(251,146,60,0.3)] ring-2 ring-orange-100 dark:ring-orange-600/30">
+      <span className="text-sm font-bold font-mono text-orange-900 dark:text-orange-100">3</span>
+    </div>
+  );
+  return (
+    <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center border border-gray-100 dark:border-slate-700">
+      <span className="text-[12px] font-bold text-gray-400 dark:text-slate-500 font-mono">#{rank}</span>
+    </div>
+  );
+};
 
-  if (error || !results) return (
-    <div className="space-y-4">
-      <BackBtn label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
-      <div className="flex flex-col items-center gap-4 py-20 text-center bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800">
-        <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
-          <Clock className="w-5 h-5 text-gray-400 dark:text-slate-500" />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-600 dark:text-slate-300">{error || 'Results not yet available'}</p>
-          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Check back after the contest is finalized.</p>
+// ── CONTEST REVIEW VIEW ───────────────────────────────────────────────────────
+const ContestReviewView: React.FC<{
+  answers: any[];
+  onNavigate: (nav: ContestNav) => void;
+  contestId: number;
+}> = ({ answers, onNavigate, contestId }) => {
+  const { t } = useLanguage();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (!answers || answers.length === 0) return null;
+  const item = answers[currentIndex];
+  if (!item) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[110] flex flex-col bg-white dark:bg-slate-950 animate-in fade-in duration-500 overflow-hidden">
+      <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
+        <h4 className="font-bold text-lg md:text-xl text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
+        <div className="flex items-center gap-4">
+          <div className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
+            {currentIndex + 1} / {answers.length}
+          </div>
+          <button onClick={() => onNavigate({ view: 'detail', contestId })} className="p-2 -ml-2 text-gray-400 hover:text-brand-primary transition-colors">
+            <X className="w-6 h-6" />
+          </button>
         </div>
       </div>
-    </div>
-  );
 
-  const me = results.my_attempt;
-  // Determine the score color
-  const pct = me ? Math.round((me.score / me.total) * 100) : null;
-  const scoreColor = pct !== null
-    ? pct >= 80 ? 'text-brand-primary'
-    : pct >= 60 ? 'text-emerald-400'
-    : pct >= 40 ? 'text-amber-400'
-    : 'text-red-400'
-    : 'text-brand-primary';
-
-  return (
-    <div className="space-y-5 animate-in fade-in duration-500">
-      <BackBtn label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
-
-      {/* My result card — light theme */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-sm">
-        {/* Brand accent top strip */}
-        <div className="h-1 w-full bg-gradient-to-r from-brand-primary via-cyan-400 to-brand-primary/40" />
-
-        <div className="p-5 md:p-6">
-          <p className="text-[10px] font-mono text-brand-primary uppercase tracking-[3px] mb-1">
-            {t('vocabContest')} #{results.number}
-          </p>
-          <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white mb-4">{t('contestYourResult')}</h2>
-
-          {me ? (
-            <div className="flex items-stretch gap-3 flex-wrap">
-              {/* Score chip */}
-              <div className="flex flex-col items-center justify-center px-4 py-3 rounded-2xl min-w-[80px] bg-brand-primary/5 border border-brand-primary/15">
-                <div className="flex items-baseline gap-0.5">
-                  <span className={`text-4xl md:text-5xl font-bold tabular-nums leading-none ${scoreColor}`}>{me.score}</span>
-                  <span className="text-lg md:text-xl font-bold text-gray-300 dark:text-slate-600 tabular-nums leading-none">/{me.total}</span>
+      <div className="flex-1 overflow-y-auto p-3 md:p-5 custom-scrollbar">
+        <div className="max-w-4xl mx-auto py-2">
+          <div className={`rounded-[24px] border-2 overflow-hidden transition-all shadow-sm ${item.is_correct ? 'border-emerald-500/20 bg-emerald-50/5' : 'border-red-500/20 bg-red-50/5'}`}>
+            <div className="p-4 md:p-6 space-y-4">
+              <div className="flex justify-between items-start gap-4">
+                <div className="space-y-1.5">
+                  <span className={`text-[10px] font-mono font-bold uppercase tracking-[2px] ${item.is_correct ? 'text-emerald-500' : 'text-red-500'}`}>Question {currentIndex + 1}</span>
+                  <h5 className="font-bold text-[16px] md:text-lg text-brand-dark dark:text-white leading-snug">{item.question_text}</h5>
                 </div>
-                <p className="text-[9px] font-mono text-gray-400 dark:text-slate-500 uppercase tracking-[2px] mt-1.5">{t('contestScoreLabel')}</p>
+                <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0 shadow-sm ${item.is_correct ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}>
+                  {item.is_correct ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+                </div>
               </div>
 
-              {/* Rank chip */}
-              <div className="flex flex-col items-center justify-center px-4 py-3 rounded-2xl min-w-[64px] bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
-                <span className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tabular-nums leading-none">#{me.rank}</span>
-                <p className="text-[9px] font-mono text-gray-400 dark:text-slate-500 uppercase tracking-[2px] mt-1.5">{t('contestRankLabel')}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+                {item.options?.map((option: any) => {
+                  const isSelected = item.selected_option_id === option.id;
+                  const isCorrect = option.is_correct;
+                  let stateClass = 'bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 text-gray-500';
+                  if (isSelected && isCorrect) stateClass = 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20';
+                  else if (isSelected && !isCorrect) stateClass = 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20';
+                  else if (isCorrect) stateClass = 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30';
+
+                  return (
+                    <div key={option.id} className={`p-3 md:p-4 rounded-[12px] border text-[12px] md:text-[14px] font-bold flex items-center gap-3 transition-all ${stateClass}`}>
+                      {isCorrect ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : isSelected ? <XCircle className="w-4 h-4 shrink-0" /> : <div className="w-2.5 h-2.5 rounded-full bg-current opacity-20 shrink-0" />}
+                      <span>{option.content}</span>
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Prize chip (if won) */}
-              {me.prize && (
-                <div className="flex flex-col items-center justify-center px-4 py-3 rounded-2xl min-w-[64px] bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30">
-                  <div className="mb-1">
-                    <PlaceIcon place={me.prize.place} className="w-8 h-8" />
-                  </div>
-                  <p className="text-[11px] font-bold text-amber-700 dark:text-amber-300 mt-1.5 text-center leading-snug max-w-[120px]">{me.prize.reward_name}</p>
-                  <p className="text-[9px] font-mono text-amber-500/60 uppercase tracking-[2px] mt-0.5">{t('contestPrizeWon')}</p>
+              {item.explanation && (
+                <div className="bg-white/80 dark:bg-slate-900/50 p-4 rounded-[16px] border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary opacity-30"></div>
+                  <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-1 opacity-70">{t('explanation')}</span>
+                  <p className="text-[11px] md:text-[13px] font-medium text-gray-600 dark:text-slate-400 italic leading-relaxed">{item.explanation}</p>
                 </div>
               )}
             </div>
-          ) : (
-            <p className="text-sm text-gray-400 dark:text-slate-500 italic">{t('contestDidNotParticipate')}</p>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* Leaderboard — flat section, no outer card */}
-      {results.leaderboard.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-1 px-1">
-            <div className="w-5 h-5 rounded-md bg-amber-500/10 flex items-center justify-center">
-              <Trophy className="w-3 h-3 text-amber-500" />
-            </div>
-            <h3 className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px]">
-              {t('contestLeaderboard')}
-            </h3>
-          </div>
-          <div className="divide-y divide-gray-100 dark:divide-slate-800">
-            {results.leaderboard.map(entry => {
-              const isMe = me ? entry.rank === me.rank : false;
-              return (
-                <div
-                  key={entry.enrollment_id}
-                  className={`flex items-center gap-3 px-1 py-3 relative overflow-hidden transition-colors duration-150
-                    ${isMe ? 'bg-brand-primary/5 dark:bg-brand-primary/8 -mx-1 px-2 rounded-xl' : ''}
-                  `}
-                >
-                  {/* "YOU" accent left border */}
-                  {isMe && (
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-brand-primary rounded-r-full" />
-                  )}
-
-                  <div className="w-7 flex justify-center shrink-0">
-                    <PlaceIcon place={entry.rank} />
-                  </div>
-
-                  <span className={`flex-1 text-sm font-semibold truncate ${isMe ? 'text-brand-primary dark:text-brand-primary' : 'text-gray-900 dark:text-slate-100'}`}>
-                    {entry.full_name || (entry as any).name}
-                  </span>
-
-                  {isMe && (
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
-                      YOU
-                    </span>
-                  )}
-
-                  <span className={`text-xs font-mono font-bold tabular-nums shrink-0 ${isMe ? 'text-brand-primary' : 'text-gray-500 dark:text-slate-400'}`}>
-                    {entry.score}/{entry.total}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Personal review */}
-      {me && me.answers.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden">
+      <div className="p-3 md:p-5 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-5">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <button
-            onClick={() => setReviewExpanded(v => !v)}
-            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors duration-150"
+            onClick={() => currentIndex > 0 && setCurrentIndex(prev => prev - 1)}
+            disabled={currentIndex === 0}
+            className="flex-1 md:flex-none px-6 md:px-10 py-3 rounded-[12px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
           >
-            <span className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[2px] flex items-center gap-2">
-              <div className="w-5 h-5 rounded-md bg-brand-primary/10 flex items-center justify-center">
-                <BookOpen className="w-3 h-3 text-brand-primary" />
-              </div>
-              {t('detailedReview')}
-            </span>
-            <ChevronRight className={`w-4 h-4 text-gray-400 dark:text-slate-500 transition-transform duration-200 ${reviewExpanded ? 'rotate-90' : ''}`} />
+            <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span><span className="md:hidden">{t('back')}</span>
           </button>
 
-          {reviewExpanded && (
-            <div className="px-5 pb-5 space-y-6 border-t border-gray-50 dark:border-slate-800/80 pt-5">
-              {me.answers.map((ans, idx) => (
-                <div key={ans.question_id} className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-lg bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 shrink-0 mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 dark:text-slate-100 tracking-tight">{ans.word}</p>
-                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5 leading-relaxed">{ans.question_text}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1.5 ml-9">
-                    {ans.options.map(opt => {
-                      const isSelected = opt.id === ans.selected_option_id;
-                      const isCorrect = opt.is_correct;
-                      return (
-                        <div
-                          key={opt.id}
-                          className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm border transition-colors ${
-                            isCorrect
-                              ? 'border-emerald-200 dark:border-emerald-700/50 bg-emerald-50/80 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
-                              : isSelected
-                              ? 'border-red-200 dark:border-red-700/50 bg-red-50/80 dark:bg-red-900/20 text-red-600 dark:text-red-400'
-                              : 'border-gray-100 dark:border-slate-700/50 text-gray-400 dark:text-slate-500 bg-gray-50/50 dark:bg-slate-800/30'
-                          }`}
-                        >
-                          {isCorrect
-                            ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                            : isSelected
-                            ? <XCircle className="w-3.5 h-3.5 shrink-0" />
-                            : <span className="w-3.5 h-3.5 shrink-0" />
-                          }
-                          <span className={isSelected || isCorrect ? 'font-semibold' : ''}>{opt.content}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {ans.explanation && (
-                    <div className="ml-9 p-3.5 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30">
-                      <p className="text-[9px] font-mono font-bold text-blue-500 uppercase tracking-[2px] mb-1.5">{t('explanation')}</p>
-                      <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">{ans.explanation}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+          {currentIndex === answers.length - 1 ? (
+            <button onClick={() => onNavigate({ view: 'detail', contestId })} className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
+              {t('backToOverview')}
+            </button>
+          ) : (
+            <button
+              onClick={() => currentIndex < answers.length - 1 && setCurrentIndex(prev => prev + 1)}
+              className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[12px] font-bold text-[14px] hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+            >
+              {t('nextQuestion') || 'Next'} <ChevronRight className="w-4 h-4" />
+            </button>
           )}
         </div>
-      )}
-    </div>
+      </div>
+    </div>,
+    document.body
   );
 };
 
@@ -1617,25 +1639,18 @@ const ActionButton: React.FC<{
       </div>
     );
   }
-  if (detail.status === 'finalized') {
-    return (
-      <button
-        onClick={onAction}
-        className="w-full py-3.5 rounded-2xl font-bold font-mono text-sm text-brand-primary bg-brand-primary/10 hover:bg-brand-primary/15 border border-brand-primary/25 hover:border-brand-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 flex items-center justify-center gap-2"
-      >
-        <Trophy className="w-5 h-5" />
-        {t('contestViewResults')}
-      </button>
-    );
-  }
   return null;
 };
 
 // ── ROOT CONTESTS PAGE ─────────────────────────────────────────────────────────
+
+let globalContestNav: ContestNav = { view: 'list', contestId: null };
+
 const ContestsInner: React.FC = () => {
-  const [nav, setNav] = useState<ContestNav>({ view: 'list', contestId: null });
+  const [nav, setNav] = useState<ContestNav>(globalContestNav);
 
   const handleNavigate = useCallback((next: ContestNav) => {
+    globalContestNav = next;
     setNav(next);
   }, []);
 
@@ -1646,12 +1661,20 @@ const ContestsInner: React.FC = () => {
       return <ContestDetailView contestId={nav.contestId!} onNavigate={handleNavigate} />;
     case 'play':
       return <ContestPlayView contestId={nav.contestId!} onNavigate={handleNavigate} />;
-    case 'results':
-      return <ContestResultsView contestId={nav.contestId!} onNavigate={handleNavigate} />;
+    case 'review': {
+      // Find results from detail if already loaded or re-fetch (handled by component)
+      return <ContestReviewView contestId={nav.contestId!} onNavigate={handleNavigate} answers={nav.answers || []} />;
+    }
     default:
       return <ContestListView onNavigate={handleNavigate} />;
   }
 };
+
+interface ContestNav {
+  view: ContestView;
+  contestId: number | null;
+  answers?: any[];
+}
 
 export const Contests: React.FC = () => (
   <ContestProvider>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { apiService } from '../services/ApiService';
-import { ContestListItem, ContestDetailData, ContestStartResponse, ContestSubmitResponse, ContestResultsData, ContestLeaderboardEntry } from '../services/apiTypes';
+import { ContestListItem, ContestDetailData, ContestStartResponse, ContestSubmitResponse, ContestResultsData, ContestLiveLeaderboardResponse } from '../services/apiTypes';
 
 interface ContestContextType {
     contests: ContestListItem[];
@@ -12,7 +12,7 @@ interface ContestContextType {
     startContest: (contestId: number) => Promise<ContestStartResponse>;
     submitContest: (contestId: number, answers: { question_id: number; option_id: number }[]) => Promise<ContestSubmitResponse>;
     getContestResults: (contestId: number) => Promise<ContestResultsData>;
-    getContestLeaderboard: (contestId: number) => Promise<ContestLeaderboardEntry[]>;
+    getContestLeaderboard: (contestId: number) => Promise<ContestLiveLeaderboardResponse>;
 }
 
 const ContestContext = createContext<ContestContextType | undefined>(undefined);
@@ -37,7 +37,7 @@ export const ContestProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const getContestDetail = useCallback(async (contestId: number): Promise<ContestDetailData> => {
         const res = await apiService.getContestDetail(contestId);
-        return res.data;
+        return (res as any).data || res;
     }, []);
 
     const registerForContest = useCallback(async (contestId: number) => {
@@ -61,10 +61,10 @@ export const ContestProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const getContestResults = useCallback(async (contestId: number): Promise<ContestResultsData> => {
         const res = await apiService.getContestResults(contestId);
-        return res.data;
+        return (res as any).data || res;
     }, []);
 
-    const getContestLeaderboard = useCallback(async (contestId: number): Promise<ContestLeaderboardEntry[]> => {
+    const getContestLeaderboard = useCallback(async (contestId: number): Promise<ContestLiveLeaderboardResponse> => {
         return apiService.getContestLeaderboard(contestId);
     }, []);
 

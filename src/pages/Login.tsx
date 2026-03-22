@@ -245,10 +245,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                                     </div>
                                     <div className="text-center space-y-2">
                                         <p className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'} tracking-tight`}>
-                                            {language === 'uz' ? 'Tasdiqlash kutilmoqda...' : 'Waiting for confirmation...'}
+                                            {t('waitingConfirmation')}
                                         </p>
                                         <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'} leading-relaxed`}>
-                                            {language === 'uz' ? 'Agarda bot avtomatik ochilmasa quyidagi tugmani bosing' : 'If the bot didn\'t open automatically, tap the button below'}
+                                            {t('botNotOpened')}
                                         </p>
                                     </div>
                                     <button
@@ -256,7 +256,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                                         className="w-full bg-[#2AABEE] text-white py-4 rounded-2xl font-bold text-sm shadow-xl shadow-[#2AABEE]/25 hover:bg-[#229ED9] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2.5 uppercase tracking-widest font-mono"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>
-                                        Open Telegram
+                                        {t('openTelegram')}
                                     </button>
                                 </div>
                             )}

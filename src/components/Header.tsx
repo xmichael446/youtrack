@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Coins, Zap, Sun, Moon, LogOut, Flame } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
@@ -29,6 +29,11 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
   const [headerAvatarUrl, setHeaderAvatarUrl] = useState<string | null>(null);
   const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 
+  const notificationBtnRef = useRef<HTMLButtonElement>(null);
+  const profileBtnRef = useRef<HTMLButtonElement>(null);
+  const notificationPanelRef = useRef<HTMLDivElement>(null);
+  const profilePanelRef = useRef<HTMLDivElement>(null);
+
   // Fetch avatar from PROFILE API on mount and when dashboard user changes
   useEffect(() => {
     apiService.getProfile()
@@ -50,6 +55,61 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
         }
       });
   }, [user?.id, baseUrl]);
+
+  // ESC to close dropdowns and return focus to trigger; click-outside to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showNotifications) {
+          setShowNotifications(false);
+          notificationBtnRef.current?.focus();
+        } else if (showProfileMenu) {
+          setShowProfileMenu(false);
+          profileBtnRef.current?.focus();
+        }
+      }
+    };
+    const handleMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        showNotifications &&
+        notificationPanelRef.current &&
+        !notificationPanelRef.current.contains(target) &&
+        !notificationBtnRef.current?.contains(target)
+      ) {
+        setShowNotifications(false);
+      }
+      if (
+        showProfileMenu &&
+        profilePanelRef.current &&
+        !profilePanelRef.current.contains(target) &&
+        !profileBtnRef.current?.contains(target)
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [showNotifications, showProfileMenu]);
+
+  // Move focus into panel when it opens
+  useEffect(() => {
+    if (!showNotifications) return;
+    notificationPanelRef.current
+      ?.querySelector<HTMLElement>('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')
+      ?.focus();
+  }, [showNotifications]);
+
+  useEffect(() => {
+    if (!showProfileMenu) return;
+    profilePanelRef.current
+      ?.querySelector<HTMLElement>('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')
+      ?.focus();
+  }, [showProfileMenu]);
 
   const getNotificationTypeInfo = (type: string) => {
     switch (type) {
@@ -150,7 +210,11 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
             {/* Notifications */}
             <div className="relative">
               <button
+                ref={notificationBtnRef}
                 onClick={handleOpenNotifications}
+                aria-label={t('notifications')}
+                aria-expanded={showNotifications}
+                aria-haspopup="true"
                 className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 relative ${showNotifications ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
               >
                 <Bell className="w-[18px] h-[18px]" />
@@ -160,7 +224,12 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
               </button>
 
               {showNotifications && (
-                <div className="absolute top-full right-0 mt-2.5 w-[280px] md:w-[340px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200">
+                <div
+                  ref={notificationPanelRef}
+                  role="dialog"
+                  aria-label={t('notifications')}
+                  className="absolute top-full right-0 mt-2.5 w-[280px] md:w-[340px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200"
+                >
                   <div className="px-4 py-3 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
                     <h3 className="text-[11px] font-mono font-bold uppercase tracking-wider text-gray-900 dark:text-white">{t('notifications')}</h3>
                     <button onClick={() => markAllAsRead()}
@@ -213,24 +282,35 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                 
                 {/* Clickable Avatar -> Dropdown */}
                 <button
+                  ref={profileBtnRef}
                   onClick={() => { setShowProfileMenu(!showProfileMenu); setShowNotifications(false); }}
-                  className="relative group active:scale-95 transition-all"
+                  aria-label={user?.name ?? t('student')}
+                  aria-expanded={showProfileMenu}
+                  aria-haspopup="true"
+                  className="relative group active:scale-95 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
                 >
-                  {headerAvatarUrl ? (
-                    <img src={headerAvatarUrl} alt="avatar"
-                      className={`w-9 h-9 rounded-xl object-cover border-2 border-white dark:border-slate-800 shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`} />
-                  ) : (
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-bold border-2 border-white dark:border-slate-800 shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`}
-                      style={{ backgroundColor: avatarBg }}>
-                      {initials}
-                    </div>
-                  )}
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
+                  <div className="relative">
+                    {headerAvatarUrl ? (
+                      <img src={headerAvatarUrl} alt="avatar"
+                        className={`w-9 h-9 rounded-xl object-cover border-2 border-white dark:border-slate-800 shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`} />
+                    ) : (
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-bold border-2 border-white dark:border-slate-800 shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`}
+                        style={{ backgroundColor: avatarBg }}>
+                        {initials}
+                      </div>
+                    )}
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
+                  </div>
                 </button>
               </div>
 
               {showProfileMenu && (
-                <div className="absolute top-full right-0 mt-2.5 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200">
+                <div
+                  ref={profilePanelRef}
+                  role="dialog"
+                  aria-label={user?.name ?? t('student')}
+                  className="absolute top-full right-0 mt-2.5 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in duration-200"
+                >
                   {/* Profile Header (Name also clickable here) */}
                   <div 
                     className="p-4 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 flex items-center gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"

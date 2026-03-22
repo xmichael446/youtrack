@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useDashboard } from '../context/DashboardContext';
 
 const Curriculum: React.FC = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const { curriculum } = useDashboard();
     const [now, setNow] = useState(new Date());
 
@@ -137,11 +137,11 @@ const Curriculum: React.FC = () => {
                                             <div className="flex flex-col gap-0.5">
                                                 <div className="flex items-center gap-1.5 text-[12px] font-mono font-bold text-gray-600 dark:text-slate-300">
                                                     <Calendar className="w-3.5 h-3.5 text-brand-primary/50" />
-                                                    {fullDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    {fullDate.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                 </div>
                                                 <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
                                                     <Clock className="w-3 h-3 text-brand-primary/30" />
-                                                    {time} &bull; {Number(item.duration.split(':')[0]) * 60 + Number(item.duration.split(':')[1])} min
+                                                    {time} &bull; {Number(item.duration.split(':')[0]) * 60 + Number(item.duration.split(':')[1])} {t('mins')}
                                                 </div>
                                             </div>
                                         </td>
@@ -166,14 +166,14 @@ const Curriculum: React.FC = () => {
                                 <div className="flex items-center gap-3.5">
                                     {/* Lesson Number Badge */}
                                     <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center shrink-0 border transition-all ${isUpcoming ? 'bg-brand-primary/8 border-brand-primary/15 text-brand-primary' : 'bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400'}`}>
-                                        <span className="text-[8px] font-mono font-bold leading-none uppercase opacity-70 mb-0.5">LSN</span>
+                                        <span className="text-[8px] font-mono font-bold leading-none uppercase opacity-70 mb-0.5">{t('lsn')}</span>
                                         <span className="text-sm font-mono font-bold leading-none">{item.number.toString().padStart(2, '0')}</span>
                                     </div>
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between gap-2 mb-0.5">
                                             <div className="flex items-center gap-2 overflow-hidden text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">
-                                                <span>{fullDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                <span>{fullDate.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short', day: 'numeric' })}</span>
                                                 <span className="opacity-40">&bull;</span>
                                                 <span>{time}</span>
                                             </div>

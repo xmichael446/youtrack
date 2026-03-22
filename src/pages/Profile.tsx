@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft, Edit3, Settings, Camera, TrendingUp, TrendingDown,
   Lock, ChevronDown, Coins, Zap, Flame, CheckCircle, XCircle, AlertCircle,
+  Medal, Trophy,
 } from 'lucide-react';
+
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigation } from '../context/NavigationContext';
 import { apiService } from '../services/ApiService';
 import LoadingScreen from '../components/LoadingScreen';
-import type { ProfileData, ActivityEntry, HeatmapEntry, Achievement } from '../services/apiTypes';
+import type { ProfileData, ActivityEntry, HeatmapEntry, Achievement, ContestBadge } from '../services/apiTypes';
 
 // ---------------------------------------------------------------------------
 // Constants & helpers
@@ -31,7 +33,7 @@ function getProgressColor(pct: number) {
   if (pct >= 50) return '#f59e0b';
   return '#ef4444';
 }
-function formatRelative(dateStr: string | null) {
+function formatRelative(dateStr: string | null, t: (k: string) => string) {
   if (!dateStr) return '—';
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return '—';
@@ -40,10 +42,10 @@ function formatRelative(dateStr: string | null) {
   const m = Math.floor(s / 60);
   const h = Math.floor(m / 60);
   const d = Math.floor(h / 24);
-  if (s < 60)  return 'just now';
-  if (m < 60)  return `${m}m ago`;
-  if (h < 24)  return `${h}h ago`;
-  if (d < 30)  return `${d}d ago`;
+  if (s < 60)  return t('justNow');
+  if (m < 60)  return t('mAgo').replace('{m}', String(m));
+  if (h < 24)  return t('hAgo').replace('{h}', String(h));
+  if (d < 30)  return t('dAgo').replace('{d}', String(d));
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 function buildHeatmapGrid(entries: HeatmapEntry[]) {
@@ -180,7 +182,7 @@ const ProfileHero: React.FC<{
             {profile.streak > 0 && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
                 <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
-                <span className="text-[11px] font-bold font-mono text-amber-600 dark:text-amber-400 tabular-nums">{profile.streak}d streak</span>
+                <span className="text-[11px] font-bold font-mono text-amber-600 dark:text-amber-400 tabular-nums">{t('streakDays').replace('{count}', String(profile.streak))}</span>
               </div>
             )}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
@@ -199,17 +201,48 @@ const ProfileHero: React.FC<{
       <div className="px-5 pb-4 flex items-center gap-6 divide-x divide-gray-100 dark:divide-slate-800">
         {hasAttendance && (
           <div className="flex flex-col">
-            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">Attendance</span>
+            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('attendance')}</span>
             <span className="text-sm font-bold text-brand-dark dark:text-white font-mono tabular-nums">{Math.round(stats.attendance_pct!)}%</span>
           </div>
         )}
         {hasAttendance && (
           <div className="flex flex-col pl-6">
-            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">Assignments</span>
+            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('assignments')}</span>
             <span className="text-sm font-bold text-brand-dark dark:text-white font-mono tabular-nums">{Math.round(stats.assignment_pct ?? 0)}%</span>
           </div>
         )}
       </div>
+      
+      {/* Contest Badges - Moved inside main card */}
+      {profile.contest_badges && profile.contest_badges.length > 0 && (
+        <div className="px-5 pb-4 overflow-x-auto no-scrollbar flex gap-2.5">
+          {profile.contest_badges.map(badge => {
+            const isGold = badge.place === 1;
+            const isSilver = badge.place === 2;
+            const isBronze = badge.place === 3;
+            return (
+              <div key={badge.id} 
+                className="shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-gray-50/50 dark:bg-slate-800/40 border border-gray-100/50 dark:border-slate-700/50 transition-all hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm">
+                <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center shadow-sm
+                  ${isGold ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-500' : 
+                    isSilver ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-400' :
+                    isBronze ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-400' :
+                    'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                  {isGold ? <Trophy className="w-4 h-4" /> : <Medal className="w-4 h-4" />}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold text-brand-dark dark:text-white leading-tight truncate max-w-[120px]">
+                    {badge.reward_name}
+                  </p>
+                  <p className="text-[9px] text-gray-400 dark:text-slate-500 font-medium font-mono">
+                    #{badge.place} &middot; {badge.contest_name}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Bio */}
       <div className="px-5 pb-4">
@@ -233,11 +266,11 @@ const ProfileHero: React.FC<{
               <div className="flex items-center gap-2">
                 <span className="text-base leading-none">{level.icon}</span>
                 <span className="text-[13px] font-bold text-brand-dark dark:text-white font-mono">
-                  Level {level.number} &middot; {level.name}
+                  {t('level')} {level.number} &middot; {level.name}
                 </span>
               </div>
               <span className="text-[11px] font-mono text-gray-400 dark:text-slate-500">
-                {level.xp_next ? `→ Lv ${level.number + 1}` : 'MAX'}
+                {level.xp_next ? t('levelNextLabel').replace('{n}', String(level.number + 1)) : t('maxLevel')}
               </span>
             </div>
             <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -331,7 +364,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                 </span>
                 {earned ? (
                   <p className="text-[8px] font-mono text-brand-primary leading-none mt-1">
-                    ✓ {formatRelative(def.earned_at)}
+                    ✓ {formatRelative(def.earned_at, t)}
                   </p>
                 ) : (
                   <div className="absolute top-1.5 right-1.5 bg-white/80 dark:bg-slate-900/80 rounded-full p-0.5 shadow-sm">
@@ -373,11 +406,11 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
               </p>
               {selectedDef.earned_at ? (
                 <p className="text-[10px] text-brand-primary font-mono mt-1.5 font-bold">
-                  ✓ Earned {formatRelative(selectedDef.earned_at)}
+                  ✓ {t('earned')} {formatRelative(selectedDef.earned_at, t)}
                 </p>
               ) : (
                 <p className="text-[10px] text-gray-400 dark:text-slate-500 font-mono mt-1.5">
-                  🔒 Not yet earned
+                  🔒 {t('notYetEarned')}
                 </p>
               )}
             </div>
@@ -422,7 +455,7 @@ const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => 
               </button>
               {tooltip === i && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 whitespace-nowrap bg-slate-900 dark:bg-slate-950 text-white text-[10px] font-mono rounded-lg px-2.5 py-1.5 shadow-lg border border-slate-700 pointer-events-none">
-                  {cell.count > 0 ? `+${cell.count} activities` : 'No activity'}
+                  {cell.count > 0 ? t('heatmapActivities').replace('{count}', String(cell.count)) : t('heatmapNoActivity')}
                   <div className="text-slate-400">{cell.date}</div>
                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-[5px] border-x-transparent border-t-[5px] border-t-slate-900 dark:border-t-slate-950" />
                 </div>
@@ -477,7 +510,7 @@ const ActivityFeed: React.FC<{
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-medium text-brand-dark dark:text-white truncate">{entry.reason}</p>
-              <p className="text-[10px] font-mono text-gray-400 dark:text-slate-500">{formatRelative(entry.datetime)}</p>
+              <p className="text-[10px] font-mono text-gray-400 dark:text-slate-500">{formatRelative(entry.datetime, t)}</p>
             </div>
             <div className="text-right shrink-0">
               <p className={`text-[12px] font-bold font-mono tabular-nums ${entry.negative ? 'text-red-500' : 'text-emerald-500'}`}>
@@ -661,6 +694,7 @@ const PrivacySettings: React.FC<{
 
 const Profile: React.FC = () => {
   const { profileEnrollmentId } = useNavigation();
+  const { t } = useLanguage();
   const [subView, setSubView] = useState<'view' | 'edit' | 'settings'>('view');
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -731,7 +765,7 @@ const Profile: React.FC = () => {
       const res = await apiService.updateProfile(bio, avatar);
       setProfile(res.data);
       setSubView('view');
-      showToast('Profile updated successfully');
+      showToast(t('profileUpdated'));
     } catch (err: any) {
       showToast(err?.data?.message ?? err?.message ?? 'Update failed', 'error');
     } finally {
@@ -742,11 +776,11 @@ const Profile: React.FC = () => {
   const handleTogglePrivacy = async (field: 'hide_balance' | 'hide_activity', value: boolean) => {
     await apiService.updatePrivacy({ [field]: value });
     setProfile(prev => prev ? { ...prev, privacy: { ...prev.privacy, [field]: value } } : prev);
-    showToast('Settings saved');
+    showToast(t('settingsSaved'));
   };
 
   if (loading) {
-    return <LoadingScreen message="Syncing Profile..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   if (error || !profile) {
@@ -757,15 +791,15 @@ const Profile: React.FC = () => {
         </div>
         <div>
           <p className="text-base font-bold text-brand-dark dark:text-white">
-            {error === 'notFound' ? 'Student not found' : 'Something went wrong'}
+            {error === 'notFound' ? t('studentNotFound') : t('somethingWentWrong')}
           </p>
           <p className="text-[12px] text-gray-400 dark:text-slate-500 font-mono mt-1">
-            {error === 'notFound' ? 'This student may not be in your course.' : 'Please try again.'}
+            {error === 'notFound' ? t('studentNotFoundDesc') : t('somethingWentWrongDesc')}
           </p>
         </div>
         <button onClick={loadProfile}
           className="px-4 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-[11px] font-bold font-mono uppercase tracking-wide hover:bg-brand-primary/20 transition-colors">
-          Try again
+          {t('tryAgain')}
         </button>
       </div>
     );

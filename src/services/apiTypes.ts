@@ -1,220 +1,8 @@
-
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-
-export interface ApiRequestConfig {
-    endpoint: string;
-    method?: HttpMethod;
-    data?: any;
-    files?: File[];
-    headers?: Record<string, string>;
-    params?: Record<string, string | number | boolean>;
-}
-
-export interface ApiResponse<T = any> {
-    data: T;
-    status: number;
-    statusText: string;
-    headers: Headers;
-}
-
-export interface ApiError {
-    message: string;
-    status?: number;
-    statusText?: string;
-    data?: any;
-}
-
-export interface StateConfig<T> {
-    initialValue: T;
-    onUpdate?: (newValue: T) => void;
-    onError?: (error: ApiError) => void;
-}
-
-export interface ApiState<T> {
-    data: T | null;
-    loading: boolean;
-    error: ApiError | null;
-    lastUpdated: Date | null;
-}
-
-export type StateListener<T> = (state: ApiState<T>) => void;
-
-// --- Lessons View Types ---
-
-export interface AttendanceData {
-    track_id: number;
-    lesson_topic: string;
-    number: number;
-    opens_at: string;
-    closes_at: string;
-    status: 'attended' | 'absent' | 'marked' | null;
-}
-
-export interface AssignmentAttachment {
-    name: string;
-    link: string;
-    size?: number;
-    extension?: string;
-    type?: 'file' | 'link' | 'image'; // adjusting based on usage
-}
-
-export interface SubmissionAttachment {
-    name: string;
-    link: string;
-    size?: number;
-    extension?: string;
-}
-
-export interface Submission {
-    id: number;
-    status: 'approved' | 'rejected' | 'pending' | 'submitted';
-    student_comment?: string;
-    teacher_comment?: string;
-    created_at: string;
-    attachments: SubmissionAttachment[];
-}
-
-export interface AssignmentData {
-    id: number;
-    number: number | string;
-    description: string;
-    lesson_topic: string;
-    start_datetime: string;
-    deadline: string;
-    attachments: AssignmentAttachment[];
-    submissions: Submission[];
-    quiz?: QuizSessionData | null;
-    is_expired: boolean;   // true = absolute deadline passed (deadline + 24h), no more submissions
-    is_overdue: boolean;   // true = original deadline passed but within 24h grace period (50% rewards)
-}
-
-export interface AssignmentsData {
-    current: AssignmentData | null;
-    previous: AssignmentData[];
-}
-
-export interface LessonsResponse {
-    success: boolean;
-    data: {
-        attendance: AttendanceData | null;
-        assignments: AssignmentsData | null;
-        quiz: QuizSessionData | null;
-    };
-}
-
-// --- Action Types ---
-
-export interface MarkAttendanceResponse {
-    success: boolean;
-    data: {
-        xp: number;
-        coins: number;
-        message: string;
-    };
-}
-
-export interface AttachmentSubmission {
-    type: 'file' | 'image' | 'link';
-    name: string;
-    url?: string;
-}
-
-export interface HomeworkSubmissionData {
-    assignment_id: number;
-    comment?: string;
-    attachments?: AttachmentSubmission[];
-    files?: File[];
-}
-
-export interface HomeworkSubmissionResponse {
-    success: boolean;
-    message: string;
-    submission_id: number;
-}
-
-// --- Level Types ---
-
-export interface LevelInfo {
-    number: number;
-    name: string;
-    icon: string;
-    badge_color: string;
-    description?: string;
-    xp_current: number;
-    xp_required: number;
-    xp_next: number;
-    progress_percent: number;
-}
-
 export interface CompactLevelInfo {
-    number: number;
+    id: number;
     name: string;
     icon: string;
-    badge_color?: string;
 }
-
-// --- Shop Types ---
-
-export interface BalanceReward {
-    id: number;
-    name: string;
-    image: string | null;
-    cost: number;
-    claimed: boolean;
-    description?: string;
-}
-
-export interface LevelReward {
-    id: number;
-    name: string;
-    image: string | null;
-    description?: string;
-    required_level: CompactLevelInfo;
-    unlocked: boolean;
-    granted: boolean;
-}
-
-// Backward compat alias
-export type Reward = BalanceReward;
-
-export interface Transaction {
-    datetime: string;
-    reason: string;
-    xp: number;
-    coins: number;
-    negative?: boolean;
-}
-
-export interface ShopData {
-    balance_rewards: BalanceReward[];
-    level_rewards: LevelReward[];
-    transactions: Transaction[];
-}
-
-export interface ShopResponse {
-    success: boolean;
-    data: ShopData;
-}
-
-export interface ClaimRewardResponse {
-    success: boolean;
-    message: string;
-}
-
-// --- Notification Types ---
-
-export interface Notification {
-    id: number;
-    type: string;
-    message_uz: string;
-    message_en: string;
-    scheduled_datetime: string;
-    read: boolean;
-}
-
-export type NotificationsResponse = Notification[];
-
-// --- Quiz Types ---
 
 export interface QuizOption {
     id: number;
@@ -224,100 +12,16 @@ export interface QuizOption {
 
 export interface QuizQuestion {
     id: number;
-    word: string;
     question_text: string;
     options: QuizOption[];
+    explanation?: string;
+    vocab_level?: number;
+    source_text?: string;
 }
 
-export interface QuizAttempt {
-    id: number;
-    score: number;
-    total: number;
-    reviewed: boolean;
-    points_awarded: boolean;
-    created_at: string;
-}
-
-export interface QuizSessionData {
-    session_id: number;
-    vocab_level: string;
-    passing_score: number;
-    question_count: number;
-    already_awarded: boolean;
-    has_reviewed: boolean;
-    previous_attempts: QuizAttempt[];
-}
-
-export interface QuizQuestionsData {
-    session_id: number;
-    vocab_level: string;
-    passing_score: number;
-    questions: QuizQuestion[];
-    source_text?: string;  // text passage to read before quiz
-}
-
-export interface QuizQuestionsResponse {
-    success: boolean;
-    data: QuizQuestionsData;
-}
-
-export interface QuizResponse {
-    success: boolean;
-    data: QuizSessionData;
-}
-
-export interface QuizAnswer {
-    question_id: number;
-    option_id: number;
-}
-
-export interface QuizSubmission {
-    session_id: number;
-    answers: QuizAnswer[];
-}
-
-export interface QuizQuestionResult {
-    question_id: number;
-    word: string;
-    question_text: string;
-    options: QuizOption[];
-    selected_option_id: number;
+export interface QuizQuestionResult extends QuizQuestion {
+    selected_option_id: number | null;
     is_correct: boolean;
-    explanation: string;
-}
-
-export interface QuizSubmitResponseData {
-    attempt_id: number;
-    score: number;
-    total: number;
-    passing_score: number;
-    passed: boolean;
-    already_awarded: boolean;
-    has_reviewed: boolean;
-    points_awarded: boolean;
-    xp: number;
-    coins: number;
-}
-
-export interface QuizSubmitResponse {
-    success: boolean;
-    data: QuizSubmitResponseData;
-}
-
-export interface QuizReviewData {
-    attempt_id: number;
-    score: number;
-    total: number;
-    passing_score: number;
-    passed: boolean;
-    points_awarded: boolean;
-    reviewed: boolean;
-    answers: QuizQuestionResult[];
-}
-
-export interface QuizReviewResponse {
-    success: boolean;
-    data: QuizReviewData;
 }
 
 // --- Contest Types ---
@@ -359,10 +63,14 @@ export interface ContestRegistration {
 
 export interface ContestWinner {
     place: number;
-    enrollment_id: number;
-    full_name: string;
+    id: number;
+    name: string;
+    avatar: string | null;
     score: number;
     total: number;
+    reward_name: string | null;
+    xp: number | null;
+    coins: number | null;
 }
 
 export interface ContestDetailData {
@@ -410,35 +118,42 @@ export interface ContestSubmitResponse {
     success: boolean;
     score: number;
     total: number;
-    message: string;
+    submitted_at: string;
 }
 
 export interface ContestLeaderboardEntry {
     rank: number;
-    enrollment_id: number;
-    full_name: string;
+    name: string;
     score: number;
     total: number;
     submitted_at: string;
+    prize?: ContestPrize | null;
+    enrollment_id?: number; // fallback for navigation if id is not present
+    id?: number;
 }
 
-export interface ContestPrizeWon {
-    place: number;
-    reward_name: string;
+export interface ContestLiveLeaderboardResponse {
+    success: boolean;
+    contest_id: number;
+    status: ContestStatus;
+    leaderboard: ContestLeaderboardEntry[];
+    my_rank: number | null;
+    my_score: number | null;
 }
 
 export interface ContestMyAttempt {
+    attempt_id: number;
     score: number;
     total: number;
-    rank: number;
     submitted_at: string;
-    prize: ContestPrizeWon | null;
+    prize_awarded: boolean;
+    rank?: number; // Frontend might compute this or it might be in some versions of API
+    prize?: ContestPrize | null;
     answers: QuizQuestionResult[];
 }
 
 export interface ContestResultsData {
-    contest_id: number;
-    number: number;
+    success: boolean;
     leaderboard: ContestLeaderboardEntry[];
     my_attempt: ContestMyAttempt | null;
 }
@@ -448,12 +163,146 @@ export interface ContestResultsResponse {
     data: ContestResultsData;
 }
 
-export interface ContestLiveLeaderboardResponse {
-    success: boolean;
-    data: ContestLeaderboardEntry[];
+export interface AssignmentData {
+    id: number;
+    number: number;
+    lesson_topic: string;
+    description?: string;
+    deadline: string;
+    start_datetime: string;
+    status: string;
+    submissions: any[];
+    is_expired: boolean;
+    is_overdue: boolean;
+    attachments?: { type: 'link' | 'file'; name: string; link?: string; url?: string; size?: number }[];
+    quiz?: QuizSessionData | null;
 }
 
-// --- Profile Types ---
+export interface AttendanceData {
+    id: number;
+    number?: number;
+    lesson_topic?: string;
+    date: string;
+    status: string;
+    track_id: number;
+    keyword?: string;
+    opens_at?: string;
+    closes_at?: string;
+}
+
+export interface HomeworkSubmissionData {
+    assignment_id: number;
+    comment?: string;
+    files?: File[];
+    attachments?: any[];
+}
+
+export interface HomeworkSubmissionResponse {
+    success: boolean;
+    message: string;
+}
+
+export interface LessonsResponse {
+    success: boolean;
+    data: any;
+}
+
+export interface MarkAttendanceResponse {
+    success: boolean;
+    message: string;
+    data?: any;
+}
+
+export interface ShopResponse {
+    success: boolean;
+    data: any;
+}
+
+export interface ClaimRewardResponse {
+    success: boolean;
+    message: string;
+}
+
+export interface BalanceReward {
+    id: number;
+    name: string;
+    description: string;
+    cost: number;
+    image: string | null;
+    claimed: boolean;
+}
+
+export interface LevelReward {
+    id: number;
+    name: string;
+    description: string;
+    required_level: {
+        number: number;
+        name: string;
+        icon: string;
+        badge_color: string;
+    };
+    image: string | null;
+    granted: boolean;
+    unlocked: boolean;
+}
+
+export interface NotificationsResponse {
+    success: boolean;
+    data: any[];
+}
+
+export interface QuizSessionData {
+    session_id: number;
+    question_count: number;
+    passing_score: number | null;
+    already_awarded: boolean;
+    has_reviewed: boolean;
+    previous_attempts: any[];
+}
+
+export interface QuizQuestionsData {
+    questions: QuizQuestion[];
+    source_text?: string;
+    vocab_level?: number;
+}
+
+export interface QuizQuestionsResponse {
+    success: boolean;
+    data: QuizQuestionsData;
+}
+
+export interface QuizSubmitResponseData {
+    score: number;
+    total: number;
+    passed: boolean;
+    points_awarded: boolean;
+    xp: number;
+    coins: number;
+    passing_score: number;
+    already_awarded: boolean;
+    attempt_id: number;
+}
+
+export interface QuizSubmitResponse {
+    success: boolean;
+    data: QuizSubmitResponseData;
+}
+
+export interface QuizReviewResponse {
+    success: boolean;
+    data: {
+        answers: QuizQuestionResult[];
+    };
+}
+
+export interface QuizSubmission {
+    session_id: number;
+    answers: {
+        question_id: number;
+        option_id: number;
+    }[];
+}
 
 export interface Achievement {
     key: string;
@@ -461,35 +310,50 @@ export interface Achievement {
     description: string;
     icon: string;
     rarity: 'common' | 'rare' | 'epic' | 'legendary';
+    achieved: boolean;
     earned_at: string | null;
 }
 
-export interface ProfilePrivacy {
-    hide_balance: boolean;
-    hide_activity: boolean;
-}
-
-export interface ProfileStats {
-    attendance_pct?: number;
-    assignment_pct?: number;
-    total_points: number;
-    balance: number | null;
+export interface ContestBadge {
+    id: number;
+    contest_number: number;
+    contest_name: string;
+    place: number;
+    reward_name: string;
+    reward_image: string | null;
+    earned_at: string;
 }
 
 export interface ProfileData {
-    is_own_profile: boolean;
     full_name: string;
     avatar: string | null;
-    bio: string;
+    bio: string | null;
     group_name: string;
     course_name: string;
-    level: LevelInfo | null;
     rank: number;
     streak: number;
-    longest_streak: number;
-    stats: ProfileStats;
+    level: {
+        number: number;
+        name: string;
+        icon: string;
+        xp_current: number;
+        xp_next: number;
+        progress_percent: number;
+        badge_color: string;
+    };
+    stats: {
+        attendance_pct?: number;
+        assignment_pct?: number;
+        balance?: number;
+        total_points: number;
+    };
     achievements: Achievement[];
-    privacy: ProfilePrivacy;
+    contest_badges: ContestBadge[];
+    is_own_profile: boolean;
+    privacy: {
+        hide_balance: boolean;
+        hide_activity: boolean;
+    };
 }
 
 export interface ProfileResponse {
@@ -498,23 +362,19 @@ export interface ProfileResponse {
 }
 
 export interface ActivityEntry {
-    reason: string;
     xp: number;
     coins: number;
-    negative: boolean;
+    reason: string;
     datetime: string;
-}
-
-export interface ActivityData {
-    entries: ActivityEntry[];
-    page: number;
-    total_pages: number;
-    has_next: boolean;
+    negative: boolean;
 }
 
 export interface ActivityResponse {
     success: boolean;
-    data: ActivityData;
+    data: {
+        entries: ActivityEntry[];
+        has_next: boolean;
+    };
 }
 
 export interface HeatmapEntry {
@@ -526,3 +386,36 @@ export interface HeatmapResponse {
     success: boolean;
     data: HeatmapEntry[];
 }
+
+export interface ApiRequestConfig {
+    endpoint: string;
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+    data?: any;
+    params?: Record<string, string | number | boolean>;
+    headers?: Record<string, string>;
+    files?: File[];
+}
+
+export interface ApiResponse<T> {
+    data: T;
+    status: number;
+    statusText: string;
+    headers: Headers;
+}
+
+export interface ApiError {
+    message: string;
+    status: number;
+    statusText: string;
+    data?: any;
+}
+
+export interface ApiState<T> {
+    data: T | null;
+    loading: boolean;
+    error: ApiError | null;
+    lastUpdated: Date | null;
+}
+
+export type StateListener<T> = (state: ApiState<T>) => void;
+

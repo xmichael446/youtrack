@@ -21,7 +21,7 @@ const LeaderboardContent: React.FC = () => {
   }, []);
 
   if (loading && groupLeaderboard.length === 0) {
-    return <LoadingScreen message="Fetching rankings..." />;
+    return <LoadingScreen message={t('fetchingRankings')} />;
   }
 
   const activeLeaderboard = activeTab === 'group' ? groupLeaderboard : courseLeaderboard;
@@ -104,24 +104,23 @@ const LeaderboardContent: React.FC = () => {
     <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-10">
 
       {/* Header */}
-      <div className="flex items-start gap-4 px-1">
-        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-xl shadow-amber-500/30 shrink-0 ring-2 ring-amber-400/20">
-          <Trophy className="w-7 h-7 md:w-8 md:h-8 text-white fill-white/80" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white">
-            {t('leaderboard')}
-          </h1>
-          <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
-            Top {activeLeaderboard.length > 0 ? activeLeaderboard.length : 20} &middot; {t('competePeers').split(',')[0]}
-          </p>
-        </div>
+      <div className="px-1">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
+          <Trophy className="w-6 h-6 text-amber-400 fill-amber-400/20 shrink-0" />
+          {t('leaderboard')}
+        </h1>
+        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+          Top {activeLeaderboard.length > 0 ? activeLeaderboard.length : 20} &middot; {t('competePeers').split(',')[0]}
+        </p>
       </div>
 
       {/* Tab Switcher */}
       <div className="max-w-sm mx-auto w-full">
-        <div className="bg-gray-100 dark:bg-slate-800/80 p-1 rounded-2xl flex border border-gray-200/50 dark:border-slate-700/50 shadow-inner">
+        <div role="tablist" aria-label={t('leaderboard')} className="bg-gray-100 dark:bg-slate-800/80 p-1 rounded-2xl flex border border-gray-200/50 dark:border-slate-700/50 shadow-inner">
           <button
+            role="tab"
+            aria-selected={activeTab === 'group'}
+            aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('group')}
             className={`flex-1 h-12 rounded-xl font-semibold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono flex items-center justify-center gap-2
               ${activeTab === 'group'
@@ -132,6 +131,9 @@ const LeaderboardContent: React.FC = () => {
             {t('groupRank')}
           </button>
           <button
+            role="tab"
+            aria-selected={activeTab === 'course'}
+            aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('course')}
             className={`flex-1 h-12 rounded-xl font-semibold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono flex items-center justify-center gap-2
               ${activeTab === 'course'
@@ -145,7 +147,7 @@ const LeaderboardContent: React.FC = () => {
       </div>
 
       {/* Leaderboard Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div id="leaderboard-panel" role="tabpanel" aria-label={activeTab === 'group' ? t('groupRank') : t('courseRank')} className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
 
         {/* Desktop Table Header */}
         <div className="hidden sm:grid px-6 py-3 border-b border-gray-100 dark:border-slate-800/70 bg-gray-50/80 dark:bg-slate-800/40"
@@ -169,11 +171,23 @@ const LeaderboardContent: React.FC = () => {
             const showAccentBorder = isCurrentUser || entry.rank <= 3;
             const borderColor = getPodiumBorderColor(entry.rank, isCurrentUser);
 
+            const handleActivate = () =>
+              isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id));
+
             return (
               <div
                 key={entry.id || i}
-                onClick={() => isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id))}
-                className={`group relative transition-all duration-200 cursor-pointer
+                role="button"
+                tabIndex={0}
+                aria-label={`${entry.full_name}${isCurrentUser ? ` (${t('youLabel')})` : ''}, ${t('rank')} ${entry.rank}, ${entry.total_points.toLocaleString()} ${t('points')}`}
+                onClick={handleActivate}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleActivate();
+                  }
+                }}
+                className={`group relative transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary
                   ${getPodiumRowClasses(entry.rank, isCurrentUser)}
                   ${entry.rank <= 3 ? 'sm:py-1' : ''}
                 `}
@@ -201,7 +215,7 @@ const LeaderboardContent: React.FC = () => {
                       </p>
                       {isCurrentUser && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
-                          YOU
+                          {t('youLabel')}
                         </span>
                       )}
                     </div>
@@ -244,14 +258,14 @@ const LeaderboardContent: React.FC = () => {
                       </p>
                       {isCurrentUser && (
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
-                          YOU
+                          {t('youLabel')}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                       {entry.streak > 0 && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
-                          🔥 {entry.streak} days
+                          🔥 {entry.streak} {t('days')}
                         </span>
                       )}
                     </div>
@@ -276,8 +290,8 @@ const LeaderboardContent: React.FC = () => {
               <div className="w-16 h-16 rounded-3xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
                 <Trophy className="w-7 h-7 text-gray-300 dark:text-slate-600" />
               </div>
-              <p className="text-sm font-bold text-gray-400 dark:text-slate-500">No rankings yet</p>
-              <p className="text-[11px] text-gray-300 dark:text-slate-600 font-mono">Attend lessons to earn your spot</p>
+              <p className="text-sm font-bold text-gray-400 dark:text-slate-500">{t('noRankings')}</p>
+              <p className="text-[11px] text-gray-300 dark:text-slate-600 font-mono">{t('attendToEarnSpot')}</p>
             </div>
           )}
         </div>

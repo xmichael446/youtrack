@@ -77,7 +77,7 @@ const RewardsContent: React.FC = () => {
   };
 
   if (loading && rewards.length === 0 && levelRewards.length === 0) {
-    return <LoadingScreen message="Opening Shop..." />;
+    return <LoadingScreen message={t('openingShop')} />;
   }
 
   if (error && rewards.length === 0 && levelRewards.length === 0) {
@@ -92,18 +92,14 @@ const RewardsContent: React.FC = () => {
     <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-10">
 
       {/* Page Header */}
-      <div className="flex items-start gap-4 px-1">
-        <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/30 shrink-0 ring-2 ring-amber-400/20">
-          <Gift className="w-7 h-7 md:w-8 md:h-8 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white">
-            {t('rewardsShop')}
-          </h1>
-          <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5">
-            {t('exchangeCoins')}
-          </p>
-        </div>
+      <div className="px-1">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
+          <Gift className="w-6 h-6 text-amber-400 shrink-0" />
+          {t('rewardsShop')}
+        </h1>
+        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+          {t('exchangeCoins')}
+        </p>
       </div>
 
       {/* Unified Rewards Grid */}
@@ -158,7 +154,7 @@ const RewardsContent: React.FC = () => {
 
                   {!affordable && !reward.claimed && (
                     <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[9px] font-mono font-bold tracking-wide flex items-center gap-1">
-                      <Coins className="w-2.5 h-2.5" /> Need {needed} more
+                      <Coins className="w-2.5 h-2.5" /> {t('needMore').replace('{count}', String(needed))}
                     </div>
                   )}
                 </div>
@@ -205,7 +201,7 @@ const RewardsContent: React.FC = () => {
                         t('claimNow')
                       ) : (
                         <>
-                          <Coins className="w-3.5 h-3.5" /> Need {needed} more coins
+                          <Coins className="w-3.5 h-3.5" /> {t('needMoreCoins').replace('{count}', String(needed))}
                         </>
                       )}
                     </button>
@@ -253,7 +249,7 @@ const RewardsContent: React.FC = () => {
                   {!isUnlocked && (
                     <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px] flex items-center justify-center z-10">
                       <div className="bg-black/60 text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 font-mono">
-                        <Lock className="w-3.5 h-3.5" /> Level {reward.required_level.number} Required
+                        <Lock className="w-3.5 h-3.5" /> {t('levelRequired').replace('{level}', String(reward.required_level.number))}
                       </div>
                     </div>
                   )}
@@ -261,7 +257,7 @@ const RewardsContent: React.FC = () => {
                   {isGranted && (
                     <div className="absolute inset-0 bg-emerald-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
                       <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl font-mono">
-                        <Check className="w-3.5 h-3.5 stroke-[3px]" /> Granted
+                        <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('granted')}
                       </div>
                     </div>
                   )}
@@ -311,7 +307,7 @@ const RewardsContent: React.FC = () => {
                       ) : isUnlocked ? (
                         t('claimFree')
                       ) : (
-                        <><Lock className="w-3.5 h-3.5" /> Level {reward.required_level.number} Required</>
+                        <><Lock className="w-3.5 h-3.5" /> {t('levelRequired').replace('{level}', String(reward.required_level.number))}</>
                       )}
                     </button>
                   </div>

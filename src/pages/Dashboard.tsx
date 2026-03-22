@@ -16,6 +16,24 @@ import LoadingScreen from '../components/LoadingScreen';
 import Curriculum from '../components/Curriculum';
 import { openExternalLink } from '../utils/telegram';
 
+const RankBadge: React.FC<{ delta: number }> = ({ delta }) => {
+  if (delta === 0) return null;
+  if (delta > 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 text-emerald-400 text-[10px] font-bold font-mono">
+        <TrendingUp className="w-3 h-3" />
+        {delta}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-0.5 text-red-400 text-[10px] font-bold font-mono">
+      <TrendingDown className="w-3 h-3" />
+      {Math.abs(delta)}
+    </span>
+  );
+};
+
 const Dashboard: React.FC = () => {
   const { t } = useLanguage();
   const { user, course, event, loading, enrollment } = useDashboard();
@@ -68,36 +86,19 @@ const Dashboard: React.FC = () => {
   }, [event]);
 
   if (!user.name || !course.name) {
-    return <LoadingScreen message="Syncing Dashboard..." />;
+    return <LoadingScreen message={t('syncingDashboard')} />;
   }
 
   // Rank change helpers
   const courseRankDelta = (enrollment?.last_rank ?? 0) - (enrollment?.rank ?? 0);
   const streak = enrollment?.streak ?? 0;
 
-  const RankBadge: React.FC<{ delta: number }> = ({ delta }) => {
-    if (delta === 0) return null;
-    if (delta > 0) {
-      return (
-        <span className="inline-flex items-center gap-0.5 text-emerald-400 text-[10px] font-bold font-mono">
-          <TrendingUp className="w-3 h-3" />
-          {delta}
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-0.5 text-red-400 text-[10px] font-bold font-mono">
-        <TrendingDown className="w-3 h-3" />
-        {Math.abs(delta)}
-      </span>
-    );
-  };
 
   return (
     <div className="space-y-5 md:space-y-6 animate-in fade-in duration-700 pb-10">
 
       {/* ── 1. HERO GRID: Competitive Card + Countdown ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <section aria-label={t('dashboard')} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         {/* Competitive Hero Card — theme-adaptive */}
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-5 md:p-6 relative overflow-hidden group animate-in fade-in duration-700 border border-gray-100 dark:border-slate-800 shadow-sm">
@@ -109,18 +110,18 @@ const Dashboard: React.FC = () => {
             {/* Greeting */}
             <div className="mb-6 md:mb-8">
               <p className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-2 opacity-80">
-                WELCOME BACK
+                {t('welcomeBack')}
               </p>
               <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white leading-tight">
                 {user.name}
               </h1>
               {streak > 0 ? (
                 <p className="text-sm font-medium mt-1.5 text-amber-500 dark:text-amber-400">
-                  Keep the streak alive. Keep climbing.
+                  {t('streakPromptActive')}
                 </p>
               ) : (
                 <p className="text-sm font-medium text-gray-400 dark:text-slate-500 mt-1.5">
-                  Start your streak today — consistency wins.
+                  {t('streakPromptNone')}
                 </p>
               )}
             </div>
@@ -163,7 +164,7 @@ const Dashboard: React.FC = () => {
 
             {/* Motivating summary */}
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-5 leading-relaxed">
-              You've covered <span className="font-bold text-brand-dark dark:text-white">{course.attendanceDue} topics</span> and <span className="font-bold text-brand-dark dark:text-white">{course.assignmentsApproved} assignments</span> in <span className="font-bold text-brand-dark dark:text-white">{course.name}</span>, with <span className="font-bold text-amber-500">{Math.round(course.attendancePercentage)}% attendance</span> — {streak > 0 ? t('keepItUp') : 'keep at it!'}
+              You've covered <span className="font-bold text-brand-dark dark:text-white">{course.attendanceDue} {t('topics')}</span> and <span className="font-bold text-brand-dark dark:text-white">{course.assignmentsApproved} {t('assignmentsCount')}</span> in <span className="font-bold text-brand-dark dark:text-white">{course.name}</span>, with <span className="font-bold text-amber-500">{Math.round(course.attendancePercentage)}% {t('attendance').toLowerCase()}</span> — {streak > 0 ? t('keepItUp') : t('keepAtIt')}
             </p>
           </div>
         </div>
@@ -184,7 +185,7 @@ const Dashboard: React.FC = () => {
               <div className="relative z-10 h-full flex flex-col">
                 <div className="flex items-center gap-2 mb-3">
                   <div className={`w-1.5 h-1.5 rounded-full ${event.is_active ? 'bg-emerald-500 animate-ping' : event.type === 'contest' ? 'bg-violet-500' : 'bg-brand-primary'} ${!event.is_active && 'animate-pulse'}`} />
-                  <span className={`text-[9px] font-mono font-bold uppercase tracking-[2px] ${event.is_active ? 'text-emerald-600 dark:text-emerald-400' : event.type === 'contest' ? 'text-violet-600 dark:text-violet-400' : 'text-brand-primary'}`}>
+                  <span className={`text-[9px] font-semibold uppercase tracking-[2px] ${event.is_active ? 'text-emerald-600 dark:text-emerald-400' : event.type === 'contest' ? 'text-violet-600 dark:text-violet-400' : 'text-brand-primary'}`}>
                     {event.is_active ? t('liveNow') || 'Live Now' : event.type === 'contest' ? t('upcomingContest') || 'Upcoming Contest' : t('upcomingEvent')}
                   </span>
                 </div>
@@ -192,7 +193,7 @@ const Dashboard: React.FC = () => {
                 <h3 className="text-base md:text-lg font-bold leading-snug mb-2 tracking-tight text-brand-dark dark:text-white">
                   {event.type === 'lesson' && event.number != null && (
                     <span className="inline-flex items-center bg-slate-900 dark:bg-white/10 text-white px-1 py-px rounded-[4px] text-[10px] font-mono font-bold uppercase tracking-wide mr-1 align-middle">
-                      LSN {event.number}
+                      {t('lsn')} {event.number}
                     </span>
                   )}
                   {event.topic}
@@ -231,7 +232,7 @@ const Dashboard: React.FC = () => {
                         <span className={`text-xl md:text-2xl font-bold tabular-nums leading-none font-mono ${event.type === 'contest' ? 'text-violet-500' : 'text-brand-primary'}`}>
                           {item.value.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-[8px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mt-1">
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mt-1">
                           {item.label}
                         </span>
                       </div>
@@ -242,10 +243,10 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* ── 3. COURSE INFO STRIP ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden animate-in fade-in duration-500 delay-75 fill-mode-both">
+      <section aria-label={course.name} className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden animate-in fade-in duration-500 delay-75 fill-mode-both">
         <div className="flex flex-col md:flex-row">
 
           {/* Image / Logo — full bleed on both axes */}
@@ -299,22 +300,22 @@ const Dashboard: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
+      </section>
 
 
 
       {/* ── 5. CURRICULUM ── */}
-      <div id="curriculum">
+      <section id="curriculum" aria-label={t('courseCurriculum')}>
         <Curriculum />
-      </div>
+      </section>
 
       {/* ── 6. TUTORIAL / VIDEO BANNER (moved to bottom) ── */}
-      <div className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in duration-700 delay-300 fill-mode-both">
+      <section aria-label={t('guideVideo')} className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in duration-700 delay-300 fill-mode-both">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/8 to-transparent pointer-events-none" />
         <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-brand-primary/15 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000 pointer-events-none" />
 
         <div className="relative z-10 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-primary/15 text-brand-primary rounded-full mb-4 border border-brand-primary/20 text-[9px] font-mono font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-primary/15 text-brand-primary rounded-full mb-4 border border-brand-primary/20 text-[9px] font-semibold uppercase tracking-wider">
             <PlayCircle className="w-3 h-3" />
             {t('guideVideo')}
           </div>
@@ -331,7 +332,7 @@ const Dashboard: React.FC = () => {
           {t('watchTutorial')}
           <PlayCircle className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
         </button>
-      </div>
+      </section>
 
     </div>
   );
