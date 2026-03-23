@@ -26,7 +26,7 @@ const NavItem = ({
   return (
     <button
       onClick={() => onNavigate(view)}
-      className={`flex flex-col md:flex-row items-center justify-center md:justify-start px-2 py-2.5 md:px-4 md:py-3.5 w-full md:w-auto rounded-2xl transition-all duration-300 group relative
+      className={`flex flex-col md:flex-row items-center justify-center md:justify-start px-2 py-2.5 md:px-4 md:py-2.5 w-full md:w-auto rounded-2xl transition-all duration-300 group relative
         ${isActive
           ? 'text-brand-primary bg-brand-primary/8 dark:bg-brand-primary/12 md:bg-gradient-to-r md:from-brand-primary/10 md:to-transparent shadow-sm'
           : 'text-gray-400 dark:text-slate-500 hover:text-brand-primary dark:hover:text-brand-primary hover:bg-gray-50 dark:hover:bg-slate-800/50'

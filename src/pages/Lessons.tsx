@@ -351,18 +351,28 @@ const QuizSection: React.FC<{
 
   const handleSelectOption = (questionId: number, optionId: number) => {
     setAnswers(prev => ({ ...prev, [questionId]: optionId }));
+    // Auto-advance to next question after a short delay
+    setTimeout(() => {
+      setCurrentQuestionIndex(prev => {
+        if (questionsData && prev < questionsData.questions.length - 1) {
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 400);
   };
 
   const goToNextQuestion = () => {
-    if (questionsData && currentQuestionIndex < questionsData.questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-    }
+    setCurrentQuestionIndex(prev => {
+      if (questionsData && prev < questionsData.questions.length - 1) {
+        return prev + 1;
+      }
+      return prev;
+    });
   };
 
   const goToPrevQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
-    }
+    setCurrentQuestionIndex(prev => prev > 0 ? prev - 1 : prev);
   };
 
   const handleSubmitQuiz = async () => {
@@ -617,7 +627,7 @@ const QuizSection: React.FC<{
         <div className="p-3 md:p-5 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-5">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             <button
-              onClick={() => currentQuestionIndex > 0 && setCurrentIndex(prev => prev - 1)}
+              onClick={() => setCurrentQuestionIndex(prev => prev > 0 ? prev - 1 : prev)}
               disabled={currentQuestionIndex === 0}
               className="flex-1 md:flex-none px-6 md:px-10 py-3 rounded-[12px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
             >
@@ -630,7 +640,7 @@ const QuizSection: React.FC<{
               </button>
             ) : (
               <button
-                onClick={() => currentQuestionIndex < reviewData.length - 1 && setCurrentIndex(prev => prev + 1)}
+                onClick={() => setCurrentQuestionIndex(prev => prev < reviewData.length - 1 ? prev + 1 : prev)}
                 className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[12px] font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
               >
                 {t('nextQuestion')} <ChevronRight className="w-4 h-4" />

@@ -75,7 +75,7 @@ const LeaderboardContent: React.FC = () => {
       );
     })();
     return (
-      <div className="flex flex-col items-center gap-0.5">
+      <div className="flex items-center gap-1.5">
         {badge}
         {change}
       </div>
@@ -151,14 +151,10 @@ const LeaderboardContent: React.FC = () => {
 
         {/* Desktop Table Header */}
         <div className="hidden sm:grid px-6 py-3 border-b border-gray-100 dark:border-slate-800/70 bg-gray-50/80 dark:bg-slate-800/40"
-          style={{ gridTemplateColumns: '3.5rem 1fr 5rem 7rem' }}
+          style={{ gridTemplateColumns: '7rem 1fr auto' }}
         >
           <div className="section-label">{t('rank')}</div>
-          <div className="ml-5 section-label">{t('student')}</div>
-          <div className="text-center flex items-center justify-center gap-1 section-label">
-            <Flame className="w-3 h-3 text-amber-400" />
-            <span>{t('streak')}</span>
-          </div>
+          <div className="ml-3 section-label">{t('student')}</div>
           <div className="text-right section-label">{t('points')}</div>
         </div>
 
@@ -200,15 +196,15 @@ const LeaderboardContent: React.FC = () => {
                 {/* Desktop layout */}
                 <div
                   className="hidden sm:grid items-center px-6 py-2.5"
-                  style={{ gridTemplateColumns: '3.5rem 1fr 5rem 7rem' }}
+                  style={{ gridTemplateColumns: '7rem 1fr auto' }}
                 >
                   {/* Rank + inline change */}
-                  <div className="flex items-start justify-start shrink-0">
+                  <div className="flex items-center justify-start shrink-0">
                     {getRankBadge(entry.rank, entry.last_rank)}
                   </div>
 
                   {/* Student Info */}
-                  <div className="min-w-0 ml-5">
+                  <div className="min-w-0 ml-3">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold text-brand-dark dark:text-white truncate leading-tight">
                         {entry.full_name}
@@ -221,25 +217,22 @@ const LeaderboardContent: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Streak column */}
-                  <div className="flex items-center justify-center">
+                  {/* Points + Streak unified */}
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base font-bold text-brand-dark dark:text-white tabular-nums">
+                        {entry.total_points.toLocaleString()}
+                      </span>
+                      <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary shrink-0" />
+                    </div>
                     {entry.streak > 0 ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
-                        🔥 {entry.streak}
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-500 dark:text-amber-400">
+                        <Flame className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        {entry.streak}
                       </span>
                     ) : (
-                      <Minus className="w-3.5 h-3.5 text-gray-200 dark:text-slate-700" />
+                      <span className="text-xs text-gray-200 dark:text-slate-700">—</span>
                     )}
-                  </div>
-
-                  {/* Points */}
-                  <div className="flex items-center justify-end gap-2">
-                    <span className="text-lg font-bold text-brand-dark dark:text-white tabular-nums">
-                      {entry.total_points.toLocaleString()}
-                    </span>
-                    <div className="w-5 h-5 rounded-md bg-brand-primary/10 flex items-center justify-center shrink-0">
-                      <Star className="w-3 h-3 text-brand-primary fill-brand-primary" />
-                    </div>
                   </div>
                 </div>
 
@@ -262,23 +255,22 @@ const LeaderboardContent: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                      {entry.streak > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
-                          🔥 {entry.streak} {t('days')}
-                        </span>
-                      )}
-                    </div>
                   </div>
 
-                  {/* Points */}
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-base font-bold text-brand-dark dark:text-white tabular-nums">
-                      {entry.total_points.toLocaleString()}
-                    </span>
-                    <div className="w-5 h-5 rounded-md bg-brand-primary/10 flex items-center justify-center">
-                      <Star className="w-3 h-3 text-brand-primary fill-brand-primary" />
+                  {/* Points + Streak unified */}
+                  <div className="flex flex-col items-end gap-0.5 shrink-0">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-bold text-brand-dark dark:text-white tabular-nums">
+                        {entry.total_points.toLocaleString()}
+                      </span>
+                      <Star className="w-3 h-3 text-brand-primary fill-brand-primary shrink-0" />
                     </div>
+                    {entry.streak > 0 && (
+                      <span className="inline-flex items-center gap-0.5 text-xs font-medium text-amber-500 dark:text-amber-400">
+                        <Flame className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        {entry.streak}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
