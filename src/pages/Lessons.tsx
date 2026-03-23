@@ -266,9 +266,9 @@ const QuizSection: React.FC<{
   const [showReviewWarning, setShowReviewWarning] = useState<number | null>(null);
 
   const sortedAttempts = React.useMemo(() => {
-    if (!quizSummary.previous_attempts) return [];
+    if (!quizSummary?.previous_attempts) return [];
     return [...quizSummary.previous_attempts].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-  }, [quizSummary.previous_attempts]);
+  }, [quizSummary?.previous_attempts]);
 
   useEffect(() => {
     setQuizSummary(initialData || null);
@@ -432,7 +432,12 @@ const QuizSection: React.FC<{
     }
   };
 
-  if (!quizSummary) return null;
+  if (!quizSummary) return (
+    <div className="bg-gray-50 dark:bg-slate-800/50 p-8 rounded-[14px] border border-gray-100 dark:border-slate-700 text-center">
+      <ClipboardList className="w-10 h-10 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
+      <p className="text-sm font-medium text-gray-400 dark:text-slate-500">{t('noQuizYet')}</p>
+    </div>
+  );
 
   const renderSolvingMode = () => {
     const questionText = questionsData!.questions[currentQuestionIndex].question_text;

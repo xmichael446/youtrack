@@ -123,6 +123,7 @@ export default {
   "noAssignmentsTitle": "No Assignments Yet",
   "noAssignmentsSubtitle": "You have no assignments at the moment. Enjoy the break — new tasks will appear here soon!",
   "noNotifications": "No notifications",
+  "noQuizYet": "No quiz for this lesson yet.",
   "noRewards": "No rewards available at the moment",
   "notifications": "Notifications",
   "notificationsUnread": "Notifications ({count} unread)",

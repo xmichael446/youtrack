@@ -123,6 +123,7 @@ export default {
   "noAssignmentsTitle": "Topshiriqlar Yo'q",
   "noAssignmentsSubtitle": "Hozircha topshiriqlaringiz yo'q. Dam oling — yangi topshiriqlar tez orada bu yerda paydo bo'ladi!",
   "noNotifications": "Hozircha bildirishnomalar yo'q",
+  "noQuizYet": "Ushbu dars uchun hozircha test mavjud emas.",
   "noRewards": "Hozircha sovg'alar mavjud emas",
   "notifications": "Bildirishnomalar",
   "notificationsUnread": "Bildirishnomalar ({count} ta o'qilmagan)",
