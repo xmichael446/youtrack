@@ -835,6 +835,14 @@ const assignmentStatusDot = (status: string) => {
   return 'bg-gray-400';
 };
 
+const assignmentStatusBg = (status: string) => {
+  const s = status.toLowerCase();
+  if (s === 'approved') return 'bg-emerald-500/10';
+  if (s === 'rejected' || s === 'missed') return 'bg-red-500/10';
+  if (s === 'submitted' || s === 'pending' || s.includes('awaiting')) return 'bg-amber-500/10';
+  return 'bg-gray-500/10';
+};
+
 // --- Current Assignment Section ---
 const CurrentAssignmentSection: React.FC<{
   assignment: AssignmentData;
@@ -852,22 +860,22 @@ const CurrentAssignmentSection: React.FC<{
   const canSubmit = !isApproved && !isExpired;
 
   const statusBadge = isApproved ? (
-    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
       {t('assignmentApproved')}
     </span>
   ) : isExpired ? (
-    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400">
+    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-red-500/10 text-red-500 dark:text-red-400">
       <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></span>
       {t('assignmentExpired')}
     </span>
   ) : isOverdue ? (
-    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400">
+    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-orange-500/10 text-orange-600 dark:text-orange-400">
       <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0"></span>
       {t('assignmentOverdue')}
     </span>
   ) : latestSubmission ? (
-    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-500">
+    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-500">
       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
       {t('submitted')}
     </span>
@@ -882,7 +890,7 @@ const CurrentAssignmentSection: React.FC<{
     <div className="bg-white dark:bg-slate-900 rounded-[24px] border border-gray-100 dark:border-slate-800 overflow-hidden shadow-sm">
       <div className="p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/50">
         <h3 className="font-bold text-brand-dark dark:text-white flex items-center gap-2 text-sm md:text-base">
-          <ClipboardList className="w-5 h-5 text-brand-primary" />
+          <ClipboardList className="w-5 h-5 text-gray-400 dark:text-slate-500" />
           {t('lessonContent')}
         </h3>
         <div className="flex flex-wrap items-center gap-2 justify-end">
@@ -913,40 +921,42 @@ const CurrentAssignmentSection: React.FC<{
       <div className="p-4 md:p-6">
         {activeTab === 'assignment' ? (
           <div className="space-y-5 animate-in fade-in duration-300">
-            {/* Topic info block — full width, button below on mobile */}
-            <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-[14px] border border-gray-100 dark:border-slate-700">
-              <div className="flex items-start gap-3">
-                <FileText style={{width:'18px',height:'18px'}} className="text-brand-primary shrink-0 mt-1" />
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs font-bold text-brand-primary uppercase tracking-widest block leading-none mb-1">{t('activeTopic')}</span>
-                  <h4 className="text-sm font-bold text-brand-dark dark:text-white leading-snug mb-2">{assignment.lesson_topic}</h4>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <span className="flex items-center gap-1.5 text-xs text-gray-400">
-                      <Calendar className="w-3 h-3 shrink-0" />{new Date(assignment.start_datetime).toLocaleDateString()}
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs font-semibold text-red-500">
-                      <Clock className="w-3 h-3 shrink-0" />{t('due')} {new Date(assignment.deadline).toLocaleDateString()}, {new Date(assignment.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                </div>
+            {/* Topic info block */}
+            <div className="space-y-3">
+              <div>
+                <span className="section-label text-gray-400 dark:text-slate-500 block mb-1.5">{t('activeTopic')}</span>
+                <h4 className="text-sm font-semibold text-brand-dark dark:text-white leading-snug">{assignment.lesson_topic}</h4>
               </div>
+
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500">
+                  <Calendar className="w-3 h-3 shrink-0" />
+                  {new Date(assignment.start_datetime).toLocaleDateString()}
+                </span>
+                <span className={`flex items-center gap-1.5 text-xs font-medium ${isOverdue ? 'text-orange-500 dark:text-orange-400' : 'text-red-500 dark:text-red-400'}`}>
+                  <Clock className="w-3 h-3 shrink-0" />
+                  {t('due')} {new Date(assignment.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(assignment.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+
               {/* Overdue warning */}
               {isOverdue && !isExpired && (
-                <div className="mt-3 flex items-start gap-2.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-[10px] px-3.5 py-3">
+                <div className="flex items-start gap-2.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-xl px-3.5 py-3">
                   <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs font-bold text-orange-700 dark:text-orange-400 leading-snug">{t('lateSubmission')}</p>
+                    <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 leading-snug">{t('lateSubmission')}</p>
                     <p className="text-xs text-orange-600/80 dark:text-orange-400/70 mt-0.5">{t('lateSubmissionDesc')}</p>
                   </div>
                 </div>
               )}
+
               {canSubmit && (
                 <button
                   onClick={onSubmit}
-                  className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 font-bold text-sm rounded-[10px] transition-all active:scale-[0.99] ${
+                  className={`w-full flex items-center justify-center gap-2 py-2.5 font-semibold text-sm rounded-xl transition-all active:scale-[0.99] ${
                     isOverdue
-                      ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20 hover:shadow-md'
-                      : 'bg-brand-primary hover:bg-brand-primary/90 text-white shadow-brand-primary/20 hover:shadow-md'
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                      : 'bg-brand-primary hover:bg-brand-primary/90 text-white'
                   }`}
                 >
                   <UploadCloud className="w-4 h-4" />
@@ -958,8 +968,8 @@ const CurrentAssignmentSection: React.FC<{
             </div>
 
             <div>
-              <label className="section-label text-gray-400 flex items-center gap-2 mb-2">
-                <FileText className="w-4 h-4 text-brand-primary" />{t('homeworkDescription')}
+              <label className="section-label text-gray-400 dark:text-slate-500 flex items-center gap-2 mb-2">
+                <FileText className="w-3.5 h-3.5 text-gray-400 dark:text-slate-500" />{t('homeworkDescription')}
               </label>
               <blockquote className="border-l-2 border-gray-200 dark:border-slate-700 pl-3 text-sm md:text-sm text-gray-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">{assignment.description}</blockquote>
             </div>
@@ -978,15 +988,15 @@ const CurrentAssignmentSection: React.FC<{
 
             {assignment.submissions && assignment.submissions.length > 0 && (
               <div className="space-y-2">
-                <label className="section-label text-gray-400 flex items-center gap-2">
-                  <HistoryIcon className="w-4 h-4 text-brand-primary" />{t('submissionHistory')}
+                <label className="section-label text-gray-400 dark:text-slate-500 flex items-center gap-2">
+                  <HistoryIcon className="w-3.5 h-3.5 text-gray-400 dark:text-slate-500" />{t('submissionHistory')}
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {assignment.submissions.map((sub, idx) => (
                     <div key={idx} className="border border-gray-100 dark:border-slate-700 rounded-[12px] p-3 md:p-4 space-y-2.5">
                       <div className="flex justify-between items-center gap-3">
                         <span className="text-xs md:text-sm font-medium text-gray-500 dark:text-slate-400 shrink-0 tabular-nums">{new Date(sub.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-medium shrink-0 ${assignmentStatusColor(sub.status)}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium shrink-0 ${assignmentStatusColor(sub.status)} ${assignmentStatusBg(sub.status)}`}>
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${assignmentStatusDot(sub.status)}`}></span>
                           {humanizeStatus(sub.status)}
                         </span>
@@ -1055,7 +1065,7 @@ const AssignmentHistoryCard: React.FC<{
           <p className="text-xs font-medium text-gray-400 mt-0.5">{new Date(assignment.start_datetime).toLocaleDateString()}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${assignmentStatusColor(latestSubmission?.status || statusLabel)}`}>
+          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${assignmentStatusColor(latestSubmission?.status || statusLabel)} ${assignmentStatusBg(latestSubmission?.status || statusLabel)}`}>
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${assignmentStatusDot(latestSubmission?.status || statusLabel)}`}></span>
             {statusLabel}
           </span>
@@ -1224,15 +1234,15 @@ const ActiveAttendanceCard: React.FC<{
           </div>
           {/* Status chip */}
           {attendance.status === 'attended' || attendance.status === 'marked' ? (
-            <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase tracking-wide shadow-sm shadow-emerald-500/20">
-              <CheckCircle2 className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
               <span className="hidden sm:inline">{t('attended')}</span>
-            </div>
+            </span>
           ) : (attendance.status !== null || isExpired) ? (
-            <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-xl font-bold text-xs uppercase tracking-wide shadow-sm shadow-red-500/20">
-              <XCircle className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-red-500/10 text-red-500 dark:text-red-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></span>
               <span className="hidden sm:inline">{t('missed')}</span>
-            </div>
+            </span>
           ) : (
             /* Time remaining pill */
             <div className="shrink-0 flex items-center gap-1.5 bg-slate-900 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-700">

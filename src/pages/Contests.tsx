@@ -719,9 +719,8 @@ const ContestDetailView: React.FC<{
                       <div className="shrink-0">
                         <RankBadge rank={place} />
                       </div>
-                      <LeaderboardAvatar avatar={avatar} name={name} className="w-10 h-10" />
                       <div className="min-w-0">
-                        <span className={`text-sm font-bold truncate block leading-tight ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors`}>{name}</span>
+                        <span className={`text-sm font-bold block leading-tight ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors`}>{name}</span>
                         {rewardName && (
                           <span className="text-[10px] font-medium text-gray-500 dark:text-slate-400 block mt-0.5">{rewardName}</span>
                         )}
@@ -814,8 +813,7 @@ const ContestDetailView: React.FC<{
                             <td className="px-2 sm:px-4 py-3 text-center text-gray-400 dark:text-slate-500 font-mono text-xs sm:text-sm">{idx + 1}</td>
                             <td className="px-2 sm:px-4 py-3">
                               <div className="flex items-center gap-2 sm:gap-3">
-                                <LeaderboardAvatar avatar={avatar} name={name} />
-                                <span className={`font-semibold ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} truncate text-xs sm:text-sm group-hover:text-brand-primary transition-colors`}
+                                <span className={`font-semibold ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} text-xs sm:text-sm group-hover:text-brand-primary transition-colors`}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     if (isMe) navigateToProfile(null);
@@ -900,9 +898,8 @@ const ContestDetailView: React.FC<{
                             <td className="px-2 sm:px-4 py-3">
                               <div className="flex items-center justify-between gap-2 sm:gap-3">
                                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                                  <LeaderboardAvatar avatar={avatar} name={name} />
                                   <div className="flex items-center gap-1.5 min-w-0">
-                                    <span className={`font-semibold truncate text-xs sm:text-sm ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors cursor-pointer`}
+                                    <span className={`font-semibold text-xs sm:text-sm ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors cursor-pointer`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (isMe) navigateToProfile(null);
@@ -962,9 +959,8 @@ const ContestDetailView: React.FC<{
                             </td>
                             <td className="px-2 sm:px-4 py-3">
                               <div className="flex items-center gap-2 sm:gap-3">
-                                <LeaderboardAvatar avatar={(entry as any).avatar} name={name} />
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                    <span className={`font-semibold truncate text-xs sm:text-sm ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors cursor-pointer`}
+                                    <span className={`font-semibold text-xs sm:text-sm ${isMe ? 'text-brand-primary' : 'text-gray-900 dark:text-slate-100'} group-hover:text-brand-primary transition-colors cursor-pointer`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (isMe) navigateToProfile(null);
