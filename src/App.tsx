@@ -41,7 +41,7 @@ const NavItem = ({
           <div className="absolute -inset-2 bg-brand-primary/15 blur-lg rounded-full md:hidden"></div>
         )}
       </div>
-      <span className={`text-[9px] md:text-[12px] font-semibold mt-1 md:mt-0 md:ml-3.5 tracking-wide uppercase md:capitalize transition-all ${isActive ? 'text-brand-primary' : ''}`}>
+      <span className={`text-xs md:text-sm font-semibold mt-1 md:mt-0 md:ml-3.5 md:capitalize transition-all ${isActive ? 'text-brand-primary' : ''}`}>
         {label}
       </span>
     </button>
@@ -52,20 +52,18 @@ const SidebarProgress = () => {
   const { course } = useDashboard();
   const { t } = useLanguage();
   return (
-    <div className="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden group border border-white/5">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/20 rounded-full -mr-12 -mt-12 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-      <div className="absolute bottom-0 left-0 w-20 h-20 bg-brand-primary/10 rounded-full -ml-8 -mb-8 blur-xl"></div>
+    <div className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-5 text-white shadow-sm relative overflow-hidden group border border-white/5">
       <div className="relative z-10">
-        <p className="text-[9px] font-bold text-brand-primary uppercase tracking-[3px] mb-1.5">{t('overallProgress')}</p>
+        <p className="section-label text-brand-primary mb-1.5">{t('overallProgress')}</p>
         <p className="font-semibold text-base leading-tight mb-4 text-white/90">{course?.name || 'Loading...'}</p>
         <div className="flex items-center gap-3 mb-2">
           <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-brand-primary shadow-[0_0_8px_rgba(18,194,220,0.6)] transition-all duration-1000 rounded-full"
+              className="h-full bg-brand-primary transition-all duration-1000 rounded-full"
               style={{ width: `${course?.completion || 0}%` }}
             ></div>
           </div>
-          <span className="text-[11px] font-mono font-semibold text-white/60 tabular-nums">{course?.completion || 0}%</span>
+          <span className="text-xs font-semibold text-white/60 tabular-nums">{course?.completion || 0}%</span>
         </div>
       </div>
     </div>

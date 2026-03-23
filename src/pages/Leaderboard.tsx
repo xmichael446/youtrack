@@ -34,14 +34,14 @@ const LeaderboardContent: React.FC = () => {
       return (
         <div className="flex items-center gap-0.5 text-emerald-500">
           <ArrowUp className="w-2.5 h-2.5" />
-          <span className="text-[9px] font-bold font-mono tabular-nums">{lastRankVal - rank}</span>
+          <span className="text-xs font-medium tabular-nums">{lastRankVal - rank}</span>
         </div>
       );
     } else if (rank > lastRankVal) {
       return (
         <div className="flex items-center gap-0.5 text-red-500">
           <ArrowDown className="w-2.5 h-2.5" />
-          <span className="text-[9px] font-bold font-mono tabular-nums">{rank - lastRankVal}</span>
+          <span className="text-xs font-medium tabular-nums">{rank - lastRankVal}</span>
         </div>
       );
     } else {
@@ -60,17 +60,17 @@ const LeaderboardContent: React.FC = () => {
       );
       if (rank === 2) return (
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
-          <span className="text-sm font-bold font-mono text-slate-700 dark:text-slate-200">2</span>
+          <span className="text-sm font-bold tabular-nums text-slate-700 dark:text-slate-200">2</span>
         </div>
       );
       if (rank === 3) return (
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md shadow-orange-400/30 ring-2 ring-orange-400/30">
-          <span className="text-sm font-bold font-mono text-orange-900">3</span>
+          <span className="text-sm font-bold tabular-nums text-orange-900">3</span>
         </div>
       );
       return (
         <div className="w-10 h-10 flex items-center justify-center">
-          <span className="text-[13px] font-semibold text-gray-300 dark:text-slate-700 tabular-nums font-mono">#{rank.toString().padStart(2, '0')}</span>
+          <span className="text-sm font-semibold text-gray-300 dark:text-slate-700 tabular-nums">#{rank.toString().padStart(2, '0')}</span>
         </div>
       );
     })();
@@ -110,7 +110,7 @@ const LeaderboardContent: React.FC = () => {
           {t('leaderboard')}
         </h1>
         <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
-          Top {activeLeaderboard.length > 0 ? activeLeaderboard.length : 20} &middot; {t('competePeers').split(',')[0]}
+          {t('topN', { count: activeLeaderboard.length > 0 ? activeLeaderboard.length : 20 })} &middot; {t('attendToEarnSpot')}
         </p>
       </div>
 
@@ -122,7 +122,7 @@ const LeaderboardContent: React.FC = () => {
             aria-selected={activeTab === 'group'}
             aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('group')}
-            className={`flex-1 h-12 rounded-xl font-semibold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono flex items-center justify-center gap-2
+            className={`flex-1 h-12 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2
               ${activeTab === 'group'
                 ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
@@ -135,7 +135,7 @@ const LeaderboardContent: React.FC = () => {
             aria-selected={activeTab === 'course'}
             aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('course')}
-            className={`flex-1 h-12 rounded-xl font-semibold text-[11px] uppercase tracking-wider transition-all duration-300 font-mono flex items-center justify-center gap-2
+            className={`flex-1 h-12 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2
               ${activeTab === 'course'
                 ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
@@ -153,13 +153,13 @@ const LeaderboardContent: React.FC = () => {
         <div className="hidden sm:grid px-6 py-3 border-b border-gray-100 dark:border-slate-800/70 bg-gray-50/80 dark:bg-slate-800/40"
           style={{ gridTemplateColumns: '3.5rem 1fr 5rem 7rem' }}
         >
-          <div className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('rank')}</div>
-          <div className="ml-5 text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('student')}</div>
-          <div className="text-center text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-center gap-1">
+          <div className="section-label">{t('rank')}</div>
+          <div className="ml-5 section-label">{t('student')}</div>
+          <div className="text-center flex items-center justify-center gap-1 section-label">
             <Flame className="w-3 h-3 text-amber-400" />
             <span>{t('streak')}</span>
           </div>
-          <div className="text-right text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('points')}</div>
+          <div className="text-right section-label">{t('points')}</div>
         </div>
 
         <div className="divide-y divide-gray-50 dark:divide-slate-800/50">
@@ -210,11 +210,11 @@ const LeaderboardContent: React.FC = () => {
                   {/* Student Info */}
                   <div className="min-w-0 ml-5">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-[14px] font-semibold text-brand-dark dark:text-white truncate leading-tight">
+                      <p className="text-sm font-semibold text-brand-dark dark:text-white truncate leading-tight">
                         {entry.full_name}
                       </p>
                       {isCurrentUser && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
                           {t('youLabel')}
                         </span>
                       )}
@@ -224,7 +224,7 @@ const LeaderboardContent: React.FC = () => {
                   {/* Streak column */}
                   <div className="flex items-center justify-center">
                     {entry.streak > 0 ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
                         🔥 {entry.streak}
                       </span>
                     ) : (
@@ -234,7 +234,7 @@ const LeaderboardContent: React.FC = () => {
 
                   {/* Points */}
                   <div className="flex items-center justify-end gap-2">
-                    <span className="text-lg font-semibold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">
+                    <span className="text-lg font-bold text-brand-dark dark:text-white tabular-nums">
                       {entry.total_points.toLocaleString()}
                     </span>
                     <div className="w-5 h-5 rounded-md bg-brand-primary/10 flex items-center justify-center shrink-0">
@@ -257,14 +257,14 @@ const LeaderboardContent: React.FC = () => {
                         {entry.full_name}
                       </p>
                       {isCurrentUser && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
                           {t('youLabel')}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                       {entry.streak > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
                           🔥 {entry.streak} {t('days')}
                         </span>
                       )}
@@ -273,7 +273,7 @@ const LeaderboardContent: React.FC = () => {
 
                   {/* Points */}
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-base font-semibold text-brand-dark dark:text-white tabular-nums tracking-tight font-mono">
+                    <span className="text-base font-bold text-brand-dark dark:text-white tabular-nums">
                       {entry.total_points.toLocaleString()}
                     </span>
                     <div className="w-5 h-5 rounded-md bg-brand-primary/10 flex items-center justify-center">
@@ -287,11 +287,9 @@ const LeaderboardContent: React.FC = () => {
 
           {activeLeaderboard.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
-              <div className="w-16 h-16 rounded-3xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
-                <Trophy className="w-7 h-7 text-gray-300 dark:text-slate-600" />
-              </div>
-              <p className="text-sm font-bold text-gray-400 dark:text-slate-500">{t('noRankings')}</p>
-              <p className="text-[11px] text-gray-300 dark:text-slate-600 font-mono">{t('attendToEarnSpot')}</p>
+              <Trophy className="w-10 h-10 text-gray-300 dark:text-slate-600 mb-2" />
+              <p className="text-sm font-medium text-gray-400 dark:text-slate-500">{t('noRankings')}</p>
+              <p className="text-xs text-gray-300 dark:text-slate-600">{t('attendToEarnSpot')}</p>
             </div>
           )}
         </div>

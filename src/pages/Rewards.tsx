@@ -94,10 +94,10 @@ const RewardsContent: React.FC = () => {
       {/* Page Header */}
       <div className="px-1">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
-          <Gift className="w-6 h-6 text-amber-400 shrink-0" />
+          <Gift className="w-6 h-6 text-gray-400 dark:text-slate-500 shrink-0" />
           {t('rewardsShop')}
         </h1>
-        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+        <p className="text-sm font-normal text-gray-500 dark:text-slate-400 mt-1">
           {t('exchangeCoins')}
         </p>
       </div>
@@ -146,14 +146,14 @@ const RewardsContent: React.FC = () => {
 
                   {reward.claimed && (
                     <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl font-mono">
+                      <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-xs font-medium inline-flex items-center gap-2 shadow-xl">
                         <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('claimed')}
                       </div>
                     </div>
                   )}
 
                   {!affordable && !reward.claimed && (
-                    <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[9px] font-mono font-bold tracking-wide flex items-center gap-1">
+                    <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                       <Coins className="w-2.5 h-2.5" /> {t('needMore').replace('{count}', String(needed))}
                     </div>
                   )}
@@ -162,8 +162,8 @@ const RewardsContent: React.FC = () => {
                 {/* Content */}
                 <div className="p-5 md:p-6 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="font-semibold text-brand-dark dark:text-white text-lg leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
-                    <span className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold font-mono border
+                    <h3 className="text-sm font-semibold text-brand-dark dark:text-white leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                    <span className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tabular-nums border
                       ${affordable || reward.claimed
                         ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
                         : 'bg-gray-50 dark:bg-slate-800 text-gray-400 border-gray-200 dark:border-slate-700'}`}>
@@ -173,7 +173,7 @@ const RewardsContent: React.FC = () => {
                   </div>
 
                   {reward.description && (
-                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-5 leading-relaxed italic">
+                    <p className="text-xs font-normal text-gray-500 dark:text-slate-400 mb-5 leading-relaxed italic">
                       "{reward.description}"
                     </p>
                   )}
@@ -182,7 +182,7 @@ const RewardsContent: React.FC = () => {
                     <button
                       disabled={(reward.claimed ? false : !affordable) || isProcessing}
                       onClick={() => handleClaim(reward)}
-                      className={`w-full py-3.5 rounded-2xl font-semibold text-[11px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95
                         ${reward.claimed
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : affordable
@@ -248,7 +248,7 @@ const RewardsContent: React.FC = () => {
 
                   {!isUnlocked && (
                     <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-black/60 text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 font-mono">
+                      <div className="bg-black/60 text-white px-4 py-2 rounded-full text-xs font-medium inline-flex items-center gap-2">
                         <Lock className="w-3.5 h-3.5" /> {t('levelRequired').replace('{level}', String(reward.required_level.number))}
                       </div>
                     </div>
@@ -256,7 +256,7 @@ const RewardsContent: React.FC = () => {
 
                   {isGranted && (
                     <div className="absolute inset-0 bg-emerald-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl font-mono">
+                      <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-xs font-medium inline-flex items-center gap-2 shadow-xl">
                         <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('granted')}
                       </div>
                     </div>
@@ -266,9 +266,9 @@ const RewardsContent: React.FC = () => {
                 {/* Content */}
                 <div className="p-5 md:p-6 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="font-semibold text-brand-dark dark:text-white text-lg leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                    <h3 className="text-sm font-semibold text-brand-dark dark:text-white leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
                     <span
-                      className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold font-mono border"
+                      className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tabular-nums border"
                       style={{
                         backgroundColor: `${levelColor}12`,
                         color: levelColor,
@@ -280,7 +280,7 @@ const RewardsContent: React.FC = () => {
                   </div>
 
                   {reward.description && (
-                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-5 leading-relaxed italic">
+                    <p className="text-xs font-normal text-gray-500 dark:text-slate-400 mb-5 leading-relaxed italic">
                       "{reward.description}"
                     </p>
                   )}
@@ -289,7 +289,7 @@ const RewardsContent: React.FC = () => {
                     <button
                       disabled={(!isUnlocked && !isGranted) || isProcessing}
                       onClick={() => handleClaimLevel(reward)}
-                      className={`w-full py-3.5 rounded-2xl font-semibold text-[11px] font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95
                         ${isGranted
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : isUnlocked
@@ -325,8 +325,8 @@ const RewardsContent: React.FC = () => {
             <History className="w-[18px] h-[18px] text-amber-500" />
           </div>
           <div>
-            <h2 className="text-[12px] font-mono font-semibold text-brand-dark dark:text-white uppercase tracking-[2px]">{t('coinsHistory')}</h2>
-            <p className="text-[11px] font-medium text-gray-500 dark:text-slate-400">{t('trackingEarnings')}</p>
+            <h2 className="section-label">{t('coinsHistory')}</h2>
+            <p className="text-xs font-normal text-gray-500 dark:text-slate-400">{t('trackingEarnings')}</p>
           </div>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">

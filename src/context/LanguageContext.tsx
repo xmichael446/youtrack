@@ -5,7 +5,7 @@ import { UZ_TRANSLATIONS, EN_TRANSLATIONS } from '../constants/translations/inde
 interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
-    t: (key: string) => string;
+    t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -20,9 +20,17 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         localStorage.setItem('language', language);
     }, [language]);
 
-    const t = (key: string): string => {
+    const t = (key: string, params?: Record<string, string | number>): string => {
         const translations = language === 'uz' ? UZ_TRANSLATIONS : EN_TRANSLATIONS;
-        return translations[key] || key;
+        let text = (translations as any)[key] || key;
+        
+        if (params) {
+            Object.entries(params).forEach(([k, v]) => {
+                text = text.split(`{${k}}`).join(String(v));
+            });
+        }
+        
+        return text;
     };
 
     return (

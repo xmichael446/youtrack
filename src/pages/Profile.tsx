@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, Edit3, Settings, Camera, TrendingUp, TrendingDown,
   Lock, ChevronDown, Coins, Zap, Flame, CheckCircle, XCircle, AlertCircle,
@@ -28,11 +28,6 @@ function getInitials(name: string) {
 function getAvatarBg(id: number) {
   return `hsl(${(id * 137) % 360}, 60%, 50%)`;
 }
-function getProgressColor(pct: number) {
-  if (pct >= 80) return '#22c55e';
-  if (pct >= 50) return '#f59e0b';
-  return '#ef4444';
-}
 function formatRelative(dateStr: string | null, t: (k: string) => string) {
   if (!dateStr) return '—';
   const date = new Date(dateStr);
@@ -46,7 +41,7 @@ function formatRelative(dateStr: string | null, t: (k: string) => string) {
   if (m < 60)  return t('mAgo').replace('{m}', String(m));
   if (h < 24)  return t('hAgo').replace('{h}', String(h));
   if (d < 30)  return t('dAgo').replace('{d}', String(d));
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return date.toLocaleDateString(navigator.language, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 function buildHeatmapGrid(entries: HeatmapEntry[]) {
   const countMap = new Map(entries.map(e => [e.date, e.count]));
@@ -74,34 +69,20 @@ function buildHeatmapGrid(entries: HeatmapEntry[]) {
   }
   return cells;
 }
-function heatmapColor(count: number) {
-  if (count === 0) return null;
-  if (count <= 2)  return '#bbf7d0';
-  if (count <= 4)  return '#4ade80';
-  return '#16a34a';
+function heatmapColorClass(count: number) {
+  if (count === 0) return 'bg-gray-100 dark:bg-slate-800';
+  if (count <= 2)  return 'bg-green-200 dark:bg-green-900/70';
+  if (count <= 4)  return 'bg-green-400 dark:bg-green-600';
+  return 'bg-green-600 dark:bg-green-500';
 }
 
 // ---------------------------------------------------------------------------
 // Small reusable UI
 // ---------------------------------------------------------------------------
 
-const CircularRing: React.FC<{ pct: number; color: string; size?: number }> = ({ pct, color, size = 72 }) => {
-  const r = (size - 8) / 2;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - (Math.min(pct, 100) / 100) * circ;
-  return (
-    <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={5} fill="none"
-        className="stroke-gray-100 dark:stroke-slate-800" />
-      <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={5} fill="none"
-        stroke={color} strokeDasharray={circ} strokeDashoffset={offset}
-        strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
-    </svg>
-  );
-};
-
 const Toast: React.FC<{ message: string; type: 'success' | 'error' }> = ({ message, type }) => (
-  <div className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-white text-sm font-medium font-mono animate-in fade-in duration-300
+  <div role={type === 'error' ? 'alert' : 'status'} aria-live={type === 'error' ? 'assertive' : 'polite'}
+    className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-white text-sm font-medium animate-in fade-in duration-300
     ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}>
     {type === 'success' ? <CheckCircle className="w-4 h-4 shrink-0" /> : <XCircle className="w-4 h-4 shrink-0" />}
     {message}
@@ -131,18 +112,18 @@ const ProfileHero: React.FC<{
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <button onClick={navigateBack}
-          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary dark:hover:text-brand-primary transition-colors text-[12px] font-bold font-mono uppercase tracking-wide">
+          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary dark:hover:text-brand-primary transition-colors text-xs font-medium">
           <ArrowLeft className="w-4 h-4" />
           {t('back')}
         </button>
         {profile.is_own_profile && (
           <div className="flex items-center gap-2">
-            <button onClick={onSettings}
-              className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:text-brand-primary dark:hover:text-brand-primary transition-colors">
+            <button onClick={onSettings} aria-label={t('settings')}
+              className="min-w-[44px] min-h-[44px] rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:text-brand-primary dark:hover:text-brand-primary transition-colors">
               <Settings className="w-4 h-4" />
             </button>
             <button onClick={onEdit}
-              className="flex items-center gap-1.5 px-3 h-8 rounded-xl bg-brand-primary/10 text-brand-primary text-[11px] font-bold font-mono uppercase tracking-wide hover:bg-brand-primary/20 transition-colors">
+              className="flex items-center gap-1.5 px-3 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-xs font-medium hover:bg-brand-primary/20 transition-colors">
               <Edit3 className="w-3.5 h-3.5" />
               {t('editProfile')}
             </button>
@@ -163,7 +144,7 @@ const ProfileHero: React.FC<{
             </div>
           )}
           {profile.rank > 0 && (
-            <div className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-lg bg-brand-primary text-white text-[10px] font-bold font-mono shadow-md">
+            <div className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-lg bg-brand-primary text-white text-xs font-bold tabular-nums shadow-md">
               #{profile.rank}
             </div>
           )}
@@ -173,7 +154,7 @@ const ProfileHero: React.FC<{
           <h2 className="text-xl font-bold text-brand-dark dark:text-white tracking-tight leading-tight">
             {profile.full_name}
           </h2>
-          <p className="text-[12px] text-gray-500 dark:text-slate-400 font-medium mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-slate-400 font-medium mt-0.5">
             {profile.group_name} &middot; {profile.course_name}
           </p>
           
@@ -182,16 +163,16 @@ const ProfileHero: React.FC<{
             {profile.streak > 0 && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
                 <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
-                <span className="text-[11px] font-bold font-mono text-amber-600 dark:text-amber-400 tabular-nums">{t('streakDays').replace('{count}', String(profile.streak))}</span>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 tabular-nums">{t('streakDays').replace('{count}', String(profile.streak))}</span>
               </div>
             )}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
               <Coins className="w-3.5 h-3.5 text-amber-500" />
-              <span className="text-[11px] font-bold font-mono text-amber-600 dark:text-amber-400 tabular-nums">{stats.balance ?? 0}</span>
+              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 tabular-nums">{stats.balance ?? 0}</span>
             </div>
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-brand-primary/10 border border-brand-primary/20 shadow-sm">
               <Zap className="w-3.5 h-3.5 text-brand-primary fill-brand-primary/20" />
-              <span className="text-[11px] font-bold font-mono text-brand-primary tabular-nums">{stats.total_points} XP</span>
+              <span className="text-xs font-bold text-brand-primary tabular-nums">{stats.total_points} XP</span>
             </div>
           </div>
         </div>
@@ -201,14 +182,14 @@ const ProfileHero: React.FC<{
       <div className="px-5 pb-4 flex items-center gap-6 divide-x divide-gray-100 dark:divide-slate-800">
         {hasAttendance && (
           <div className="flex flex-col">
-            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('attendance')}</span>
-            <span className="text-sm font-bold text-brand-dark dark:text-white font-mono tabular-nums">{Math.round(stats.attendance_pct!)}%</span>
+            <span className="text-xs font-medium text-gray-400 dark:text-slate-500">{t('attendance')}</span>
+            <span className="text-sm font-bold text-brand-dark dark:text-white tabular-nums">{Math.round(stats.attendance_pct!)}%</span>
           </div>
         )}
         {hasAttendance && (
           <div className="flex flex-col pl-6">
-            <span className="text-[9px] font-bold font-mono text-gray-400 dark:text-slate-500 uppercase tracking-widest">{t('assignments')}</span>
-            <span className="text-sm font-bold text-brand-dark dark:text-white font-mono tabular-nums">{Math.round(stats.assignment_pct ?? 0)}%</span>
+            <span className="text-xs font-medium text-gray-400 dark:text-slate-500">{t('assignments')}</span>
+            <span className="text-sm font-bold text-brand-dark dark:text-white tabular-nums">{Math.round(stats.assignment_pct ?? 0)}%</span>
           </div>
         )}
       </div>
@@ -231,10 +212,10 @@ const ProfileHero: React.FC<{
                   {isGold ? <Trophy className="w-4 h-4" /> : <Medal className="w-4 h-4" />}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] font-bold text-brand-dark dark:text-white leading-tight truncate max-w-[120px]">
+                  <p className="text-xs font-medium text-brand-dark dark:text-white leading-tight truncate max-w-[120px]">
                     {badge.reward_name}
                   </p>
-                  <p className="text-[9px] text-gray-400 dark:text-slate-500 font-medium font-mono">
+                  <p className="text-xs text-gray-400 dark:text-slate-500 font-normal">
                     #{badge.place} &middot; {badge.contest_name}
                   </p>
                 </div>
@@ -247,14 +228,14 @@ const ProfileHero: React.FC<{
       {/* Bio */}
       <div className="px-5 pb-4">
         {profile.bio ? (
-          <p className="text-[13px] text-gray-600 dark:text-slate-300 leading-relaxed">{profile.bio}</p>
+          <p className="text-sm font-normal text-gray-600 dark:text-slate-300 leading-relaxed">{profile.bio}</p>
         ) : profile.is_own_profile ? (
           <button onClick={onEdit}
-            className="text-[12px] text-brand-primary/70 italic hover:text-brand-primary transition-colors">
+            className="text-xs text-brand-primary/70 italic hover:text-brand-primary transition-colors">
             {t('bioPlaceholder')}
           </button>
         ) : (
-          <p className="text-[12px] text-gray-400 dark:text-slate-500 italic">{t('noBioPeer')}</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 italic">{t('noBioPeer')}</p>
         )}
       </div>
 
@@ -265,11 +246,11 @@ const ProfileHero: React.FC<{
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className="text-base leading-none">{level.icon}</span>
-                <span className="text-[13px] font-bold text-brand-dark dark:text-white font-mono">
+                <span className="text-sm font-bold text-brand-dark dark:text-white">
                   {t('level')} {level.number} &middot; {level.name}
                 </span>
               </div>
-              <span className="text-[11px] font-mono text-gray-400 dark:text-slate-500">
+              <span className="text-xs text-gray-400 dark:text-slate-500">
                 {level.xp_next ? t('levelNextLabel').replace('{n}', String(level.number + 1)) : t('maxLevel')}
               </span>
             </div>
@@ -278,15 +259,15 @@ const ProfileHero: React.FC<{
                 style={{ width: `${level.progress_percent}%`, backgroundColor: level.badge_color }} />
             </div>
             <div className="flex justify-between mt-1.5">
-              <span className="text-[10px] font-mono text-gray-400 dark:text-slate-500">{level.xp_current} XP</span>
-              <span className="text-[10px] font-mono text-gray-400 dark:text-slate-500">
+              <span className="text-xs text-gray-400 dark:text-slate-500">{level.xp_current} XP</span>
+              <span className="text-xs text-gray-400 dark:text-slate-500">
                 {level.xp_next ? `${level.xp_next} XP` : '—'}
               </span>
             </div>
           </>
         ) : (
           <>
-            <p className="text-[11px] text-gray-400 dark:text-slate-500 font-mono italic mb-2">{t('noLevel')}</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 italic mb-2">{t('noLevel')}</p>
             <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full" />
           </>
         )}
@@ -318,10 +299,10 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500">
+        <p className="section-label">
           {t('achievements')}
         </p>
-        <span className="text-[10px] font-mono text-gray-400 dark:text-slate-500">
+        <span className="text-xs text-gray-400 dark:text-slate-500">
           {earnedCount}/{achievements.length}
         </span>
       </div>
@@ -345,6 +326,9 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
               )}
               <button
                 onClick={() => setSelected(isSelected ? null : def.key)}
+                aria-expanded={isSelected}
+                aria-controls={`badge-detail-${def.key}`}
+                aria-label={`${def.name} — ${def.rarity}`}
                 className="shrink-0 w-[88px] flex flex-col items-center p-2.5 rounded-xl transition-all duration-200 text-left relative"
                 style={{
                   border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : 'transparent'}`,
@@ -355,15 +339,15 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                 }}
               >
                 <span className="text-2xl leading-none mt-0.5 mb-1.5">{def.icon}</span>
-                <p className="text-[10px] font-bold text-center leading-tight text-gray-700 dark:text-slate-200 line-clamp-2 w-full flex-1">
+                <p className="text-xs font-medium text-center leading-tight text-gray-700 dark:text-slate-200 line-clamp-2 w-full flex-1">
                   {def.name}
                 </p>
-                <span className="mt-auto text-[7px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full leading-none"
+                <span className="mt-auto text-xs font-medium px-1.5 py-0.5 rounded-full leading-none"
                   style={{ backgroundColor: `${borderColor}20`, color: borderColor }}>
                   {def.rarity}
                 </span>
                 {earned ? (
-                  <p className="text-[8px] font-mono text-brand-primary leading-none mt-1">
+                  <p className="text-xs text-brand-primary leading-none mt-1">
                     ✓ {formatRelative(def.earned_at, t)}
                   </p>
                 ) : (
@@ -379,7 +363,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
 
       {/* Inline detail panel — shown when a badge is selected */}
       {selectedDef && (
-        <div className="mt-3 p-3.5 rounded-xl border animate-in fade-in duration-200"
+        <div id={`badge-detail-${selectedDef.key}`} className="mt-3 p-3.5 rounded-xl border animate-in fade-in duration-200"
           style={{
             borderColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}40`,
             backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}08`,
@@ -390,10 +374,10 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
             </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <p className="text-[13px] font-bold text-brand-dark dark:text-white">
+                <p className="text-sm font-semibold text-brand-dark dark:text-white">
                   {selectedDef.name}
                 </p>
-                <span className="text-[8px] font-bold uppercase font-mono px-1.5 py-0.5 rounded-full"
+                <span className="text-xs font-medium px-1.5 py-0.5 rounded-full"
                   style={{
                     backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}25`,
                     color: RARITY_COLORS[selectedDef.rarity] || '#9ca3af',
@@ -401,15 +385,15 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                   {selectedDef.rarity}
                 </span>
               </div>
-              <p className="text-[12px] text-gray-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">
                 {selectedDef.description}
               </p>
               {selectedDef.earned_at ? (
-                <p className="text-[10px] text-brand-primary font-mono mt-1.5 font-bold">
+                <p className="text-xs text-brand-primary font-medium mt-1.5">
                   ✓ {t('earned')} {formatRelative(selectedDef.earned_at, t)}
                 </p>
               ) : (
-                <p className="text-[10px] text-gray-400 dark:text-slate-500 font-mono mt-1.5">
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">
                   🔒 {t('notYetEarned')}
                 </p>
               )}
@@ -428,33 +412,34 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
 const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => {
   const { t } = useLanguage();
   const [tooltip, setTooltip] = useState<number | null>(null);
-  const grid = buildHeatmapGrid(entries);
+  const grid = useMemo(() => buildHeatmapGrid(entries), [entries]);
   const firstDate = new Date(grid[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const lastDate  = new Date(grid[grid.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
-      <p className="text-[11px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-3">
+      <p className="section-label mb-3">
         {t('activityHeatmap')}
       </p>
       <div className="flex gap-1 flex-wrap">
         {grid.map((cell, i) => {
-          const bg = heatmapColor(cell.count);
+          const colorCls = heatmapColorClass(cell.count);
+          const ariaLabel = cell.count > 0
+            ? t('heatmapActivities').replace('{count}', String(cell.count)) + ` — ${cell.date}`
+            : t('heatmapNoActivity') + ` — ${cell.date}`;
           return (
             <div key={cell.date} className="relative">
               <button
+                aria-label={ariaLabel}
                 className="w-6 h-6 rounded-md transition-transform hover:scale-110"
                 onMouseEnter={() => setTooltip(i)}
                 onMouseLeave={() => setTooltip(null)}
                 onClick={() => setTooltip(tooltip === i ? null : i)}
               >
-                <div
-                  className={`w-full h-full rounded-md ${bg ? '' : 'bg-gray-100 dark:bg-slate-800'}`}
-                  style={bg ? { backgroundColor: bg } : undefined}
-                />
+                <div className={`w-full h-full rounded-md ${colorCls}`} />
               </button>
               {tooltip === i && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 whitespace-nowrap bg-slate-900 dark:bg-slate-950 text-white text-[10px] font-mono rounded-lg px-2.5 py-1.5 shadow-lg border border-slate-700 pointer-events-none">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 whitespace-nowrap bg-slate-900 dark:bg-slate-950 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg border border-slate-700 pointer-events-none">
                   {cell.count > 0 ? t('heatmapActivities').replace('{count}', String(cell.count)) : t('heatmapNoActivity')}
                   <div className="text-slate-400">{cell.date}</div>
                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-[5px] border-x-transparent border-t-[5px] border-t-slate-900 dark:border-t-slate-950" />
@@ -465,8 +450,8 @@ const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => 
         })}
       </div>
       <div className="flex justify-between mt-2">
-        <span className="text-[9px] font-mono text-gray-300 dark:text-slate-600">{firstDate}</span>
-        <span className="text-[9px] font-mono text-gray-300 dark:text-slate-600">{lastDate}</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">{firstDate}</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">{lastDate}</span>
       </div>
     </div>
   );
@@ -487,7 +472,7 @@ const ActivityFeed: React.FC<{
   if (entries.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 shadow-sm text-center">
-        <p className="text-[12px] text-gray-400 dark:text-slate-500 font-mono leading-relaxed">{t('noActivity')}</p>
+        <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('noActivity')}</p>
       </div>
     );
   }
@@ -495,7 +480,7 @@ const ActivityFeed: React.FC<{
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
       <div className="px-5 py-3.5 border-b border-gray-50 dark:border-slate-800/70">
-        <p className="text-[11px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500">
+        <p className="section-label">
           {t('activityFeed')}
         </p>
       </div>
@@ -509,15 +494,15 @@ const ActivityFeed: React.FC<{
                 : <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium text-brand-dark dark:text-white truncate">{entry.reason}</p>
-              <p className="text-[10px] font-mono text-gray-400 dark:text-slate-500">{formatRelative(entry.datetime, t)}</p>
+              <p className="text-sm font-medium text-brand-dark dark:text-white truncate">{entry.reason}</p>
+              <p className="text-xs font-normal text-gray-400 dark:text-slate-500">{formatRelative(entry.datetime, t)}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className={`text-[12px] font-bold font-mono tabular-nums ${entry.negative ? 'text-red-500' : 'text-emerald-500'}`}>
+              <p className={`text-sm font-bold tabular-nums ${entry.negative ? 'text-red-500' : 'text-emerald-500'}`}>
                 {entry.negative ? '-' : '+'}{entry.xp} XP
               </p>
               {entry.coins !== 0 && (
-                <p className={`text-[10px] font-mono tabular-nums ${entry.negative ? 'text-red-400' : 'text-amber-500'}`}>
+                <p className={`text-xs tabular-nums ${entry.negative ? 'text-red-400' : 'text-amber-500'}`}>
                   {entry.negative ? '-' : '+'}{entry.coins} coins
                 </p>
               )}
@@ -528,7 +513,7 @@ const ActivityFeed: React.FC<{
       {hasMore && (
         <div className="px-5 py-3 border-t border-gray-50 dark:border-slate-800/70">
           <button onClick={onLoadMore} disabled={loadingMore}
-            className="w-full h-9 rounded-xl bg-gray-50 dark:bg-slate-800 text-[11px] font-bold font-mono uppercase tracking-wider text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full h-9 rounded-xl bg-gray-50 dark:bg-slate-800 text-xs font-medium text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loadingMore
               ? <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
               : <ChevronDown className="w-3.5 h-3.5" />}
@@ -558,7 +543,12 @@ const ProfileEdit: React.FC<{
   const [preview, setPreview] = useState<string | null>(profile.avatar ? `${baseUrl}${profile.avatar}` : null);
   const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const id = enrollmentId ?? 0;
+
+  useEffect(() => {
+    return () => { if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current); };
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -566,14 +556,17 @@ const ProfileEdit: React.FC<{
     if (file.size > 2 * 1024 * 1024) { setFileError(t('avatarTooBig')); return; }
     setFileError(null);
     setAvatar(file);
-    setPreview(URL.createObjectURL(file));
+    if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    const url = URL.createObjectURL(file);
+    objectUrlRef.current = url;
+    setPreview(url);
   };
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
         <button onClick={onBack}
-          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary transition-colors text-[12px] font-bold font-mono uppercase tracking-wide">
+          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary transition-colors text-xs font-medium">
           <ArrowLeft className="w-4 h-4" />
           {t('back')}
         </button>
@@ -584,7 +577,7 @@ const ProfileEdit: React.FC<{
         className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm p-5 space-y-5">
         {/* Avatar */}
         <div className="flex flex-col items-center gap-3">
-          <div className="relative cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
+          <button type="button" aria-label={t('uploadPhoto')} className="relative cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
             {preview ? (
               <img src={preview} alt="avatar" className="w-24 h-24 rounded-2xl object-cover ring-2 ring-gray-100 dark:ring-slate-700" />
             ) : (
@@ -596,13 +589,13 @@ const ProfileEdit: React.FC<{
             <div className="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="w-6 h-6 text-white" />
             </div>
-          </div>
+          </button>
           <button type="button" onClick={() => fileInputRef.current?.click()}
-            className="text-[12px] text-brand-primary font-bold font-mono uppercase tracking-wide hover:text-brand-primary/80 transition-colors">
+            className="text-xs text-brand-primary font-medium hover:text-brand-primary/80 transition-colors">
             {t('uploadPhoto')}
           </button>
           {fileError && (
-            <div className="flex items-center gap-1.5 text-red-500 text-[11px] font-mono">
+            <div className="flex items-center gap-1.5 text-red-500 text-xs">
               <AlertCircle className="w-3.5 h-3.5" />{fileError}
             </div>
           )}
@@ -611,14 +604,14 @@ const ProfileEdit: React.FC<{
 
         {/* Bio */}
         <div>
-          <label className="block text-[11px] font-bold font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500 mb-2">{t('bio')}</label>
+          <label className="block section-label mb-2">{t('bio')}</label>
           <textarea value={bio} onChange={e => setBio(e.target.value.slice(0, 280))} placeholder={t('bioPlaceholder')} rows={4}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-[14px] text-brand-dark dark:text-white placeholder-gray-300 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary resize-none font-sans transition-all" />
-          <p className="text-right text-[10px] font-mono text-gray-300 dark:text-slate-600 mt-1">{bio.length} / 280</p>
+            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-normal text-brand-dark dark:text-white placeholder-gray-300 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary resize-none font-sans transition-all" />
+          <p className="text-right text-xs text-gray-300 dark:text-slate-600 mt-1">{bio.length} / 280</p>
         </div>
 
         <button type="submit" disabled={saving}
-          className="w-full h-12 rounded-xl bg-brand-primary text-white font-bold text-[13px] uppercase tracking-wider font-mono hover:bg-brand-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20">
+          className="w-full h-12 rounded-xl bg-brand-primary text-white font-bold text-sm hover:bg-brand-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20">
           {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
           {t('saveChanges')}
         </button>
@@ -626,6 +619,35 @@ const ProfileEdit: React.FC<{
     </div>
   );
 };
+
+// ---------------------------------------------------------------------------
+// ToggleRow (module-level for PrivacySettings)
+// ---------------------------------------------------------------------------
+
+const ToggleRow: React.FC<{
+  label: string;
+  desc: string;
+  checked: boolean;
+  disabled: boolean;
+  onToggle: () => void;
+}> = ({ label, desc, checked, disabled, onToggle }) => (
+  <div className="flex items-start justify-between gap-4 py-4 border-b border-gray-50 dark:border-slate-800/70 last:border-0">
+    <div className="flex-1">
+      <p className="text-sm font-medium text-brand-dark dark:text-white">{label}</p>
+      <p className="text-xs font-normal text-gray-400 dark:text-slate-500 mt-0.5 leading-relaxed">{desc}</p>
+    </div>
+    <button
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={onToggle}
+      disabled={disabled}
+      className={`relative w-11 h-6 rounded-full transition-colors duration-300 shrink-0 mt-0.5 disabled:opacity-60 ${checked ? 'bg-brand-primary' : 'bg-gray-200 dark:bg-slate-700'}`}
+    >
+      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+    </button>
+  </div>
+);
 
 // ---------------------------------------------------------------------------
 // PrivacySettings sub-view
@@ -654,35 +676,27 @@ const PrivacySettings: React.FC<{
     }
   };
 
-  const ToggleRow: React.FC<{ field: 'hide_balance' | 'hide_activity'; label: string; desc: string }> = ({ field, label, desc }) => {
-    const checked = localPrivacy[field];
-    return (
-      <div className="flex items-start justify-between gap-4 py-4 border-b border-gray-50 dark:border-slate-800/70 last:border-0">
-        <div className="flex-1">
-          <p className="text-[14px] font-medium text-brand-dark dark:text-white">{label}</p>
-          <p className="text-[12px] text-gray-400 dark:text-slate-500 mt-0.5 leading-relaxed">{desc}</p>
-        </div>
-        <button onClick={() => handleToggle(field)} disabled={pending !== null}
-          className={`relative w-11 h-6 rounded-full transition-colors duration-300 shrink-0 mt-0.5 disabled:opacity-60 ${checked ? 'bg-brand-primary' : 'bg-gray-200 dark:bg-slate-700'}`}>
-          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
-        </button>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
         <button onClick={onBack}
-          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary transition-colors text-[12px] font-bold font-mono uppercase tracking-wide">
+          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary transition-colors text-xs font-medium">
           <ArrowLeft className="w-4 h-4" />
           {t('back')}
         </button>
         <h2 className="text-lg font-bold text-brand-dark dark:text-white">{t('privacySettings')}</h2>
       </div>
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm px-5">
-        <ToggleRow field="hide_balance" label={t('hideBalance')} desc={t('hideBalanceDesc')} />
-        <ToggleRow field="hide_activity" label={t('hideActivity')} desc={t('hideActivityDesc')} />
+        <ToggleRow
+          label={t('hideBalance')} desc={t('hideBalanceDesc')}
+          checked={localPrivacy.hide_balance} disabled={pending !== null}
+          onToggle={() => handleToggle('hide_balance')}
+        />
+        <ToggleRow
+          label={t('hideActivity')} desc={t('hideActivityDesc')}
+          checked={localPrivacy.hide_activity} disabled={pending !== null}
+          onToggle={() => handleToggle('hide_activity')}
+        />
       </div>
     </div>
   );
@@ -708,10 +722,16 @@ const Profile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<'notFound' | 'general' | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (toastTimerRef.current) clearTimeout(toastTimerRef.current); };
+  }, []);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    toastTimerRef.current = setTimeout(() => setToast(null), 3000);
   };
 
   const loadProfile = async () => {
@@ -786,19 +806,17 @@ const Profile: React.FC = () => {
   if (error || !profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4 text-center">
-        <div className="w-16 h-16 rounded-3xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
-          <AlertCircle className="w-7 h-7 text-gray-400 dark:text-slate-500" />
-        </div>
+        <AlertCircle className="w-10 h-10 text-gray-400 dark:text-slate-500" />
         <div>
           <p className="text-base font-bold text-brand-dark dark:text-white">
             {error === 'notFound' ? t('studentNotFound') : t('somethingWentWrong')}
           </p>
-          <p className="text-[12px] text-gray-400 dark:text-slate-500 font-mono mt-1">
+          <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
             {error === 'notFound' ? t('studentNotFoundDesc') : t('somethingWentWrongDesc')}
           </p>
         </div>
         <button onClick={loadProfile}
-          className="px-4 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-[11px] font-bold font-mono uppercase tracking-wide hover:bg-brand-primary/20 transition-colors">
+          className="px-4 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-xs font-medium hover:bg-brand-primary/20 transition-colors">
           {t('tryAgain')}
         </button>
       </div>
