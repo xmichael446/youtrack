@@ -172,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
           {/* Stats cluster */}
           <div className="flex items-center gap-1.5 md:gap-2">
             {/* Streak chip */}
-            <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 rounded-xl px-2.5 py-1.5 shrink-0">
+            <div className="hidden md:flex items-center gap-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 rounded-xl px-2.5 py-1.5 shrink-0">
               <Flame className={`w-3.5 h-3.5 shrink-0 ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-500' : 'text-gray-300 dark:text-slate-600'}`} />
               <span className={`font-semibold text-sm tabular-nums leading-none ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-slate-500'}`}>
                 {enrollment?.streak ?? 0}d
@@ -180,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
             </div>
 
             {/* Level + XP chip */}
-            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-800/70 border border-gray-100 dark:border-slate-700/50 rounded-xl px-2.5 py-1.5 shrink-0">
+            <div className="hidden md:flex items-center gap-1.5 bg-gray-50 dark:bg-slate-800/70 border border-gray-100 dark:border-slate-700/50 rounded-xl px-2.5 py-1.5 shrink-0">
               {enrollment?.level ? (
                 <span className="w-[18px] h-[18px] rounded-md flex items-center justify-center text-xs shrink-0 leading-none"
                   style={{ backgroundColor: `${enrollment.level.badge_color}22` }}>

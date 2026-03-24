@@ -854,10 +854,9 @@ const CurrentAssignmentSection: React.FC<{
 
   const latestSubmission = assignment.submissions?.[0] ?? null;
   const isApproved = latestSubmission?.status?.toLowerCase() === 'approved';
-  const isExpired = assignment.is_expired === true;
-  const isOverdue = assignment.is_overdue === true;
-  // Can still submit if: not approved AND the absolute deadline (deadline + 24h) hasn't passed
-  const canSubmit = !isApproved && !isExpired;
+  const isExpired = assignment.submission_window === 'closed';
+  const isOverdue = assignment.submission_window === 'late';
+  const canSubmit = assignment.can_submit && !isApproved;
 
   const statusBadge = isApproved ? (
     <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
@@ -940,7 +939,7 @@ const CurrentAssignmentSection: React.FC<{
               </div>
 
               {/* Overdue warning */}
-              {isOverdue && !isExpired && (
+              {canSubmit && isOverdue && !isExpired && (
                 <div className="flex items-start gap-2.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-xl px-3.5 py-3">
                   <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                   <div>
@@ -1037,12 +1036,16 @@ const AssignmentHistoryCard: React.FC<{
   isExpanded: boolean;
   onExpand: () => void;
   showToast: (message: string, type: 'success' | 'error') => void;
-}> = ({ assignment, isExpanded, onExpand, showToast }) => {
+  onSubmit?: () => void;
+}> = ({ assignment, isExpanded, onExpand, showToast, onSubmit }) => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'assignment' | 'quiz'>('assignment');
 
   const latestSubmission = assignment.submissions?.[0] ?? null;
-  const isPastDeadline = new Date(assignment.deadline).getTime() < Date.now();
+  const isApproved = latestSubmission?.status?.toLowerCase() === 'approved';
+  const isPastDeadline = assignment.submission_window === 'closed';
+  const isOverdue = assignment.submission_window === 'late';
+  const canSubmit = assignment.can_submit && !isApproved;
 
   let statusLabel = t('pending');
   if (latestSubmission) statusLabel = humanizeStatus(latestSubmission.status);
@@ -1097,6 +1100,41 @@ const AssignmentHistoryCard: React.FC<{
           <div className="p-4 md:p-5">
             {activeTab === 'assignment' ? (
               <div className="space-y-4 animate-in fade-in duration-300">
+                {canSubmit && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
+                    <span className={`flex items-center gap-1.5 text-xs font-medium ${isOverdue ? 'text-orange-500 dark:text-orange-400' : 'text-red-500 dark:text-red-400'}`}>
+                      <Clock className="w-3 h-3 shrink-0" />
+                      {t('due')} {new Date(assignment.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(assignment.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                )}
+
+                {canSubmit && isOverdue && !isPastDeadline && (
+                  <div className="flex items-start gap-2.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-xl px-3.5 py-3">
+                    <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 leading-snug">{t('lateSubmission')}</p>
+                      <p className="text-xs text-orange-600/80 dark:text-orange-400/70 mt-0.5">{t('lateSubmissionDesc')}</p>
+                    </div>
+                  </div>
+                )}
+
+                {canSubmit && onSubmit && (
+                  <button
+                    onClick={onSubmit}
+                    className={`w-full flex items-center justify-center gap-2 py-2.5 font-semibold text-sm rounded-xl transition-all active:scale-[0.99] ${
+                      isOverdue
+                        ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                        : 'bg-brand-primary hover:bg-brand-primary/90 text-white'
+                    }`}
+                  >
+                    <UploadCloud className="w-4 h-4" />
+                    {isOverdue
+                      ? (latestSubmission ? t('resubmitLate') : t('submitLate'))
+                      : (latestSubmission ? t('resubmit') : t('startSubmission'))}
+                  </button>
+                )}
+
                 <div>
                   <label className="section-label text-gray-400 flex items-center gap-2 mb-2">
                     <FileText className="w-4 h-4 text-brand-primary" />{t('homeworkDescription')}
@@ -1297,7 +1335,7 @@ const LessonsContent: React.FC = () => {
   const { t } = useLanguage();
   const { lessonsData, loading, error, submitAssignment } = useLessons();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submittingAssignment, setSubmittingAssignment] = useState<AssignmentData | null>(null);
   const [expandedRowIds, setExpandedRowIds] = useState<number[]>([]);
 
   const toggleRow = (id: number) => {
@@ -1372,7 +1410,7 @@ const LessonsContent: React.FC = () => {
             {showCurrentAssignment && (
               <CurrentAssignmentSection
                 assignment={currentAssignment}
-                onSubmit={() => setIsModalOpen(true)}
+                onSubmit={() => setSubmittingAssignment(currentAssignment)}
                 showToast={showToast}
               />
             )}
@@ -1390,6 +1428,7 @@ const LessonsContent: React.FC = () => {
                     isExpanded={expandedRowIds.includes(prev.id)}
                     onExpand={() => toggleRow(prev.id)}
                     showToast={showToast}
+                    onSubmit={() => setSubmittingAssignment(prev)}
                   />
                 ))}
               </div>
@@ -1403,12 +1442,12 @@ const LessonsContent: React.FC = () => {
         )}
       </section>
 
-      {showCurrentAssignment && (
+      {submittingAssignment && (
         <SubmissionModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          assignment={currentAssignment}
-          onSubmit={submitAssignment}
+          isOpen={true}
+          onClose={() => setSubmittingAssignment(null)}
+          assignment={submittingAssignment}
+          onSubmit={(data) => submitAssignment(data, submittingAssignment.id)}
           showToast={showToast}
         />
       )}

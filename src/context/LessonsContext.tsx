@@ -19,7 +19,7 @@ interface LessonsContextType {
     error: string | null;
     fetchLessons: () => Promise<void>;
     markAttendance: (keyword: string) => Promise<MarkAttendanceResponse>;
-    submitAssignment: (data: Omit<HomeworkSubmissionData, 'assignment_id' | 'student_code'>) => Promise<void>;
+    submitAssignment: (data: Omit<HomeworkSubmissionData, 'assignment_id' | 'student_code'>, assignmentId?: number) => Promise<void>;
     getQuizQuestions: (sessionId: number) => Promise<QuizQuestionsResponse>;
     getQuizReview: (attemptId: number) => Promise<QuizReviewResponse>;
     submitQuiz: (data: QuizSubmission) => Promise<QuizSubmitResponse>;
@@ -80,14 +80,16 @@ export const LessonsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    const submitAssignment = async (data: Omit<HomeworkSubmissionData, 'assignment_id'>) => {
-        if (!lessonsData?.assignments?.current) {
+    const submitAssignment = async (data: Omit<HomeworkSubmissionData, 'assignment_id'>, assignmentId?: number) => {
+        const idToSubmit = assignmentId || lessonsData?.assignments?.current?.id;
+        
+        if (!idToSubmit) {
             throw new Error("Missing assignment data");
         }
 
         try {
             await apiService.submitHomework({
-                assignment_id: lessonsData.assignments.current.id,
+                assignment_id: idToSubmit,
                 ...data
             });
 

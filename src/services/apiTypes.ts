@@ -174,6 +174,8 @@ export interface AssignmentData {
     submissions: any[];
     is_expired: boolean;
     is_overdue: boolean;
+    can_submit: boolean;
+    submission_window: 'normal' | 'late' | 'closed';
     attachments?: { type: 'link' | 'file'; name: string; link?: string; url?: string; size?: number }[];
     quiz?: QuizSessionData | null;
 }
