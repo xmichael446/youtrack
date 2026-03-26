@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { ViewState } from './types';
 import { useRouter } from './router/useRouter';
+import type { RouteParams } from './router/routes';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
@@ -71,17 +72,24 @@ const SidebarProgress = () => {
 };
 
 const App: React.FC = () => {
-  const { view: currentView, navigate } = useRouter('dashboard');
+  const { view: currentView, params, navigate } = useRouter('dashboard');
   const [previousView, setPreviousView] = useState<ViewState>('leaderboard');
-  const [profileEnrollmentId, setProfileEnrollmentId] = useState<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('isLogged') === 'true';
   });
 
+  // Derive profileEnrollmentId from route params for deep-link support
+  const profileEnrollmentId = currentView === 'profile' && params.id
+    ? Number(params.id)
+    : null;
+
   const navigateToProfile = useCallback((enrollmentId: number | null) => {
     setPreviousView(currentView);
-    setProfileEnrollmentId(enrollmentId);
-    navigate('profile');
+    if (enrollmentId !== null) {
+      navigate('profile', { id: String(enrollmentId) });
+    } else {
+      navigate('profile');
+    }
   }, [currentView, navigate]);
 
   const navigateBack = useCallback(() => {
@@ -152,13 +160,12 @@ const App: React.FC = () => {
     return <Login onLogin={handleLogin} isDark={isDark} toggleTheme={toggleTheme} />;
   }
 
-  const navigateTo = (view: ViewState) => {
-    setProfileEnrollmentId(null);
-    navigate(view);
+  const navigateTo = (view: ViewState, routeParams: RouteParams = {}) => {
+    navigate(view, routeParams);
   };
 
   return (
-    <NavigationContext.Provider value={{ profileEnrollmentId, navigateToProfile, navigateBack, navigateTo }}>
+    <NavigationContext.Provider value={{ params, profileEnrollmentId, navigateToProfile, navigateBack, navigateTo }}>
       <DashboardProvider>
         <NotificationProvider>
           <AppContent
@@ -176,7 +183,7 @@ const App: React.FC = () => {
 
 const AppContent: React.FC<{
   currentView: ViewState;
-  navigateTo: (view: ViewState) => void;
+  navigateTo: (view: ViewState, params?: RouteParams) => void;
   isDark: boolean;
   toggleTheme: () => void;
   handleLogout: () => void;
