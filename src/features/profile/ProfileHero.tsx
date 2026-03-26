@@ -15,7 +15,7 @@ const ProfileHero: React.FC<{
   onSettings: () => void;
 }> = ({ profile, enrollmentId, onEdit, onSettings }) => {
   const { t } = useLanguage();
-  const { navigateBack } = useNavigation();
+  const { goBack } = useNavigation();
   const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
   const avatarUrl = profile.avatar ? `${baseUrl}${profile.avatar}` : null;
   const id = enrollmentId ?? 0;
@@ -26,7 +26,7 @@ const ProfileHero: React.FC<{
     <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
-        <button onClick={navigateBack}
+        <button onClick={() => goBack('dashboard')}
           className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary dark:hover:text-brand-primary transition-colors text-xs font-medium">
           <ArrowLeft className="w-4 h-4" />
           {t('back')}

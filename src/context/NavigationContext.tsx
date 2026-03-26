@@ -6,7 +6,7 @@ interface NavigationContextType {
   params: RouteParams;
   profileEnrollmentId: number | null;
   navigateToProfile: (enrollmentId: number | null) => void;
-  navigateBack: () => void;
+  goBack: (fallbackView?: ViewState, fallbackParams?: RouteParams) => void;
   navigateTo: (view: ViewState, params?: RouteParams) => void;
 }
 
@@ -14,7 +14,7 @@ export const NavigationContext = createContext<NavigationContextType>({
   params: {},
   profileEnrollmentId: null,
   navigateToProfile: () => {},
-  navigateBack: () => {},
+  goBack: () => {},
   navigateTo: () => {},
 });
 

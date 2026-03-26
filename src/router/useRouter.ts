@@ -16,7 +16,10 @@ export function useRouter(defaultView: ViewState = 'dashboard') {
     const match = viewFromUrl();
     return match ?? { view: defaultView, params: {} };
   });
-  const skipPopState = useRef(false);
+
+  // Track how many pushState entries we own so goBack knows
+  // whether history.back() will stay inside the app.
+  const depth = useRef(0);
 
   const navigate = useCallback(
     (nextView: ViewState, params: RouteParams = {}, replace = false) => {
@@ -24,23 +27,32 @@ export function useRouter(defaultView: ViewState = 'dashboard') {
       const path = buildPath(nextView, params);
       if (path === null) return;
 
-      skipPopState.current = true;
       const historyState = { view: nextView, params };
       if (replace) {
         window.history.replaceState(historyState, '', path);
       } else {
+        depth.current++;
         window.history.pushState(historyState, '', path);
       }
     },
     [],
   );
 
+  const goBack = useCallback(
+    (fallbackView: ViewState = 'dashboard', fallbackParams: RouteParams = {}) => {
+      if (depth.current > 0) {
+        depth.current--;
+        window.history.back();
+      } else {
+        // No app history to pop (deep-linked) — navigate to fallback
+        navigate(fallbackView, fallbackParams, true);
+      }
+    },
+    [navigate],
+  );
+
   useEffect(() => {
     const onPopState = (e: PopStateEvent) => {
-      if (skipPopState.current) {
-        skipPopState.current = false;
-        return;
-      }
       const histState = e.state as { view?: ViewState; params?: RouteParams } | null;
       if (histState?.view) {
         setState({ view: histState.view, params: histState.params ?? {} });
@@ -62,5 +74,5 @@ export function useRouter(defaultView: ViewState = 'dashboard') {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return { view: state.view, params: state.params, navigate } as const;
+  return { view: state.view, params: state.params, navigate, goBack } as const;
 }

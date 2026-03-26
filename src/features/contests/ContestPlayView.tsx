@@ -10,6 +10,7 @@ import {
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useContests } from '../../context/ContestContext';
+import { useNavigation } from '../../context/NavigationContext';
 import LoadingScreen from '../../components/LoadingScreen';
 import Toast from '../../components/ui/Toast';
 import BackButton from '../../components/ui/BackButton';
@@ -24,6 +25,7 @@ const ContestPlayView: React.FC<{
   onNavigate: (nav: ContestNav) => void;
 }> = ({ contestId, onNavigate }) => {
   const { t } = useLanguage();
+  const { goBack } = useNavigation();
   const { startContest, submitContest } = useContests();
 
   const [playState, setPlayState] = useState<ContestPlayState | null>(null);
@@ -154,7 +156,7 @@ const ContestPlayView: React.FC<{
 
   if (error === 'already_started') return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      <BackButton label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
+      <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
       <div className="flex flex-col items-center gap-4 py-20 text-center">
         <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
           <Clock className="w-6 h-6 text-brand-primary" />
@@ -164,7 +166,7 @@ const ContestPlayView: React.FC<{
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-xs">Your answers are saved. Results will be available once the contest is finalized.</p>
         </div>
         <button
-          onClick={() => onNavigate({ view: 'detail', contestId })}
+          onClick={() => goBack('contests')}
           className="px-5 py-2.5 rounded-xl text-sm font-bold font-mono text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 transition-colors"
         >
           Back to Contest
@@ -175,7 +177,7 @@ const ContestPlayView: React.FC<{
 
   if (error) return (
     <div className="space-y-4">
-      <BackButton label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
+      <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
       <div className="flex flex-col items-center gap-4 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
         <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <AlertCircle className="w-5 h-5 text-red-400" />
@@ -297,7 +299,7 @@ const ContestPlayView: React.FC<{
       <div className={`flex items-center gap-3 p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6 transition-all duration-500 ${ts.ring}`}>
         {/* Close / back */}
         <button
-          onClick={() => onNavigate({ view: 'detail', contestId })}
+          onClick={() => goBack('contests')}
           className="p-2 -ml-2 text-gray-400 hover:text-brand-primary transition-colors shrink-0"
           aria-label="Exit contest"
         >

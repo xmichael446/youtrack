@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
+import { useNavigation } from '../../context/NavigationContext';
 import type { ContestNav } from './contestTypes';
 
 const ContestReviewView: React.FC<{
@@ -16,6 +17,7 @@ const ContestReviewView: React.FC<{
   contestId: number;
 }> = ({ answers, onNavigate, contestId }) => {
   const { t } = useLanguage();
+  const { goBack } = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (!answers || answers.length === 0) return null;
@@ -30,7 +32,7 @@ const ContestReviewView: React.FC<{
           <div className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
             {currentIndex + 1} / {answers.length}
           </div>
-          <button onClick={() => onNavigate({ view: 'detail', contestId })} className="p-2 -ml-2 text-gray-400 hover:text-brand-primary transition-colors">
+          <button onClick={() => goBack('contests', { id: String(contestId) })} className="p-2 -ml-2 text-gray-400 hover:text-brand-primary transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -91,7 +93,7 @@ const ContestReviewView: React.FC<{
           </button>
 
           {currentIndex === answers.length - 1 ? (
-            <button onClick={() => onNavigate({ view: 'detail', contestId })} className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
+            <button onClick={() => goBack('contests', { id: String(contestId) })} className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
               {t('backToOverview')}
             </button>
           ) : (

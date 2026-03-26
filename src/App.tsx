@@ -72,8 +72,7 @@ const SidebarProgress = () => {
 };
 
 const App: React.FC = () => {
-  const { view: currentView, params, navigate } = useRouter('dashboard');
-  const [previousView, setPreviousView] = useState<ViewState>('leaderboard');
+  const { view: currentView, params, navigate, goBack } = useRouter('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('isLogged') === 'true';
   });
@@ -84,17 +83,12 @@ const App: React.FC = () => {
     : null;
 
   const navigateToProfile = useCallback((enrollmentId: number | null) => {
-    setPreviousView(currentView);
     if (enrollmentId !== null) {
       navigate('profile', { id: String(enrollmentId) });
     } else {
       navigate('profile');
     }
-  }, [currentView, navigate]);
-
-  const navigateBack = useCallback(() => {
-    navigate(previousView);
-  }, [previousView, navigate]);
+  }, [navigate]);
 
   const [isDark, setIsDark] = useState(() => {
     return document.documentElement.classList.contains('dark');
@@ -165,7 +159,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <NavigationContext.Provider value={{ params, profileEnrollmentId, navigateToProfile, navigateBack, navigateTo }}>
+    <NavigationContext.Provider value={{ params, profileEnrollmentId, navigateToProfile, goBack, navigateTo }}>
       <DashboardProvider>
         <NotificationProvider>
           <AppContent

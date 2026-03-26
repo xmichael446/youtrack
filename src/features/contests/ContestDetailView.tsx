@@ -39,7 +39,7 @@ const ContestDetailView: React.FC<{
 }> = ({ contestId, onNavigate }) => {
   const { t } = useLanguage();
   const { user } = useDashboard();
-  const { navigateToProfile } = useNavigation();
+  const { navigateToProfile, goBack } = useNavigation();
   const { getContestDetail, registerForContest, getContestResults, getContestLeaderboard } = useContests();
   const [detail, setDetail] = useState<ContestDetailData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -126,7 +126,7 @@ const ContestDetailView: React.FC<{
 
   if (error || !detail) return (
     <div className="space-y-4 animate-in fade-in duration-500">
-      <BackButton label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
+      <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
       <div className="flex flex-col items-center gap-3 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
         <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <AlertCircle className="w-5 h-5 text-red-400" />
@@ -140,7 +140,7 @@ const ContestDetailView: React.FC<{
     <div className="space-y-5 animate-in fade-in duration-500">
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
-      <BackButton label={t('contestBackToList')} onClick={() => onNavigate({ view: 'list', contestId: null })} />
+      <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
 
       {/* Header card -- light theme consistent with lesson cards */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-sm">
