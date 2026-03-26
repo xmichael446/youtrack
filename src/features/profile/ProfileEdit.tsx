@@ -1,0 +1,99 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, Camera, AlertCircle } from 'lucide-react';
+
+import { useLanguage } from '../../context/LanguageContext';
+import type { ProfileData } from '../../services/apiTypes';
+import { getInitials, getAvatarBg } from './profileHelpers';
+
+const ProfileEdit: React.FC<{
+  profile: ProfileData;
+  enrollmentId: number | null;
+  onSave: (bio: string, avatar?: File) => Promise<void>;
+  onBack: () => void;
+  saving: boolean;
+}> = ({ profile, enrollmentId, onSave, onBack, saving }) => {
+  const { t } = useLanguage();
+  const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
+  const [bio, setBio] = useState(profile.bio ?? '');
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(profile.avatar ? `${baseUrl}${profile.avatar}` : null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
+  const id = enrollmentId ?? 0;
+
+  useEffect(() => {
+    return () => { if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current); };
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { setFileError(t('avatarTooBig')); return; }
+    setFileError(null);
+    setAvatar(file);
+    if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    const url = URL.createObjectURL(file);
+    objectUrlRef.current = url;
+    setPreview(url);
+  };
+
+  return (
+    <div className="space-y-5 animate-in fade-in duration-300">
+      <div className="flex items-center gap-3">
+        <button onClick={onBack}
+          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary transition-colors text-xs font-medium">
+          <ArrowLeft className="w-4 h-4" />
+          {t('back')}
+        </button>
+        <h2 className="text-lg font-bold text-brand-dark dark:text-white">{t('editProfile')}</h2>
+      </div>
+
+      <form onSubmit={async e => { e.preventDefault(); await onSave(bio, avatar ?? undefined); }}
+        className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm p-5 space-y-5">
+        {/* Avatar */}
+        <div className="flex flex-col items-center gap-3">
+          <button type="button" aria-label={t('uploadPhoto')} className="relative cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
+            {preview ? (
+              <img src={preview} alt="avatar" className="w-24 h-24 rounded-2xl object-cover ring-2 ring-gray-100 dark:ring-slate-700" />
+            ) : (
+              <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-white text-2xl font-bold ring-2 ring-gray-100 dark:ring-slate-700"
+                style={{ backgroundColor: getAvatarBg(id) }}>
+                {getInitials(profile.full_name)}
+              </div>
+            )}
+            <div className="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Camera className="w-6 h-6 text-white" />
+            </div>
+          </button>
+          <button type="button" onClick={() => fileInputRef.current?.click()}
+            className="text-xs text-brand-primary font-medium hover:text-brand-primary/80 transition-colors">
+            {t('uploadPhoto')}
+          </button>
+          {fileError && (
+            <div className="flex items-center gap-1.5 text-red-500 text-xs">
+              <AlertCircle className="w-3.5 h-3.5" />{fileError}
+            </div>
+          )}
+          <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileChange} />
+        </div>
+
+        {/* Bio */}
+        <div>
+          <label className="block section-label mb-2">{t('bio')}</label>
+          <textarea value={bio} onChange={e => setBio(e.target.value.slice(0, 280))} placeholder={t('bioPlaceholder')} rows={4}
+            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-normal text-brand-dark dark:text-white placeholder-gray-300 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary resize-none font-sans transition-all" />
+          <p className="text-right text-xs text-gray-300 dark:text-slate-600 mt-1">{bio.length} / 280</p>
+        </div>
+
+        <button type="submit" disabled={saving}
+          className="w-full h-12 rounded-xl bg-brand-primary text-white font-bold text-sm hover:bg-brand-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20">
+          {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+          {t('saveChanges')}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default ProfileEdit;

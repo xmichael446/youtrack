@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ViewState } from './types';
+import { useRouter } from './router/useRouter';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
@@ -9,7 +10,6 @@ import Profile from './pages/Profile';
 import { Contests } from './pages/Contests';
 import Login from './pages/Login';
 import Footer from './components/Footer';
-import LoadingScreen from './components/LoadingScreen';
 import { LayoutDashboard, Trophy, BookOpen, Gift, Swords } from 'lucide-react';
 import { useLanguage } from './context/LanguageContext';
 import { DashboardProvider, useDashboard } from './context/DashboardContext';
@@ -71,22 +71,22 @@ const SidebarProgress = () => {
 };
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<ViewState>('dashboard');
+  const { view: currentView, navigate } = useRouter('dashboard');
   const [previousView, setPreviousView] = useState<ViewState>('leaderboard');
   const [profileEnrollmentId, setProfileEnrollmentId] = useState<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('isLogged') === 'true';
   });
 
-  const navigateToProfile = (enrollmentId: number | null) => {
+  const navigateToProfile = useCallback((enrollmentId: number | null) => {
     setPreviousView(currentView);
     setProfileEnrollmentId(enrollmentId);
-    setCurrentView('profile');
-  };
+    navigate('profile');
+  }, [currentView, navigate]);
 
-  const navigateBack = () => {
-    setCurrentView(previousView);
-  };
+  const navigateBack = useCallback(() => {
+    navigate(previousView);
+  }, [previousView, navigate]);
 
   const [isDark, setIsDark] = useState(() => {
     return document.documentElement.classList.contains('dark');
@@ -153,8 +153,8 @@ const App: React.FC = () => {
   }
 
   const navigateTo = (view: ViewState) => {
-    setCurrentView(view);
     setProfileEnrollmentId(null);
+    navigate(view);
   };
 
   return (
@@ -163,7 +163,7 @@ const App: React.FC = () => {
         <NotificationProvider>
           <AppContent
             currentView={currentView}
-            setCurrentView={setCurrentView}
+            navigateTo={navigateTo}
             isDark={isDark}
             toggleTheme={toggleTheme}
             handleLogout={handleLogout}
@@ -176,11 +176,11 @@ const App: React.FC = () => {
 
 const AppContent: React.FC<{
   currentView: ViewState;
-  setCurrentView: (view: ViewState) => void;
+  navigateTo: (view: ViewState) => void;
   isDark: boolean;
   toggleTheme: () => void;
   handleLogout: () => void;
-}> = ({ currentView, setCurrentView, isDark, toggleTheme, handleLogout }) => {
+}> = ({ currentView, navigateTo, isDark, toggleTheme, handleLogout }) => {
   const { t } = useLanguage();
   const { user } = useDashboard();
   const mainRef = React.useRef<HTMLDivElement>(null);
@@ -239,11 +239,11 @@ const AppContent: React.FC<{
 
           {/* Nav Items */}
           <nav className="flex-1 space-y-1">
-            <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={setCurrentView} />
-            <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={setCurrentView} />
-            <NavItem view="lessons" icon={BookOpen} label={t('lessons')} currentView={currentView} onNavigate={setCurrentView} />
-            <NavItem view="contests" icon={Swords} label={t('contests')} currentView={currentView} onNavigate={setCurrentView} />
-            <NavItem view="rewards" icon={Gift} label={t('giftShop')} currentView={currentView} onNavigate={setCurrentView} />
+            <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={navigateTo} />
+            <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={navigateTo} />
+            <NavItem view="lessons" icon={BookOpen} label={t('lessons')} currentView={currentView} onNavigate={navigateTo} />
+            <NavItem view="contests" icon={Swords} label={t('contests')} currentView={currentView} onNavigate={navigateTo} />
+            <NavItem view="rewards" icon={Gift} label={t('giftShop')} currentView={currentView} onNavigate={navigateTo} />
           </nav>
 
           {/* Sidebar Footer */}
@@ -272,11 +272,11 @@ const AppContent: React.FC<{
           {/* Bottom Nav (Mobile) */}
           <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-gray-100 dark:border-slate-800 pt-2.5 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-300">
             <div className="flex justify-around items-center px-1">
-              <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={setCurrentView} />
-              <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={setCurrentView} />
-              <NavItem view="lessons" icon={BookOpen} label={t('lessons')} currentView={currentView} onNavigate={setCurrentView} />
-              <NavItem view="contests" icon={Swords} label={t('contests')} currentView={currentView} onNavigate={setCurrentView} />
-              <NavItem view="rewards" icon={Gift} label={t('giftShop')} currentView={currentView} onNavigate={setCurrentView} />
+              <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={navigateTo} />
+              <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={navigateTo} />
+              <NavItem view="lessons" icon={BookOpen} label={t('lessons')} currentView={currentView} onNavigate={navigateTo} />
+              <NavItem view="contests" icon={Swords} label={t('contests')} currentView={currentView} onNavigate={navigateTo} />
+              <NavItem view="rewards" icon={Gift} label={t('giftShop')} currentView={currentView} onNavigate={navigateTo} />
             </div>
           </nav>
         </div>
