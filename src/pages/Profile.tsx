@@ -133,17 +133,17 @@ const Profile: React.FC = () => {
   if (error || !profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4 text-center">
-        <AlertCircle className="w-10 h-10 text-gray-400 dark:text-slate-500" />
+        <AlertCircle className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted" />
         <div>
-          <p className="text-base font-bold text-brand-dark dark:text-white">
+          <p className="text-h4 text-brand-dark dark:text-text-theme-dark-primary">
             {error === 'notFound' ? t('studentNotFound') : t('somethingWentWrong')}
           </p>
-          <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
+          <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1">
             {error === 'notFound' ? t('studentNotFoundDesc') : t('somethingWentWrongDesc')}
           </p>
         </div>
         <button onClick={loadProfile}
-          className="px-4 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-xs font-medium hover:bg-brand-primary/20 transition-colors">
+          className="px-4 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-caption hover:bg-brand-primary/20 transition-colors">
           {t('tryAgain')}
         </button>
       </div>

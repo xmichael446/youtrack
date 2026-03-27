@@ -45,7 +45,7 @@ const LeaderboardContent: React.FC = () => {
         </div>
       );
     } else {
-      return <Minus className="w-2.5 h-2.5 text-gray-300 dark:text-slate-600" />;
+      return <Minus className="w-2.5 h-2.5 text-surface-secondary dark:text-surface-dark-elevated" />;
     }
   };
 
@@ -60,7 +60,7 @@ const LeaderboardContent: React.FC = () => {
       );
       if (rank === 2) return (
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
-          <span className="text-sm font-bold tabular-nums text-slate-700 dark:text-slate-200">2</span>
+          <span className="text-body tabular-nums text-slate-700 dark:text-text-theme-dark-primary">2</span>
         </div>
       );
       if (rank === 3) return (
@@ -70,12 +70,12 @@ const LeaderboardContent: React.FC = () => {
       );
       return (
         <div className="w-10 h-10 flex items-center justify-center">
-          <span className="text-sm font-semibold text-gray-300 dark:text-slate-700 tabular-nums">#{rank.toString().padStart(2, '0')}</span>
+          <span className="text-body text-surface-secondary dark:text-surface-dark-elevated tabular-nums">#{rank.toString().padStart(2, '0')}</span>
         </div>
       );
     })();
     return (
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         {badge}
         {change}
       </div>
@@ -87,15 +87,15 @@ const LeaderboardContent: React.FC = () => {
       return 'bg-brand-primary/5 dark:bg-brand-primary/8';
     }
     if (rank === 1) return 'bg-amber-50/50 dark:bg-amber-500/5';
-    if (rank === 2) return 'bg-slate-50/50 dark:bg-slate-700/5';
+    if (rank === 2) return 'bg-surface-secondary/50 dark:bg-surface-dark-elevated/5';
     if (rank === 3) return 'bg-orange-50/50 dark:bg-orange-500/5';
-    return 'hover:bg-gray-50/60 dark:hover:bg-slate-800/30';
+    return 'hover:bg-surface-secondary/60 dark:hover:bg-surface-dark-elevated/30';
   };
 
   const getPodiumBorderColor = (rank: number, isCurrentUser: boolean) => {
     if (isCurrentUser) return 'bg-brand-primary';
     if (rank === 1) return 'bg-amber-400';
-    if (rank === 2) return 'bg-slate-400';
+    if (rank === 2) return 'bg-slate-400'; // intentional metallic silver accent
     if (rank === 3) return 'bg-orange-400';
     return '';
   };
@@ -105,27 +105,27 @@ const LeaderboardContent: React.FC = () => {
 
       {/* Header */}
       <div className="px-1">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
+        <h1 className="text-h1 tracking-tight text-brand-dark dark:text-text-theme-dark-primary flex items-center gap-2">
           <Trophy className="w-6 h-6 text-amber-400 fill-amber-400/20 shrink-0" />
           {t('leaderboard')}
         </h1>
-        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+        <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1">
           {t('topN', { count: activeLeaderboard.length > 0 ? activeLeaderboard.length : 20 })} &middot; {t('attendToEarnSpot')}
         </p>
       </div>
 
       {/* Tab Switcher */}
       <div className="max-w-sm mx-auto w-full">
-        <div role="tablist" aria-label={t('leaderboard')} className="bg-gray-100 dark:bg-slate-800/80 p-1 rounded-2xl flex border border-gray-200/50 dark:border-slate-700/50 shadow-inner">
+        <div role="tablist" aria-label={t('leaderboard')} className="bg-surface-secondary dark:bg-surface-dark-elevated/80 p-1 rounded-2xl flex border border-surface-secondary/50 dark:border-surface-dark-elevated/50 shadow-inner">
           <button
             role="tab"
             aria-selected={activeTab === 'group'}
             aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('group')}
-            className={`flex-1 h-12 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2
+            className={`flex-1 h-12 rounded-xl text-body transition-all duration-300 flex items-center justify-center gap-2
               ${activeTab === 'group'
-                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
-                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
+                ? 'bg-surface-primary dark:bg-surface-dark-elevated text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
+                : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary'}`}
           >
             <Users className="w-3.5 h-3.5 shrink-0" />
             {t('groupRank')}
@@ -135,10 +135,10 @@ const LeaderboardContent: React.FC = () => {
             aria-selected={activeTab === 'course'}
             aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('course')}
-            className={`flex-1 h-12 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2
+            className={`flex-1 h-12 rounded-xl text-body transition-all duration-300 flex items-center justify-center gap-2
               ${activeTab === 'course'
-                ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
-                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}
+                ? 'bg-surface-primary dark:bg-surface-dark-elevated text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
+                : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary'}`}
           >
             <Globe className="w-3.5 h-3.5 shrink-0" />
             {t('courseRank')}
@@ -147,10 +147,10 @@ const LeaderboardContent: React.FC = () => {
       </div>
 
       {/* Leaderboard Table */}
-      <div id="leaderboard-panel" role="tabpanel" aria-label={activeTab === 'group' ? t('groupRank') : t('courseRank')} className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div id="leaderboard-panel" role="tabpanel" aria-label={activeTab === 'group' ? t('groupRank') : t('courseRank')} className="bg-surface-primary dark:bg-surface-dark-secondary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark overflow-hidden">
 
         {/* Desktop Table Header */}
-        <div className="hidden sm:grid px-6 py-3 border-b border-gray-100 dark:border-slate-800/70 bg-gray-50/80 dark:bg-slate-800/40"
+        <div className="hidden sm:grid px-6 py-3 border-b border-surface-secondary dark:border-surface-dark-elevated/70 bg-surface-secondary/80 dark:bg-surface-dark-elevated/40"
           style={{ gridTemplateColumns: '7rem 1fr auto' }}
         >
           <div className="section-label">{t('rank')}</div>
@@ -158,7 +158,7 @@ const LeaderboardContent: React.FC = () => {
           <div className="text-right section-label">{t('points')}</div>
         </div>
 
-        <div className="divide-y divide-gray-50 dark:divide-slate-800/50">
+        <div className="divide-y divide-surface-secondary dark:divide-surface-dark-elevated/50">
           {activeLeaderboard.map((entry, i) => {
             const isCurrentUser = activeTab === 'group'
               ? entry.full_name === user.name
@@ -195,7 +195,7 @@ const LeaderboardContent: React.FC = () => {
 
                 {/* Desktop layout */}
                 <div
-                  className="hidden sm:grid items-center px-6 py-2.5"
+                  className="hidden sm:grid items-center px-6 py-2"
                   style={{ gridTemplateColumns: '7rem 1fr auto' }}
                 >
                   {/* Rank + inline change */}
@@ -206,7 +206,7 @@ const LeaderboardContent: React.FC = () => {
                   {/* Student Info */}
                   <div className="min-w-0 ml-3">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-semibold text-brand-dark dark:text-white truncate leading-tight">
+                      <p className="text-body text-brand-dark dark:text-text-theme-dark-primary truncate leading-tight">
                         {entry.full_name}
                       </p>
                       {isCurrentUser && (
@@ -219,8 +219,8 @@ const LeaderboardContent: React.FC = () => {
 
                   {/* Points + Streak unified */}
                   <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-base font-bold text-brand-dark dark:text-white tabular-nums">
+                    <div className="flex items-center gap-2">
+                      <span className="text-h4 text-brand-dark dark:text-text-theme-dark-primary tabular-nums">
                         {entry.total_points.toLocaleString()}
                       </span>
                       <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary shrink-0" />
@@ -231,7 +231,7 @@ const LeaderboardContent: React.FC = () => {
                         {entry.streak}
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-200 dark:text-slate-700">—</span>
+                      <span className="text-caption text-surface-secondary dark:text-surface-dark-elevated">—</span>
                     )}
                   </div>
                 </div>
@@ -246,11 +246,11 @@ const LeaderboardContent: React.FC = () => {
                   {/* Student Info */}
                   <div className="flex-1 min-w-0 px-3">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-semibold text-brand-dark dark:text-white truncate leading-tight">
+                      <p className="text-body text-brand-dark dark:text-text-theme-dark-primary truncate leading-tight">
                         {entry.full_name}
                       </p>
                       {isCurrentUser && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider bg-brand-primary/15 text-brand-primary border border-brand-primary/25 shrink-0">
                           {t('youLabel')}
                         </span>
                       )}
@@ -260,7 +260,7 @@ const LeaderboardContent: React.FC = () => {
                   {/* Points + Streak unified */}
                   <div className="flex flex-col items-end gap-0.5 shrink-0">
                     <div className="flex items-center gap-1">
-                      <span className="text-sm font-bold text-brand-dark dark:text-white tabular-nums">
+                      <span className="text-body text-brand-dark dark:text-text-theme-dark-primary tabular-nums">
                         {entry.total_points.toLocaleString()}
                       </span>
                       <Star className="w-3 h-3 text-brand-primary fill-brand-primary shrink-0" />
@@ -279,9 +279,9 @@ const LeaderboardContent: React.FC = () => {
 
           {activeLeaderboard.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
-              <Trophy className="w-10 h-10 text-gray-300 dark:text-slate-600 mb-2" />
-              <p className="text-sm font-medium text-gray-400 dark:text-slate-500">{t('noRankings')}</p>
-              <p className="text-xs text-gray-300 dark:text-slate-600">{t('attendToEarnSpot')}</p>
+              <Trophy className="w-10 h-10 text-surface-secondary dark:text-surface-dark-elevated mb-2" />
+              <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noRankings')}</p>
+              <p className="text-caption text-surface-secondary dark:text-surface-dark-elevated">{t('attendToEarnSpot')}</p>
             </div>
           )}
         </div>

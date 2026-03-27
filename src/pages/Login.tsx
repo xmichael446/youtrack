@@ -97,7 +97,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
     };
 
     return (
-        <div className={`h-dvh w-full flex flex-col items-center justify-center p-4 transition-colors duration-500 relative overflow-hidden font-sans ${isDark ? 'bg-slate-950 text-white' : 'bg-gray-50 text-slate-900'}`}>
+        <div className={`h-dvh w-full flex flex-col items-center justify-center p-4 transition-colors duration-500 relative overflow-hidden font-sans ${isDark ? 'bg-surface-dark-primary text-text-theme-dark-primary' : 'bg-surface-secondary text-text-theme-primary'}`}>
 
             {/* Background Ambience */}
             <div className={`absolute top-[-20%] left-[-15%] w-[60%] h-[60%] rounded-full blur-[160px] pointer-events-none transition-colors duration-1000 ${isDark ? 'bg-brand-primary/15' : 'bg-brand-primary/8'}`}></div>
@@ -105,10 +105,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none ${isDark ? 'bg-violet-500/5' : 'bg-violet-500/3'}`}></div>
 
             {/* Top Controls */}
-            <div className="absolute top-[calc(env(safe-area-inset-top)+1.25rem)] right-5 z-50 flex items-center gap-2.5 animate-in fade-in duration-500">
+            <div className="absolute top-[calc(env(safe-area-inset-top)+1.25rem)] right-5 z-50 flex items-center gap-2 animate-in fade-in duration-500">
                 <button
                     onClick={toggleTheme}
-                    className={`p-2.5 rounded-xl transition-all duration-300 backdrop-blur-xl shadow-sm hover:scale-105 active:scale-95 ${isDark ? 'bg-slate-900/60 text-yellow-400 hover:bg-slate-800/60 border border-white/5' : 'bg-white/80 border border-gray-200/60 text-slate-500 hover:bg-white'}`}
+                    className={`p-2 rounded-xl transition-all duration-300 backdrop-blur-xl shadow-sm hover:scale-105 active:scale-95 ${isDark ? 'bg-surface-dark-secondary/60 text-yellow-400 hover:bg-surface-dark-elevated/60 border border-white/5' : 'bg-surface-primary/80 border border-surface-secondary/60 text-text-theme-secondary hover:bg-surface-primary'}`}
                 >
                     {isDark ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
@@ -117,12 +117,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                     )}
                 </button>
 
-                <div className={`flex items-center p-1 rounded-xl backdrop-blur-xl shadow-sm transition-colors duration-300 gap-0.5 ${isDark ? 'bg-slate-900/60 border border-white/5' : 'bg-white/80 border border-gray-200/60'}`}>
+                <div className={`flex items-center p-1 rounded-xl backdrop-blur-xl shadow-sm transition-colors duration-300 gap-0.5 ${isDark ? 'bg-surface-dark-secondary/60 border border-white/5' : 'bg-surface-primary/80 border border-surface-secondary/60'}`}>
                     {['uz', 'en'].map((lang) => (
                         <button
                             key={lang}
                             onClick={() => setLanguage(lang as 'uz' | 'en')}
-                            className={`px-2.5 py-1.5 rounded-lg text-[9px] font-bold tracking-widest transition-all duration-200 font-mono ${language === lang ? 'bg-brand-primary text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                            className={`px-2 py-1 rounded-lg text-[9px] tracking-widest transition-all duration-200 font-mono ${language === lang ? 'bg-brand-primary text-white shadow-sm' : 'text-text-theme-muted hover:text-text-theme-secondary dark:hover:text-text-theme-dark-secondary'}`}
                         >
                             {lang.toUpperCase()}
                         </button>
@@ -132,15 +132,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
 
             {/* Main Card */}
             <div className="w-full max-w-sm md:max-w-4xl z-10 animate-in fade-in duration-700 ease-out">
-                <div className={`backdrop-blur-2xl border rounded-3xl md:rounded-[32px] shadow-2xl relative overflow-hidden transition-all duration-500 ${isDark ? 'bg-slate-900/50 border-transparent shadow-black/40' : 'bg-white/85 border-gray-200/60 shadow-black/8'}`}>
+                <div className={`backdrop-blur-2xl border rounded-3xl md:rounded-[32px] shadow-2xl relative overflow-hidden transition-all duration-500 ${isDark ? 'bg-surface-dark-secondary/50 border-transparent shadow-black/40' : 'bg-surface-primary/85 border-surface-secondary/60 shadow-black/8'}`}>
 
                     {/* Subtle grid texture */}
                     <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #888 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
                     <div className="flex flex-col md:flex-row">
                         {/* Branding Side */}
-                        <div className={`p-7 md:p-12 md:w-1/2 flex flex-col items-center justify-center text-center relative z-10 border-b md:border-b-0 md:border-r ${isDark ? 'border-white/5' : 'border-gray-200/40'}`}>
-                            <div className="mb-8 md:mb-10 transform transition-transform duration-700 hover:scale-105">
+                        <div className={`p-6 md:p-12 md:w-1/2 flex flex-col items-center justify-center text-center relative z-10 border-b md:border-b-0 md:border-r ${isDark ? 'border-white/5' : 'border-surface-secondary/40'}`}>
+                            <div className="mb-8 transform transition-transform duration-700 hover:scale-105">
                                 <img
                                     src={isDark ? "/logo-dark.png" : "/logo-light.png"}
                                     alt="YouTrack Logo"
@@ -152,10 +152,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                                 />
                             </div>
 
-                            <h4 className={`text-xl md:text-2xl font-bold tracking-tight mb-2 ${isDark ? 'text-white' : 'text-slate-950'}`}>
+                            <h4 className={`text-h2 md:text-h1 tracking-tight mb-2 ${isDark ? 'text-text-theme-dark-primary' : 'text-text-theme-primary'}`}>
                                 {t('loginYourSpace')}
                             </h4>
-                            <p className={`font-medium text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            <p className={`text-body leading-relaxed ${isDark ? 'text-text-theme-dark-secondary' : 'text-text-theme-secondary'}`}>
                                 {language === 'uz' ? (
                                     <><span className="text-brand-primary font-bold">YouTrack</span> {t('welcomeTo')}!</>
                                 ) : (
@@ -165,17 +165,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                         </div>
 
                         {/* Auth Section */}
-                        <div className={`p-7 md:p-12 md:w-1/2 flex flex-col justify-center ${isDark ? 'bg-black/10' : 'bg-white/30'}`}>
+                        <div className={`p-6 md:p-12 md:w-1/2 flex flex-col justify-center ${isDark ? 'bg-black/10' : 'bg-surface-primary/30'}`}>
                             {authStep === 'login' && (
                                 <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                                     <div>
-                                        <label className={`text-[10px] font-mono font-bold uppercase tracking-[2px] block mb-3 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                        <label className={`text-[10px] font-mono uppercase tracking-[2px] block mb-3 ${isDark ? 'text-text-theme-dark-muted' : 'text-text-theme-muted'}`}>
                                             {t('studentAccess')}
                                         </label>
 
                                         <div className="relative group/input">
                                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                                <User className={`w-[18px] h-[18px] transition-colors duration-300 ${isDark ? 'text-slate-600 group-focus-within/input:text-brand-primary' : 'text-slate-400 group-focus-within/input:text-brand-primary'}`} />
+                                                <User className={`w-[18px] h-[18px] transition-colors duration-300 ${isDark ? 'text-text-theme-dark-muted group-focus-within/input:text-brand-primary' : 'text-text-theme-muted group-focus-within/input:text-brand-primary'}`} />
                                             </div>
                                             <input
                                                 type="text"
@@ -196,9 +196,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                                                         setStudentCode('YT-E');
                                                     }
                                                 }}
-                                                className={`w-full border-2 text-sm font-bold rounded-2xl pl-11 pr-4 py-4 focus:outline-none transition-all duration-300 font-mono ${isDark
-                                                    ? 'bg-slate-950/60 border-white/5 text-white placeholder:text-slate-700 focus:border-brand-primary focus:bg-slate-900/80 focus:ring-4 focus:ring-brand-primary/10'
-                                                    : 'bg-white border-gray-100 text-slate-950 placeholder:text-gray-400 focus:border-brand-primary focus:bg-white focus:ring-4 focus:ring-brand-primary/8'
+                                                className={`w-full border-2 text-body rounded-2xl pl-11 pr-4 py-4 focus:outline-none transition-all duration-300 font-mono ${isDark
+                                                    ? 'bg-surface-dark-primary/60 border-white/5 text-text-theme-dark-primary placeholder:text-text-theme-dark-muted focus:border-brand-primary focus:bg-surface-dark-secondary/80 focus:ring-4 focus:ring-brand-primary/10'
+                                                    : 'bg-surface-primary border-surface-secondary text-text-theme-primary placeholder:text-text-theme-muted focus:border-brand-primary focus:bg-surface-primary focus:ring-4 focus:ring-brand-primary/8'
                                                 }`}
                                             />
                                         </div>
@@ -244,16 +244,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                                         <div className="absolute inset-3 rounded-full border-[2px] border-transparent border-t-brand-primary/40 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}></div>
                                     </div>
                                     <div className="text-center space-y-2">
-                                        <p className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'} tracking-tight`}>
+                                        <p className={`text-h4 ${isDark ? 'text-text-theme-dark-primary' : 'text-text-theme-primary'} tracking-tight`}>
                                             {t('waitingConfirmation')}
                                         </p>
-                                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'} leading-relaxed`}>
+                                        <p className={`text-body ${isDark ? 'text-text-theme-dark-secondary' : 'text-text-theme-secondary'} leading-relaxed`}>
                                             {t('botNotOpened')}
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => openTelegramLink(authData.deep_link)}
-                                        className="w-full bg-[#2AABEE] text-white py-4 rounded-2xl font-bold text-sm shadow-xl shadow-[#2AABEE]/25 hover:bg-[#229ED9] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2.5 uppercase tracking-widest font-mono"
+                                        className="w-full bg-[#2AABEE] text-white py-4 rounded-2xl font-bold text-body shadow-xl shadow-[#2AABEE]/25 hover:bg-[#229ED9] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>
                                         {t('openTelegram')}
@@ -262,12 +262,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                             )}
 
                             {/* Support */}
-                            <div className="mt-7 text-center relative z-10">
+                            <div className="mt-6 text-center relative z-10">
                                 <a
                                     href="https://t.me/lr_intensive_admin"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`text-[10px] font-mono font-bold uppercase tracking-[2px] whitespace-pre-line transition-colors hover:text-brand-primary ${isDark ? 'text-slate-600' : 'text-slate-400'}`}
+                                    className={`text-[10px] font-mono uppercase tracking-[2px] whitespace-pre-line transition-colors hover:text-brand-primary ${isDark ? 'text-text-theme-dark-muted' : 'text-text-theme-muted'}`}
                                 >
                                     {t('helpSupport')}
                                 </a>

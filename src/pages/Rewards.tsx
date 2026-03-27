@@ -93,23 +93,23 @@ const RewardsContent: React.FC = () => {
 
       {/* Page Header */}
       <div className="px-1">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
-          <Gift className="w-6 h-6 text-gray-400 dark:text-slate-500 shrink-0" />
+        <h1 className="text-h1 tracking-tight text-brand-dark dark:text-text-theme-dark-primary flex items-center gap-2">
+          <Gift className="w-6 h-6 text-text-theme-muted dark:text-text-theme-dark-muted shrink-0" />
           {t('rewardsShop')}
         </h1>
-        <p className="text-sm font-normal text-gray-500 dark:text-slate-400 mt-1">
+        <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1">
           {t('exchangeCoins')}
         </p>
       </div>
 
       {/* Unified Rewards Grid */}
       {(rewards.length === 0 && levelRewards.length === 0) ? (
-        <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border-2 border-dashed border-gray-200 dark:border-slate-800 text-center">
-          <ShoppingBag className="w-10 h-10 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
-          <p className="text-gray-400 dark:text-slate-500 font-medium text-sm italic">"{t('noRewards')}"</p>
+        <div className="bg-surface-primary dark:bg-surface-dark-secondary p-12 rounded-3xl border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated text-center">
+          <ShoppingBag className="w-10 h-10 text-surface-secondary dark:text-surface-dark-elevated mx-auto mb-3" />
+          <p className="text-text-theme-muted dark:text-text-theme-dark-muted text-body italic">"{t('noRewards')}"</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Coin Rewards */}
           {sortedRewards.map((reward) => {
             const affordable = currentBalance >= reward.cost;
@@ -119,16 +119,16 @@ const RewardsContent: React.FC = () => {
             return (
               <div
                 key={`balance-${reward.id}`}
-                className={`bg-white dark:bg-slate-900 border rounded-3xl overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
+                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-3xl overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
                   ${reward.claimed
                     ? 'border-emerald-200 dark:border-emerald-500/20 shadow-md'
                     : affordable
-                      ? 'border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-brand-primary/20'
-                      : 'border-gray-100 dark:border-slate-800 shadow-sm opacity-70 hover:opacity-90'
+                      ? 'border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark hover:shadow-xl hover:border-brand-primary/20'
+                      : 'border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark opacity-70 hover:opacity-90'
                   }`}
               >
                 {/* Image */}
-                <div className="h-52 bg-gray-50 dark:bg-slate-800 relative overflow-hidden">
+                <div className="h-52 bg-surface-secondary dark:bg-surface-dark-elevated relative overflow-hidden">
                   {reward.image ? (
                     <img
                       src={`${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/${(reward.image || '').replace(/^\/+/, '')}`}
@@ -140,40 +140,40 @@ const RewardsContent: React.FC = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <ShoppingBag className="w-16 h-16 text-gray-200 dark:text-slate-700" />
+                      <ShoppingBag className="w-16 h-16 text-surface-secondary dark:text-surface-dark-elevated" />
                     </div>
                   )}
 
                   {reward.claimed && (
                     <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-xs font-medium inline-flex items-center gap-2 shadow-xl">
+                      <div className="bg-emerald-500 text-white px-6 py-2 rounded-full text-caption inline-flex items-center gap-2 shadow-xl">
                         <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('claimed')}
                       </div>
                     </div>
                   )}
 
                   {!affordable && !reward.claimed && (
-                    <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-caption flex items-center gap-1">
                       <Coins className="w-2.5 h-2.5" /> {t('needMore').replace('{count}', String(needed))}
                     </div>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="p-5 md:p-6 flex-1 flex flex-col">
+                <div className="p-4 md:p-6 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="text-sm font-semibold text-brand-dark dark:text-white leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
-                    <span className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tabular-nums border
+                    <h3 className="text-body text-brand-dark dark:text-text-theme-dark-primary leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                    <span className={`flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded-full text-caption tabular-nums border
                       ${affordable || reward.claimed
                         ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
-                        : 'bg-gray-50 dark:bg-slate-800 text-gray-400 border-gray-200 dark:border-slate-700'}`}>
+                        : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted border-surface-secondary dark:border-surface-dark-elevated'}`}>
                       <Coins className={`w-3.5 h-3.5 ${affordable || reward.claimed ? 'fill-amber-500' : 'fill-gray-400'}`} />
                       {reward.cost}
                     </span>
                   </div>
 
                   {reward.description && (
-                    <p className="text-xs font-normal text-gray-500 dark:text-slate-400 mb-5 leading-relaxed italic">
+                    <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary mb-4 leading-relaxed italic">
                       "{reward.description}"
                     </p>
                   )}
@@ -182,12 +182,12 @@ const RewardsContent: React.FC = () => {
                     <button
                       disabled={(reward.claimed ? false : !affordable) || isProcessing}
                       onClick={() => handleClaim(reward)}
-                      className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3 rounded-2xl text-body transition-all flex items-center justify-center gap-2 active:scale-95
                         ${reward.claimed
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : affordable
                             ? 'bg-gradient-to-r from-brand-primary to-brand-accent text-white shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02]'
-                            : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 cursor-not-allowed border border-gray-200 dark:border-slate-700'
+                            : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted dark:text-text-theme-dark-muted cursor-not-allowed border border-surface-secondary dark:border-surface-dark-elevated'
                         }`}
                     >
                       {isProcessing ? (
@@ -221,16 +221,16 @@ const RewardsContent: React.FC = () => {
             return (
               <div
                 key={`level-${reward.id}`}
-                className={`bg-white dark:bg-slate-900 border rounded-3xl overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
+                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-3xl overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
                   ${isGranted
                     ? 'border-emerald-200 dark:border-emerald-500/20 shadow-md'
                     : isUnlocked
-                      ? 'border-violet-200 dark:border-violet-500/20 shadow-sm hover:shadow-xl'
-                      : 'border-gray-100 dark:border-slate-800 opacity-70 hover:opacity-90'
+                      ? 'border-violet-200 dark:border-violet-500/20 shadow-card dark:shadow-card-dark hover:shadow-xl'
+                      : 'border-surface-secondary dark:border-surface-dark-elevated opacity-70 hover:opacity-90'
                   }`}
               >
                 {/* Image */}
-                <div className="h-52 bg-gray-50 dark:bg-slate-800 relative overflow-hidden">
+                <div className="h-52 bg-surface-secondary dark:bg-surface-dark-elevated relative overflow-hidden">
                   {reward.image ? (
                     <img
                       src={`${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/${(reward.image || '').replace(/^\/+/, '')}`}
@@ -256,7 +256,7 @@ const RewardsContent: React.FC = () => {
 
                   {isGranted && (
                     <div className="absolute inset-0 bg-emerald-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-emerald-500 text-white px-6 py-2.5 rounded-full text-xs font-medium inline-flex items-center gap-2 shadow-xl">
+                      <div className="bg-emerald-500 text-white px-6 py-2 rounded-full text-caption inline-flex items-center gap-2 shadow-xl">
                         <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('granted')}
                       </div>
                     </div>
@@ -264,11 +264,11 @@ const RewardsContent: React.FC = () => {
                 </div>
 
                 {/* Content */}
-                <div className="p-5 md:p-6 flex-1 flex flex-col">
+                <div className="p-4 md:p-6 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="text-sm font-semibold text-brand-dark dark:text-white leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                    <h3 className="text-body text-brand-dark dark:text-text-theme-dark-primary leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
                     <span
-                      className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tabular-nums border"
+                      className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded-full text-caption tabular-nums border"
                       style={{
                         backgroundColor: `${levelColor}12`,
                         color: levelColor,
@@ -280,7 +280,7 @@ const RewardsContent: React.FC = () => {
                   </div>
 
                   {reward.description && (
-                    <p className="text-xs font-normal text-gray-500 dark:text-slate-400 mb-5 leading-relaxed italic">
+                    <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary mb-4 leading-relaxed italic">
                       "{reward.description}"
                     </p>
                   )}
@@ -289,12 +289,12 @@ const RewardsContent: React.FC = () => {
                     <button
                       disabled={(!isUnlocked && !isGranted) || isProcessing}
                       onClick={() => handleClaimLevel(reward)}
-                      className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3 rounded-2xl text-body transition-all flex items-center justify-center gap-2 active:scale-95
                         ${isGranted
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : isUnlocked
                             ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02]'
-                            : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 cursor-not-allowed border border-gray-200 dark:border-slate-700'
+                            : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted dark:text-text-theme-dark-muted cursor-not-allowed border border-surface-secondary dark:border-surface-dark-elevated'
                         }`}
                     >
                       {isProcessing ? (
@@ -320,16 +320,16 @@ const RewardsContent: React.FC = () => {
 
       {/* Coins History */}
       <section className="animate-in fade-in duration-700 delay-200 fill-mode-both">
-        <div className="flex items-center gap-3 px-1 mb-5">
+        <div className="flex items-center gap-3 px-1 mb-4">
           <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
             <History className="w-[18px] h-[18px] text-amber-500" />
           </div>
           <div>
             <h2 className="section-label">{t('coinsHistory')}</h2>
-            <p className="text-xs font-normal text-gray-500 dark:text-slate-400">{t('trackingEarnings')}</p>
+            <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary">{t('trackingEarnings')}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+        <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-3xl shadow-card dark:shadow-card-dark border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden">
           <CoinsHistory showTitle={false} transactions={transactions} compact={false} />
         </div>
       </section>
