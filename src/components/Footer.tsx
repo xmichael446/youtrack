@@ -9,7 +9,7 @@ const Footer: React.FC<FooterProps> = ({ isDark }) => {
     const { t } = useLanguage();
     return (
         <div className="py-2 text-center animate-in fade-in duration-1000 delay-500 fill-mode-both">
-            <p className={`text-xs font-medium ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>
+            <p className={`text-caption ${isDark ? 'text-text-theme-dark-muted' : 'text-text-theme-muted'}`}>
                 {t('developedBy')}{' '}
                 <a
                     href="https://t.me/xmichael446"

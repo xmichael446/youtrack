@@ -6,14 +6,14 @@ interface LoadingScreenProps {
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = 'Syncing YouTrack' }) => {
     return (
-        <div className="absolute inset-0 z-50 bg-gray-50 dark:bg-slate-950 flex flex-col items-center justify-center">
-            <div className="flex flex-col items-center gap-5">
+        <div className="absolute inset-0 z-50 bg-surface-secondary dark:bg-surface-dark-primary flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
                 <div className="relative w-16 h-16">
                     <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>
                     <div className="absolute inset-0 border-[3px] border-transparent border-t-brand-primary rounded-full animate-spin"></div>
                     <div className="absolute inset-2 border-[2px] border-transparent border-t-brand-primary/40 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.7s' }}></div>
                 </div>
-                <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[5px] animate-pulse">
+                <p className="text-[10px] font-mono font-bold text-text-theme-muted dark:text-text-theme-dark-muted uppercase tracking-[5px] animate-pulse">
                     {message}
                 </p>
             </div>
