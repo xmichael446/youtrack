@@ -173,7 +173,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
 
   return (
     <>
-      <header className="bg-surface-primary/95 dark:bg-surface-dark-secondary/95 backdrop-blur-lg border-b border-surface-secondary/80 dark:border-surface-dark-elevated/80 fixed w-full md:sticky top-0 px-3 md:px-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3 md:py-3 flex items-center justify-between shadow-[0_1px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.2)] transition-colors duration-normal" style={{ zIndex: Z_INDEX.dropdown }}>
+      <header className="bg-surface-primary/95 dark:bg-surface-dark-primary/95 backdrop-blur-lg border-b border-surface-secondary/80 dark:border-surface-dark-elevated/80 fixed w-full md:sticky top-0 px-3 md:px-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3 md:py-3 flex items-center justify-between shadow-[0_1px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.2)] transition-colors duration-normal" style={{ zIndex: Z_INDEX.dropdown }}>
         {/* Mobile Logo */}
         <div className="flex items-center md:hidden min-w-0">
           <img

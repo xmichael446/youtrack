@@ -35,26 +35,26 @@ Derived from the YouTrack logo. The primary cyan `#12C2DC` is the anchor; all ot
 
 ### 1.3 Surface Colors (Dark Mode)
 
-A 3-layer dark system: each layer is one Slate step darker/lighter to create clear visual hierarchy without harsh contrast.
+A 3-layer dark system: each layer is progressively lighter to create clear visual hierarchy with a premium, immersive feel.
 
 | Token | Value | Tailwind Class | Usage |
 |-------|-------|----------------|-------|
-| `surface-dark-primary` | `#0f172a` (slate-900) | `dark:bg-surface-dark-primary` | Page background |
-| `surface-dark-secondary` | `#1e293b` (slate-800) | `dark:bg-surface-dark-secondary` | Cards, panels |
-| `surface-dark-elevated` | `#334155` (slate-700) | `dark:bg-surface-dark-elevated` | Modals, dropdowns, elevated elements |
+| `surface-dark-primary` | `#080f1a` (deep navy-black) | `dark:bg-surface-dark-primary` | Page background |
+| `surface-dark-secondary` | `#111827` (dark navy) | `dark:bg-surface-dark-secondary` | Cards, panels, sidebar |
+| `surface-dark-elevated` | `#1e293b` (dark slate) | `dark:bg-surface-dark-elevated` | Modals, dropdowns, elevated elements |
 
-**Rationale:** Slate-900/800/700 forms a natural dark surface triad. Each step provides ~10% more brightness, giving clear visual depth without requiring opacity tricks.
+**Rationale:** By anchoring the base at `#080f1a` (deeper than slate-900's `#0f172a`), the entire scale shifts darker. This creates three clearly distinct depth levels (instead of the previous 2 that blurred together at similar brightness), makes brand-primary (`#12C2DC`) pop more vibrantly against the deeper background, and gives the app a premium, immersive dark feel rather than "inverted gray." Each step provides ~10-15% more brightness, giving clear visual depth without requiring opacity tricks.
 
 ### 1.4 Text Colors
 
 | Token | Light Value | Dark Value | Tailwind Class | Usage |
 |-------|-------------|------------|----------------|-------|
-| `text-theme-primary` | `#1a1a2e` | `#f1f5f9` | `text-text-theme-primary`, `dark:text-text-theme-dark-primary` | Headings, primary content |
+| `text-theme-primary` | `#1a1a2e` | `#f8fafc` | `text-text-theme-primary`, `dark:text-text-theme-dark-primary` | Headings, primary content |
 | `text-theme-secondary` | `#64748b` | `#94a3b8` | `text-text-theme-secondary`, `dark:text-text-theme-dark-secondary` | Secondary content, descriptions |
-| `text-theme-muted` | `#94a3b8` | `#64748b` | `text-text-theme-muted`, `dark:text-text-theme-dark-muted` | Captions, hints, placeholders |
-| `text-theme-inverse` | `#FFFFFF` | `#0f172a` | `text-text-theme-inverse` | Text on colored/dark backgrounds |
+| `text-theme-muted` | `#94a3b8` | `#475569` | `text-text-theme-muted`, `dark:text-text-theme-dark-muted` | Captions, hints, placeholders |
+| `text-theme-inverse` | `#FFFFFF` | `#080f1a` | `text-text-theme-inverse` | Text on colored/dark backgrounds |
 
-**Rationale:** `text-primary` uses a deep navy (`#1a1a2e`) rather than pure black for softer contrast. Secondary and muted use Slate scale values for consistency with the dark mode surfaces.
+**Rationale:** `text-primary` uses a deep navy (`#1a1a2e`) rather than pure black for softer contrast. Dark mode primary upgraded to `#f8fafc` (slate-50, brighter than the former `#f1f5f9`) for improved contrast against the new deeper backgrounds. Dark mode muted updated to `#475569` (slate-600, slightly lighter than former `#64748b`) for better readability against the deeper dark surfaces.
 
 ### 1.5 Status Colors
 

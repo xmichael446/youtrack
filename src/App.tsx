@@ -274,7 +274,7 @@ const AppContent: React.FC<{
           </main>
 
           {/* Bottom Nav (Mobile) */}
-          <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-surface-primary/90 dark:bg-surface-dark-secondary/90 backdrop-blur-2xl border-t border-surface-secondary dark:border-surface-dark-elevated pt-2 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-normal">
+          <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-surface-primary/90 dark:bg-surface-dark-primary/90 backdrop-blur-2xl border-t border-surface-secondary dark:border-surface-dark-elevated pt-2 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-normal">
             <div className="flex justify-around items-center px-1">
               <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={navigateTo} />
               <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={navigateTo} />
