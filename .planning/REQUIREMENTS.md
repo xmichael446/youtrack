@@ -30,9 +30,9 @@
 - [x] **PAGE-03**: Redesign Leaderboard — engaging ranking display, playful competition visuals, rank badges
 - [ ] **PAGE-04**: Redesign Lessons page — attendance view, assignment submission, quiz flow with clear states
 - [x] **PAGE-05**: Redesign Rewards/Shop — product-style cards, point balance, claiming flow
-- [ ] **PAGE-06**: Redesign Profile page — user info, stats, achievement display
+- [x] **PAGE-06**: Redesign Profile page — user info, stats, achievement display
 - [ ] **PAGE-07**: Redesign Contest views — listing, detail, play/results views
-- [ ] **PAGE-08**: Redesign Notification display — clear notification types, read/unread states
+- [x] **PAGE-08**: Redesign Notification display — clear notification types, read/unread states
 
 ### Cross-Cutting
 
@@ -81,9 +81,9 @@
 | PAGE-03 | Phase 3 | Complete |
 | PAGE-04 | Phase 3 | Pending |
 | PAGE-05 | Phase 3 | Complete |
-| PAGE-06 | Phase 3 | Pending |
+| PAGE-06 | Phase 3 | Complete |
 | PAGE-07 | Phase 3 | Pending |
-| PAGE-08 | Phase 3 | Pending |
+| PAGE-08 | Phase 3 | Complete |
 | UX-01 | Phase 4 | Pending |
 | UX-02 | Phase 4 | Pending |
 | UX-03 | Phase 4 | Pending |
