@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Define design tokens and implement in Tailwind config
 - [ ] 01-02-PLAN.md — Migrate core layout and page components to semantic tokens
-- [ ] 01-03-PLAN.md — Migrate UI primitives, lessons, and profile features to semantic tokens
+- [x] 01-03-PLAN.md — Migrate UI primitives, lessons, and profile features to semantic tokens
 - [ ] 01-04-PLAN.md — Migrate contest features and complete full codebase migration
 
 ### Phase 2: Core Components
