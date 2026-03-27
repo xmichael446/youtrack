@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 import { useLanguage } from '../../context/LanguageContext';
 import type { ProfileData } from '../../services/apiTypes';
+import { Card } from '../../components/ui';
 
 // ---------------------------------------------------------------------------
 // ToggleRow
@@ -70,7 +71,7 @@ const PrivacySettings: React.FC<{
         </button>
         <h2 className="text-h3 text-brand-dark dark:text-text-theme-dark-primary">{t('privacySettings')}</h2>
       </div>
-      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm px-4">
+      <Card variant="default" padding="none" className="px-4">
         <ToggleRow
           label={t('hideBalance')} desc={t('hideBalanceDesc')}
           checked={localPrivacy.hide_balance} disabled={pending !== null}
@@ -81,7 +82,7 @@ const PrivacySettings: React.FC<{
           checked={localPrivacy.hide_activity} disabled={pending !== null}
           onToggle={() => handleToggle('hide_activity')}
         />
-      </div>
+      </Card>
     </div>
   );
 };

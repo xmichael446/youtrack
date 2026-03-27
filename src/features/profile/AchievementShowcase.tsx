@@ -4,6 +4,7 @@ import { Lock } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import type { Achievement } from '../../services/apiTypes';
 import { RARITY_COLORS, formatRelative } from './profileHelpers';
+import { Card } from '../../components/ui';
 
 const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achievements }) => {
   const { t } = useLanguage();
@@ -22,7 +23,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
   const earnedCount = achievements.filter(a => !!a.earned_at).length;
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated p-4 shadow-sm">
+    <Card variant="bordered" padding="md">
       <div className="flex items-center justify-between mb-3">
         <p className="section-label">
           {t('achievements')}
@@ -126,7 +127,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import type { HeatmapEntry } from '../../services/apiTypes';
 import { buildHeatmapGrid, heatmapColorClass } from './profileHelpers';
+import { Card } from '../../components/ui';
 
 const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => {
   const { t } = useLanguage();
@@ -12,7 +13,7 @@ const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => 
   const lastDate  = new Date(grid[grid.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated p-4 shadow-sm">
+    <Card variant="default" padding="md">
       <p className="section-label mb-3">
         {t('activityHeatmap')}
       </p>
@@ -48,7 +49,7 @@ const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => 
         <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">{firstDate}</span>
         <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">{lastDate}</span>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, ChevronDown } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import type { ActivityEntry } from '../../services/apiTypes';
 import { formatRelative } from './profileHelpers';
+import { Card, Button } from '../../components/ui';
 
 const ActivityFeed: React.FC<{
   entries: ActivityEntry[];
@@ -15,14 +16,14 @@ const ActivityFeed: React.FC<{
 
   if (entries.length === 0) {
     return (
-      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated p-6 shadow-sm text-center">
+      <Card variant="default" padding="lg" className="text-center">
         <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary leading-relaxed">{t('noActivity')}</p>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm overflow-hidden">
+    <Card variant="default" padding="none" className="overflow-hidden">
       <div className="px-4 py-3 border-b border-surface-secondary/70 dark:border-surface-dark-elevated/70">
         <p className="section-label">
           {t('activityFeed')}
@@ -56,16 +57,20 @@ const ActivityFeed: React.FC<{
       </div>
       {hasMore && (
         <div className="px-4 py-3 border-t border-surface-secondary/70 dark:border-surface-dark-elevated/70">
-          <button onClick={onLoadMore} disabled={loadingMore}
-            className="w-full h-9 rounded-input bg-surface-secondary dark:bg-surface-dark-secondary text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-            {loadingMore
-              ? <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              : <ChevronDown className="w-3.5 h-3.5" />}
+          <Button
+            variant="ghost"
+            size="sm"
+            fullWidth
+            onClick={onLoadMore}
+            loading={loadingMore}
+            icon={<ChevronDown className="w-3.5 h-3.5" />}
+            iconPosition="left"
+          >
             {t('loadMore')}
-          </button>
+          </Button>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
