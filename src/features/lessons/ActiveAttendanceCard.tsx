@@ -128,7 +128,7 @@ const ActiveAttendanceCard: React.FC<{
               value={attendanceCode}
               onChange={(e) => setAttendanceCode(e.target.value.toLowerCase())}
               placeholder={t('enterKeywordPlaceholder')}
-              className="flex-1 h-11 rounded-input border border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary dark:bg-surface-dark-secondary px-4 text-body font-bold focus:border-brand-primary focus:bg-surface-primary dark:focus:bg-surface-dark-primary focus:outline-none transition-all lowercase"
+              className="flex-1 h-11 rounded-input border border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary dark:bg-surface-dark-secondary px-4 text-body font-bold focus:border-brand-primary focus:bg-surface-primary dark:focus:bg-surface-dark-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all lowercase"
             />
             <Button
               variant="primary"

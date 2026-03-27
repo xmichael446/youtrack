@@ -90,7 +90,7 @@ const QuizSection: React.FC<{
   const renderArticleMode = () => (
     <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary animate-in fade-in duration-normal">
       <div className="flex items-center justify-between p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated bg-surface-primary/80 dark:bg-surface-dark-primary/80 backdrop-blur-md sticky top-0 z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
-        <button onClick={() => setMode('info')} className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors">
+        <button onClick={() => setMode('info')} className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary rounded-input">
           <X className="w-6 h-6" />
         </button>
         <div className="flex flex-col items-center">
@@ -227,7 +227,7 @@ const QuizSection: React.FC<{
     return (
       <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary animate-in fade-in duration-normal">
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated bg-surface-primary/80 dark:bg-surface-dark-primary/80 backdrop-blur-md sticky top-0 z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
-          <button onClick={() => setMode('info')} className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors">
+          <button onClick={() => setMode('info')} className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary rounded-input">
             <X className="w-6 h-6" />
           </button>
           <div className="flex-1 px-4 md:px-12 flex items-center justify-center gap-4">
@@ -339,7 +339,7 @@ const QuizSection: React.FC<{
         )}
 
         <div className="flex flex-col sm:flex-row justify-center gap-2">
-          <button onClick={() => setMode('info')} className="flex-1 sm:flex-none px-6 py-2 rounded-[12px] font-semibold text-body text-text-theme-secondary dark:text-text-theme-dark-secondary bg-surface-secondary dark:bg-surface-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated transition-all">
+          <button onClick={() => setMode('info')} className="flex-1 sm:flex-none px-6 py-2 rounded-[12px] font-semibold text-body text-text-theme-secondary dark:text-text-theme-dark-secondary bg-surface-secondary dark:bg-surface-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary">
             {t('backToOverview')}
           </button>
           <button onClick={() => handleReviewClick(lastSubmissionResult!.attempt_id)} className="flex-1 sm:flex-none px-6 py-2 rounded-[12px] font-semibold text-body text-white bg-surface-dark-primary dark:bg-surface-primary dark:text-surface-dark-primary hover:opacity-90 transition-all flex items-center justify-center gap-2 active:scale-95">
@@ -511,7 +511,7 @@ const QuizSection: React.FC<{
                     <button
                       onClick={() => handleReviewClick(attempt.id)}
                       aria-label={`${attempt.score}/${attempt.total} — ${isPassed ? t('passed') : t('failed')}, ${new Date(attempt.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-input bg-surface-secondary dark:bg-surface-dark-secondary/60 border border-surface-secondary dark:border-surface-dark-elevated/50 hover:border-surface-secondary dark:hover:border-surface-dark-elevated hover:bg-surface-primary dark:hover:bg-surface-dark-secondary transition-all group text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-input bg-surface-secondary dark:bg-surface-dark-secondary/60 border border-surface-secondary dark:border-surface-dark-elevated/50 hover:border-surface-secondary dark:hover:border-surface-dark-elevated hover:bg-surface-primary dark:hover:bg-surface-dark-secondary transition-all group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary"
                     >
                       <div className="flex items-baseline gap-0.5 min-w-[44px]">
                         <span className="text-h4 font-bold tabular-nums leading-none text-text-theme-primary dark:text-text-theme-dark-primary">
@@ -546,13 +546,13 @@ const QuizSection: React.FC<{
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setShowReviewWarning(null)}
-                            className="flex-1 py-2 rounded-button text-caption font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
+                            className="flex-1 py-2 rounded-button text-caption font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
                           >
                             {t('cancel')}
                           </button>
                           <button
                             onClick={() => loadReview(showReviewWarning)}
-                            className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white rounded-button text-caption font-semibold transition-all"
+                            className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white rounded-button text-caption font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
                           >
                             {t('viewReview')}
                           </button>
