@@ -25,8 +25,8 @@
 
 ### Page Redesigns
 
-- [ ] **PAGE-01**: Redesign Login page — set the visual tone, playful branding, clear Telegram auth flow
-- [ ] **PAGE-02**: Redesign Dashboard — clear visual hierarchy, enrollment cards, course progress, gamification elements
+- [x] **PAGE-01**: Redesign Login page — set the visual tone, playful branding, clear Telegram auth flow
+- [x] **PAGE-02**: Redesign Dashboard — clear visual hierarchy, enrollment cards, course progress, gamification elements
 - [x] **PAGE-03**: Redesign Leaderboard — engaging ranking display, playful competition visuals, rank badges
 - [ ] **PAGE-04**: Redesign Lessons page — attendance view, assignment submission, quiz flow with clear states
 - [x] **PAGE-05**: Redesign Rewards/Shop — product-style cards, point balance, claiming flow
@@ -76,8 +76,8 @@
 | COMP-05 | Phase 2 | Complete |
 | COMP-06 | Phase 2 | Complete |
 | COMP-07 | Phase 2 | Complete |
-| PAGE-01 | Phase 3 | Pending |
-| PAGE-02 | Phase 3 | Pending |
+| PAGE-01 | Phase 3 | Complete |
+| PAGE-02 | Phase 3 | Complete |
 | PAGE-03 | Phase 3 | Complete |
 | PAGE-04 | Phase 3 | Pending |
 | PAGE-05 | Phase 3 | Complete |

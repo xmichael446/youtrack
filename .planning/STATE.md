@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-page-redesigns-02-PLAN.md
-last_updated: "2026-03-27T02:18:15.690Z"
+stopped_at: Completed 03-page-redesigns-01-PLAN.md
+last_updated: "2026-03-27T02:18:42.394Z"
 progress:
   total_phases: 4
   completed_phases: 2
@@ -56,6 +56,7 @@ Plan: 3 of 5
 | Phase 02 P03 | 3 | 2 tasks | 2 files |
 | Phase 02-core-components P04 | 3 | 2 tasks | 3 files |
 | Phase 03-page-redesigns P02 | 3 | 2 tasks | 2 files |
+| Phase 03-page-redesigns P01 | 212 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - [Phase 02-core-components]: Header z-index uses Z_INDEX constants via inline styles replacing hardcoded z-30/z-50 Tailwind classes
 - [Phase 03-page-redesigns]: Podium layout uses flex items-end height hierarchy with extra bottom padding on 1st-place Card
 - [Phase 03-page-redesigns]: ClaimTarget discriminated union stores full reward object enabling type-safe Modal dispatch to handleClaim/handleClaimLevel
+- [Phase 03-page-redesigns]: Login Card uses variant=elevated with padding=none for internal layout flexibility while getting elevated shadow treatment
+- [Phase 03-page-redesigns]: Dashboard tutorial/course sections use section>Card nesting since Card lacks as prop
+- [Phase 03-page-redesigns]: view-entry animation applied via animate-view-entry on key={currentView} wrapper div in AppContent
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T02:18:00.473Z
-Stopped at: Completed 03-page-redesigns-02-PLAN.md
+Last session: 2026-03-27T02:18:42.380Z
+Stopped at: Completed 03-page-redesigns-01-PLAN.md
 Resume file: None
