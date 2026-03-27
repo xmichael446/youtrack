@@ -46,7 +46,7 @@ const LeaderboardContent: React.FC = () => {
         </div>
       );
     } else {
-      return <Minus className="w-2.5 h-2.5 text-surface-secondary dark:text-surface-dark-elevated" />;
+      return <Minus className="w-2.5 h-2.5 text-text-theme-muted dark:text-text-theme-dark-muted" />;
     }
   };
 
@@ -71,7 +71,7 @@ const LeaderboardContent: React.FC = () => {
       );
       return (
         <div className="w-10 h-10 flex items-center justify-center">
-          <span className="text-body text-surface-secondary dark:text-surface-dark-elevated tabular-nums">#{rank.toString().padStart(2, '0')}</span>
+          <span className="text-body text-text-theme-muted dark:text-text-theme-dark-muted tabular-nums">#{rank.toString().padStart(2, '0')}</span>
         </div>
       );
     })();
@@ -173,7 +173,7 @@ const LeaderboardContent: React.FC = () => {
                 <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary">{t('points')}</p>
                 <div className="flex items-center gap-1">
                   <span className="text-h4 text-brand-dark dark:text-text-theme-dark-primary tabular-nums">
-                    {(activeTab === 'group' ? enrollment.group_points : enrollment.points)?.toLocaleString() || '—'}
+                    {enrollment.total_points?.toLocaleString() || '—'}
                   </span>
                   <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
                 </div>
@@ -194,7 +194,7 @@ const LeaderboardContent: React.FC = () => {
         <>
           {/* Top-3 Podium */}
           {topThree.length >= 2 && (
-            <div className="flex items-end gap-3">
+            <div className="flex items-end gap-2 md:gap-3 overflow-hidden">
               {/* 2nd place (left) */}
               {topThree[1] && (() => {
                 const entry = topThree[1];
@@ -203,7 +203,7 @@ const LeaderboardContent: React.FC = () => {
                   <Card
                     hoverable
                     padding="md"
-                    className="flex-1 flex flex-col items-center gap-2 border-t-4 border-slate-400 cursor-pointer"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-2 border-t-4 border-slate-400 cursor-pointer"
                     onClick={() => isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id))}
                   >
                     <div className="w-10 h-10 rounded-card bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
@@ -231,7 +231,7 @@ const LeaderboardContent: React.FC = () => {
                   <Card
                     hoverable
                     padding="md"
-                    className="flex-1 flex flex-col items-center gap-2 border-t-4 border-amber-400 pb-6 cursor-pointer"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-2 border-t-4 border-amber-400 pb-6 cursor-pointer"
                     onClick={() => isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id))}
                   >
                     <div className="w-12 h-12 rounded-card bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40 ring-2 ring-amber-400/30">
@@ -264,7 +264,7 @@ const LeaderboardContent: React.FC = () => {
                   <Card
                     hoverable
                     padding="md"
-                    className="flex-1 flex flex-col items-center gap-2 border-t-4 border-orange-400 cursor-pointer"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-2 border-t-4 border-orange-400 cursor-pointer"
                     onClick={() => isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id))}
                   >
                     <div className="w-10 h-10 rounded-card bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md shadow-orange-400/30 ring-2 ring-orange-400/30">
@@ -374,7 +374,7 @@ const LeaderboardContent: React.FC = () => {
                             {entry.streak}
                           </span>
                         ) : (
-                          <span className="text-caption text-surface-secondary dark:text-surface-dark-elevated">—</span>
+                          <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">—</span>
                         )}
                       </div>
                     </div>
