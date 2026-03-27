@@ -72,9 +72,9 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Redesign Login and Dashboard pages with Phase 2 components
 - [x] 03-02-PLAN.md — Redesign Leaderboard and Rewards pages with Phase 2 components
-- [ ] 03-03-PLAN.md — Redesign Lessons page and feature sub-components
+- [x] 03-03-PLAN.md — Redesign Lessons page and feature sub-components
 - [x] 03-04-PLAN.md — Redesign Profile page and Notification dropdown
-- [ ] 03-05-PLAN.md — Redesign Contest views (list, detail, play, review)
+- [x] 03-05-PLAN.md — Redesign Contest views (list, detail, play, review)
 
 ### Phase 4: Polish
 **Goal**: The redesigned app is responsive, accessible, intentionally dark-themed, and animated — no rough edges remain
