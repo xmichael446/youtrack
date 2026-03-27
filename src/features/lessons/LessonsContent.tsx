@@ -10,6 +10,7 @@ import LoadingScreen from '../../components/LoadingScreen';
 import { useLessons } from '../../context/LessonsContext';
 import { AssignmentData } from '../../services/apiTypes';
 import Toast from '../../components/ui/Toast';
+import { EmptyState } from '../../components/ui';
 import SubmissionModal from './SubmissionModal';
 import CurrentAssignmentSection from './CurrentAssignmentSection';
 import AssignmentHistoryCard from './AssignmentHistoryCard';
@@ -66,26 +67,26 @@ const LessonsContent: React.FC = () => {
 
       {/* Attendance Section */}
       <section className="space-y-4">
-        <div className="flex items-center gap-2 px-1 text-brand-primary">
-          <Clock className="w-4 h-4 shrink-0" />
-          <h2 className="text-body font-semibold text-brand-dark dark:text-text-theme-dark-primary">{t('lessonAttendance')}</h2>
+        <div className="flex items-center gap-2 px-1">
+          <Clock className="w-4 h-4 text-brand-primary shrink-0" />
+          <h2 className="text-h4 text-brand-dark dark:text-text-theme-dark-primary">{t('lessonAttendance')}</h2>
         </div>
 
         {attendance ? (
           <ActiveAttendanceCard attendance={attendance} quiz={lessonsData?.quiz} showToast={showToast} />
         ) : (
-          <div className="text-center py-12 bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm">
-            <BookOpen className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted mx-auto mb-3" />
-            <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noLessonsSubtitle')}</p>
-          </div>
+          <EmptyState
+            icon={<BookOpen className="w-6 h-6" />}
+            message={t('noLessonsSubtitle')}
+          />
         )}
       </section>
 
       {/* Assignments Section */}
       <section className="space-y-4">
-        <div className="flex items-center gap-2 px-1 text-brand-primary">
-          <ClipboardList className="w-4 h-4 shrink-0" />
-          <h2 className="text-body font-semibold text-brand-dark dark:text-text-theme-dark-primary">{t('assignments')}</h2>
+        <div className="flex items-center gap-2 px-1">
+          <ClipboardList className="w-4 h-4 text-brand-primary shrink-0" />
+          <h2 className="text-h4 text-brand-dark dark:text-text-theme-dark-primary">{t('assignments')}</h2>
         </div>
 
         {hasAnyAssignments ? (
@@ -100,7 +101,7 @@ const LessonsContent: React.FC = () => {
             {previousAssignments.length > 0 && (
               <div className="space-y-3">
                 {showCurrentAssignment && (
-                  <p className="section-label text-text-theme-muted dark:text-text-theme-dark-muted px-1 pt-2 flex items-center gap-2">
+                  <p className="text-label uppercase tracking-wider text-text-theme-muted dark:text-text-theme-dark-muted px-1 pt-2 flex items-center gap-2">
                     <HistoryIcon className="w-3.5 h-3.5" />{t('portfolioHistory')}
                   </p>
                 )}
@@ -118,10 +119,10 @@ const LessonsContent: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated p-12 text-center">
-            <ClipboardList className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted mx-auto mb-3" />
-            <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noAssignmentsSubtitle')}</p>
-          </div>
+          <EmptyState
+            icon={<ClipboardList className="w-6 h-6" />}
+            message={t('noAssignmentsSubtitle')}
+          />
         )}
       </section>
 
