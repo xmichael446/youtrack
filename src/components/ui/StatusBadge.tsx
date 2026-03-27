@@ -23,7 +23,7 @@ const StatusBadge: React.FC<{ status: string; t: (k: string) => string }> = ({ s
     finalized: {
       label: t('contestFinalized'),
       cls: 'bg-surface-secondary text-text-theme-muted border border-surface-secondary dark:bg-surface-dark-secondary dark:text-text-theme-dark-secondary dark:border-surface-dark-elevated',
-      dotCls: 'bg-gray-400 dark:bg-slate-500',
+      dotCls: 'bg-gray-400',
     },
     closed: {
       label: t('contestClosed'),
