@@ -82,21 +82,21 @@ const SubmissionModal: React.FC<{
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
-      <div className="absolute inset-0 bg-slate-950/60 animate-in fade-in duration-300" onClick={onClose} />
-      <div className="bg-white dark:bg-slate-900 rounded-t-[24px] md:rounded-[24px] shadow-2xl w-full max-w-2xl relative z-10 flex flex-col border border-gray-100 dark:border-slate-800 overflow-hidden max-h-[90vh] animate-in duration-300 ease-out">
-        <div className="p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50">
+      <div className="absolute inset-0 bg-surface-dark-primary/60 animate-in fade-in duration-300" onClick={onClose} />
+      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-t-[24px] md:rounded-[24px] shadow-modal dark:shadow-modal-dark w-full max-w-2xl relative z-10 flex flex-col border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden max-h-[90vh] animate-in duration-300 ease-out">
+        <div className="p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-between items-center bg-surface-secondary/50 dark:bg-surface-dark-secondary/50">
           <div>
-            <h3 className="text-lg md:text-xl font-bold text-brand-dark dark:text-white">{t('submitAssignment')}</h3>
-            <p className="text-xs font-medium text-gray-500 mt-1 uppercase tracking-widest">LSN {assignment.number}: {assignment.lesson_topic}</p>
+            <h3 className="text-h3 md:text-h2 text-brand-dark dark:text-text-theme-dark-primary">{t('submitAssignment')}</h3>
+            <p className="text-caption text-text-theme-secondary mt-1 uppercase tracking-widest">LSN {assignment.number}: {assignment.lesson_topic}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} className="p-2 hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary rounded-xl transition-colors">
+            <X className="w-4 h-4 text-text-theme-secondary" />
           </button>
         </div>
 
         <div className="p-4 md:p-6 overflow-y-auto space-y-6 custom-scrollbar">
           <div className="space-y-2">
-            <label className="section-label text-gray-400 flex items-center">
+            <label className="section-label text-text-theme-muted flex items-center">
               <FileText className="w-3.5 h-3.5 mr-2 text-brand-primary" />
               {t('commentOptional')}
             </label>
@@ -104,26 +104,26 @@ const SubmissionModal: React.FC<{
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder={t('anyNotes')}
-              className="w-full rounded-[16px] border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 px-4 py-3 text-sm focus:border-brand-primary focus:outline-none transition-all dark:text-white min-h-[100px]"
+              className="w-full rounded-[16px] border border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary/50 dark:bg-surface-dark-secondary/50 px-4 py-3 text-body focus:border-brand-primary focus:outline-none transition-all dark:text-text-theme-dark-primary min-h-[100px]"
             />
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="section-label text-gray-400 flex items-center">
+              <label className="section-label text-text-theme-muted flex items-center">
                 <LinkIcon className="w-3.5 h-3.5 mr-2 text-brand-primary" />
                 {t('addAttachment')}
               </label>
-              <div className="flex bg-gray-100 dark:bg-slate-950 p-1 rounded-[12px] border border-gray-200/50 dark:border-slate-800">
+              <div className="flex bg-surface-secondary dark:bg-surface-dark-primary p-1 rounded-[12px] border border-surface-secondary/50 dark:border-surface-dark-elevated">
                 <button
                   onClick={handleAddLink}
-                  className="px-4 py-1.5 rounded-[10px] text-xs font-bold tracking-wider transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  className="px-4 py-1 rounded-[10px] text-caption font-bold tracking-wider transition-all text-text-theme-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary"
                 >
                   {t('addLink')}
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-1.5 rounded-[10px] text-xs font-bold tracking-wider transition-all text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  className="px-4 py-1 rounded-[10px] text-caption font-bold tracking-wider transition-all text-text-theme-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary"
                 >
                   {t('addFile')}
                 </button>
@@ -142,31 +142,31 @@ const SubmissionModal: React.FC<{
                 <div key={idx} className="flex gap-2 group items-center">
                   {attachment.type === 'link' ? (
                     <div className="relative flex-1">
-                      <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-theme-muted" />
                       <input
                         type="url"
                         value={attachment.value}
                         onChange={(e) => handleLinkChange(idx, e.target.value)}
                         placeholder="https://..."
-                        className="w-full rounded-[12px] border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 pl-10 pr-3 py-2.5 text-sm font-mono focus:border-brand-primary focus:outline-none transition-all dark:text-white"
+                        className="w-full rounded-[12px] border border-surface-secondary dark:border-surface-dark-elevated bg-surface-primary dark:bg-surface-dark-primary pl-10 pr-3 py-2 text-body font-mono focus:border-brand-primary focus:outline-none transition-all dark:text-text-theme-dark-primary"
                       />
                     </div>
                   ) : (
-                    <div className="flex-1 flex items-center justify-between p-2.5 bg-gray-50 dark:bg-slate-800 rounded-[12px] border border-gray-100 dark:border-slate-700 hover:border-brand-primary/30 transition-colors">
+                    <div className="flex-1 flex items-center justify-between p-2 bg-surface-secondary dark:bg-surface-dark-secondary rounded-[12px] border border-surface-secondary dark:border-surface-dark-elevated hover:border-brand-primary/30 transition-colors">
                       <div className="flex items-center gap-2">
                         <FileText className="w-3.5 h-3.5 text-brand-primary" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate max-w-[150px] md:max-w-[200px]">{attachment.file.name}</span>
+                        <span className="text-body text-text-theme-primary dark:text-text-theme-dark-primary truncate max-w-[150px] md:max-w-[200px]">{attachment.file.name}</span>
                       </div>
-                      <span className="text-xs font-mono text-gray-500">{(attachment.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                      <span className="text-caption font-mono text-text-theme-muted">{(attachment.file.size / 1024 / 1024).toFixed(2)} MB</span>
                     </div>
                   )}
                   <button onClick={() => handleRemoveAttachment(idx)} className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors shrink-0">
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               ))}
               {attachments.length === 0 && (
-                <div className="text-center py-6 text-sm text-gray-500">
+                <div className="text-center py-6 text-body text-text-theme-muted">
                   {t('noAttachments')}
                 </div>
               )}
@@ -174,17 +174,17 @@ const SubmissionModal: React.FC<{
           </div>
         </div>
 
-        <div className="p-4 md:p-6 border-t border-gray-100 dark:border-slate-800 flex gap-3 bg-gray-50/50 dark:bg-slate-800/50">
+        <div className="p-4 md:p-6 border-t border-surface-secondary dark:border-surface-dark-elevated flex gap-3 bg-surface-secondary/50 dark:bg-surface-dark-secondary/50">
           <button
             onClick={onClose}
-            className="flex-1 px-3 py-3 md:px-4 md:py-3.5 rounded-[12px] text-sm md:text-sm font-bold text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            className="flex-1 px-3 py-3 md:px-4 rounded-[12px] text-body font-bold text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary transition-colors"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-1 px-3 py-3 md:px-4 md:py-3.5 rounded-[12px] text-sm md:text-sm font-bold text-white bg-brand-primary hover:bg-brand-primary/90 shadow-brand-primary/20 hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 px-3 py-3 md:px-4 rounded-[12px] text-body font-bold text-white bg-brand-primary hover:bg-brand-primary/90 shadow-brand-primary/20 hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
             <span className="truncate">{t('submitAssignment')}</span>

@@ -31,7 +31,7 @@ const LessonsContent: React.FC = () => {
   const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
 
   if (loading && !lessonsData) return <LoadingScreen message={t('loadingLessons')} />;
-  if (error) return <div className="text-center py-20 text-red-500 font-bold text-sm">{error}</div>;
+  if (error) return <div className="text-center py-20 text-red-500 font-bold text-body">{error}</div>;
 
   const attendance = lessonsData?.attendance;
   const assignments = lessonsData?.assignments;
@@ -55,11 +55,11 @@ const LessonsContent: React.FC = () => {
 
       {/* Page Title */}
       <div className="px-1">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
+        <h1 className="text-h2 md:text-h1 tracking-tight text-brand-dark dark:text-text-theme-dark-primary flex items-center gap-2">
           <BookOpen className="w-6 h-6 text-brand-primary shrink-0" />
           {t('lessons')}
         </h1>
-        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+        <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1">
           {t('lessonsSubtitle')}
         </p>
       </div>
@@ -67,16 +67,16 @@ const LessonsContent: React.FC = () => {
       {/* Attendance Section */}
       <section className="space-y-4">
         <div className="flex items-center gap-2 px-1 text-brand-primary">
-          <Clock className="w-5 h-5 shrink-0" />
-          <h2 className="text-sm font-semibold text-brand-dark dark:text-white">{t('lessonAttendance')}</h2>
+          <Clock className="w-4 h-4 shrink-0" />
+          <h2 className="text-body font-semibold text-brand-dark dark:text-text-theme-dark-primary">{t('lessonAttendance')}</h2>
         </div>
 
         {attendance ? (
           <ActiveAttendanceCard attendance={attendance} quiz={lessonsData?.quiz} showToast={showToast} />
         ) : (
-          <div className="text-center py-14 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
-            <BookOpen className="w-10 h-10 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-400 dark:text-slate-500">{t('noLessonsSubtitle')}</p>
+          <div className="text-center py-12 bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-sm">
+            <BookOpen className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted mx-auto mb-3" />
+            <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noLessonsSubtitle')}</p>
           </div>
         )}
       </section>
@@ -84,8 +84,8 @@ const LessonsContent: React.FC = () => {
       {/* Assignments Section */}
       <section className="space-y-4">
         <div className="flex items-center gap-2 px-1 text-brand-primary">
-          <ClipboardList className="w-5 h-5 shrink-0" />
-          <h2 className="text-sm font-semibold text-brand-dark dark:text-white">{t('assignments')}</h2>
+          <ClipboardList className="w-4 h-4 shrink-0" />
+          <h2 className="text-body font-semibold text-brand-dark dark:text-text-theme-dark-primary">{t('assignments')}</h2>
         </div>
 
         {hasAnyAssignments ? (
@@ -100,7 +100,7 @@ const LessonsContent: React.FC = () => {
             {previousAssignments.length > 0 && (
               <div className="space-y-3">
                 {showCurrentAssignment && (
-                  <p className="section-label text-gray-400 dark:text-slate-500 px-1 pt-2 flex items-center gap-2">
+                  <p className="section-label text-text-theme-muted dark:text-text-theme-dark-muted px-1 pt-2 flex items-center gap-2">
                     <HistoryIcon className="w-3.5 h-3.5" />{t('portfolioHistory')}
                   </p>
                 )}
@@ -118,9 +118,9 @@ const LessonsContent: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-gray-200 dark:border-slate-800 p-14 text-center">
-            <ClipboardList className="w-10 h-10 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-400 dark:text-slate-500">{t('noAssignmentsSubtitle')}</p>
+          <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated p-12 text-center">
+            <ClipboardList className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted mx-auto mb-3" />
+            <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noAssignmentsSubtitle')}</p>
           </div>
         )}
       </section>
