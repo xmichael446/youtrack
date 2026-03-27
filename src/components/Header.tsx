@@ -5,6 +5,7 @@ import { useDashboard } from '../context/DashboardContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useNavigation } from '../context/NavigationContext';
 import { apiService } from '../services/ApiService';
+import { Z_INDEX } from '../constants/zIndex';
 
 interface HeaderProps {
   isDark: boolean;
@@ -154,7 +155,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
 
   return (
     <>
-      <header className="bg-surface-primary/95 dark:bg-surface-dark-secondary/95 backdrop-blur-lg border-b border-surface-secondary/80 dark:border-surface-dark-elevated/80 fixed w-full md:sticky top-0 z-30 px-3 md:px-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3 md:py-3 flex items-center justify-between shadow-[0_1px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.2)] transition-colors duration-normal">
+      <header className="bg-surface-primary/95 dark:bg-surface-dark-secondary/95 backdrop-blur-lg border-b border-surface-secondary/80 dark:border-surface-dark-elevated/80 fixed w-full md:sticky top-0 px-3 md:px-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3 md:py-3 flex items-center justify-between shadow-[0_1px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.2)] transition-colors duration-normal" style={{ zIndex: Z_INDEX.dropdown }}>
         {/* Mobile Logo */}
         <div className="flex items-center md:hidden min-w-0">
           <img
@@ -228,7 +229,8 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   ref={notificationPanelRef}
                   role="region"
                   aria-label={t('notifications')}
-                  className="absolute top-full right-0 mt-2 w-[280px] md:w-[340px] bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden z-50 animate-in fade-in duration-fast"
+                  className="absolute top-full right-0 mt-2 w-[280px] md:w-[340px] bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden animate-in fade-in duration-fast"
+                  style={{ zIndex: Z_INDEX.overlay }}
                 >
                   <div className="px-4 py-3 bg-surface-secondary/50 dark:bg-surface-dark-elevated/50 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-between items-center">
                     <h3 className="text-caption text-text-theme-primary dark:text-text-theme-dark-primary">{t('notifications')}</h3>
@@ -305,7 +307,8 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   ref={profilePanelRef}
                   role="menu"
                   aria-label={user?.name ?? t('student')}
-                  className="absolute top-full right-0 mt-2 w-72 bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden z-50 animate-in fade-in duration-fast"
+                  className="absolute top-full right-0 mt-2 w-72 bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden animate-in fade-in duration-fast"
+                  style={{ zIndex: Z_INDEX.overlay }}
                 >
                   {/* Profile Header (Name also clickable here) */}
                   <div 
