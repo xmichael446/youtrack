@@ -40,12 +40,12 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
     const baseClasses = [
       'w-full rounded-input border',
       error
-        ? 'border-status-error dark:border-status-dark-error focus:ring-status-error/10'
-        : 'border-surface-secondary dark:border-surface-dark-elevated focus:border-brand-primary focus:ring-brand-primary/10',
+        ? 'border-status-error dark:border-status-dark-error focus:ring-status-error/20'
+        : 'border-surface-secondary dark:border-surface-dark-elevated focus:border-brand-primary focus:ring-brand-primary/20',
       'bg-surface-primary dark:bg-surface-dark-primary',
       'text-text-theme-primary dark:text-text-theme-dark-primary',
       'placeholder:text-text-theme-muted dark:placeholder:text-text-theme-dark-muted',
-      'focus:outline-none focus:ring-4',
+      'focus:outline-none focus:ring-2',
       'transition-all duration-fast',
       sizeMap[size],
       icon ? iconPaddingMap[size] : '',

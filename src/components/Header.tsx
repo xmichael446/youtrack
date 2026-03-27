@@ -234,7 +234,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                 aria-label={unreadCount > 0 ? t('notificationsUnread', { count: unreadCount }) : t('notifications')}
                 aria-expanded={showNotifications}
                 aria-haspopup="true"
-                className={`w-10 h-10 flex items-center justify-center rounded-input transition-all duration-fast relative ${showNotifications ? 'bg-brand-primary/10 text-brand-primary' : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated'}`}
+                className={`w-10 h-10 flex items-center justify-center rounded-input transition-all duration-fast relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary ${showNotifications ? 'bg-brand-primary/10 text-brand-primary' : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated'}`}
               >
                 <Bell className="w-[18px] h-[18px]" />
                 {unreadCount > 0 && (
@@ -326,7 +326,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   aria-label={t('profile')}
                   aria-expanded={showProfileMenu}
                   aria-haspopup="menu"
-                  className="flex items-center gap-2 hover:opacity-80 transition-all active:scale-95 group"
+                  className="flex items-center gap-2 hover:opacity-80 transition-all active:scale-95 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary rounded-input"
                 >
                   {/* Clickable Name (Desktop) */}
                   <div className="hidden sm:block text-right">
@@ -388,7 +388,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                     <button
                       role="menuitem"
                       onClick={toggleTheme}
-                      className="w-full flex items-center justify-between px-3 py-2 text-body text-text-theme-secondary dark:text-text-theme-dark-primary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated rounded-input transition-colors group"
+                      className="w-full flex items-center justify-between px-3 py-2 text-body text-text-theme-secondary dark:text-text-theme-dark-primary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated rounded-input transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-secondary"
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-indigo-500 flex items-center justify-center shrink-0">
@@ -411,11 +411,11 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                       </div>
                       <div className="flex bg-surface-secondary dark:bg-surface-dark-elevated p-1 rounded-button gap-0.5">
                         <button onClick={() => setLanguage('uz')}
-                          className={`px-2 py-1 rounded-md text-caption transition-all ${language === 'uz' ? 'bg-surface-primary dark:bg-surface-dark-elevated shadow-sm text-brand-dark dark:text-text-theme-dark-primary' : 'text-text-theme-muted dark:text-text-theme-dark-muted hover:text-text-theme-secondary'}`}>
+                          className={`px-2 py-1 rounded-md text-caption transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 dark:focus-visible:ring-offset-surface-dark-elevated ${language === 'uz' ? 'bg-surface-primary dark:bg-surface-dark-elevated shadow-sm text-brand-dark dark:text-text-theme-dark-primary' : 'text-text-theme-muted dark:text-text-theme-dark-muted hover:text-text-theme-secondary'}`}>
                           UZB
                         </button>
                         <button onClick={() => setLanguage('en')}
-                          className={`px-2 py-1 rounded-md text-caption transition-all ${language === 'en' ? 'bg-surface-primary dark:bg-surface-dark-elevated shadow-sm text-brand-dark dark:text-text-theme-dark-primary' : 'text-text-theme-muted dark:text-text-theme-dark-muted hover:text-text-theme-secondary'}`}>
+                          className={`px-2 py-1 rounded-md text-caption transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 dark:focus-visible:ring-offset-surface-dark-elevated ${language === 'en' ? 'bg-surface-primary dark:bg-surface-dark-elevated shadow-sm text-brand-dark dark:text-text-theme-dark-primary' : 'text-text-theme-muted dark:text-text-theme-dark-muted hover:text-text-theme-secondary'}`}>
                           ENG
                         </button>
                       </div>
@@ -426,7 +426,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                     {/* Logout */}
                     <button
                       role="menuitem"
-                      className="w-full flex items-center gap-3 px-3 py-2 text-body text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-input transition-colors group"
+                      className="w-full flex items-center gap-3 px-3 py-2 text-body text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-input transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-error focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-secondary"
                       onClick={() => { setShowProfileMenu(false); onLogout(); }}
                     >
                       <div className="text-red-500 flex items-center justify-center shrink-0 group-hover:text-red-600 transition-colors">

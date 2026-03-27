@@ -34,7 +34,7 @@ const loaderSizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
 };
 
 const BASE_CLASSES =
-  'inline-flex items-center justify-center font-bold rounded-button transition-all duration-fast disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none';
+  'inline-flex items-center justify-center font-bold rounded-button transition-all duration-fast disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary';
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (

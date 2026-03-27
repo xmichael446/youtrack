@@ -25,7 +25,7 @@ const paddingClasses: Record<NonNullable<CardProps['padding']>, string> = {
 const BASE_CLASSES = 'rounded-card transition-all duration-fast';
 
 const HOVERABLE_CLASSES =
-  'hover:shadow-modal dark:hover:shadow-modal-dark hover:scale-[1.01] active:scale-[0.99] cursor-pointer';
+  'hover:shadow-modal dark:hover:shadow-modal-dark hover:scale-[1.01] active:scale-[0.99] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary';
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   (

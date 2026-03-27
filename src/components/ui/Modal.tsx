@@ -80,7 +80,7 @@ const Modal: React.FC<ModalProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary rounded-input transition-colors duration-fast"
+              className="p-2 hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary rounded-input transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-secondary"
             >
               <X className="w-4 h-4 text-text-theme-secondary dark:text-text-theme-dark-secondary" />
             </button>

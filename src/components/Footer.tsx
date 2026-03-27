@@ -15,7 +15,7 @@ const Footer: React.FC<FooterProps> = ({ isDark }) => {
                     href="https://t.me/xmichael446"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand-primary hover:text-brand-accent transition-colors"
+                    className="text-brand-primary hover:text-brand-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-dark-primary focus-visible:rounded-sm"
                 >
                     Michael
                 </a>
