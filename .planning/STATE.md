@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-core-components-03-PLAN.md
-last_updated: "2026-03-27T01:39:25.556Z"
+stopped_at: Completed 02-core-components-04-PLAN.md
+last_updated: "2026-03-27T01:44:37.001Z"
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -54,6 +54,7 @@ Plan: 4 of 4
 | Phase 02-core-components P02 | 2 | 2 tasks | 3 files |
 | Phase 02-core-components P01 | 3 | 2 tasks | 3 files |
 | Phase 02 P03 | 3 | 2 tasks | 2 files |
+| Phase 02-core-components P04 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Phase 02-core-components]: Z_INDEX const assertion used for type narrowing; filter+join pattern for class composition avoids clsx dependency
 - [Phase 02-core-components]: Toast z-index changed from z-[100] to z-[70] matching shared scale; Modal uses z-[60]; both use literal values until zIndex.ts constants file exists
 - [Phase 02-core-components]: Modal component extracts common overlay shell from SubmissionModal with optional title/subtitle/footer slots and 3 maxWidth presets
+- [Phase 02-core-components]: Barrel file exports all 13 UI primitives from src/components/ui/index.ts for single-path imports
+- [Phase 02-core-components]: NavItem active label uses font-semibold with brand-primary bottom indicator bar on mobile; font-normal when inactive
+- [Phase 02-core-components]: Header z-index uses Z_INDEX constants via inline styles replacing hardcoded z-30/z-50 Tailwind classes
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T01:39:25.530Z
-Stopped at: Completed 02-core-components-03-PLAN.md
+Last session: 2026-03-27T01:44:36.993Z
+Stopped at: Completed 02-core-components-04-PLAN.md
 Resume file: None

@@ -13,7 +13,7 @@ Starting from an inconsistently styled brownfield React app, this roadmap delive
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Design System** - Establish the token foundation (spacing, color, typography, shadows) that all subsequent work draws from (completed 2026-03-27)
-- [ ] **Phase 2: Core Components** - Standardize every shared UI primitive (buttons, inputs, cards, modals, nav) using the design system
+- [x] **Phase 2: Core Components** - Standardize every shared UI primitive (buttons, inputs, cards, modals, nav) using the design system (completed 2026-03-27)
 - [ ] **Phase 3: Page Redesigns** - Redesign all eight pages (Login, Dashboard, Leaderboard, Lessons, Rewards, Profile, Contests, Notifications) using the component library
 - [ ] **Phase 4: Polish** - Ensure the full app is responsive, dark-mode-intentional, animated, and accessible
 
@@ -49,13 +49,13 @@ Plans:
   3. Cards across all pages share the same padding, border, shadow, and hover behavior — no card looks different from any other
   4. Modals and dialogs use a consistent overlay, entrance animation, and internal layout
   5. The header, sidebar, and bottom nav share a unified active-state and styling treatment — the navigation feels like one system
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 02-01-PLAN.md — Create Button and Card components with z-index scale
 - [x] 02-02-PLAN.md — Create Input, Badge, and EmptyState components
 - [x] 02-03-PLAN.md — Create Modal component and standardize Toast
-- [ ] 02-04-PLAN.md — Standardize navigation active states and create barrel export
+- [x] 02-04-PLAN.md — Standardize navigation active states and create barrel export
 
 ### Phase 3: Page Redesigns
 **Goal**: Every page in the app looks like it was designed by one person — cohesive, playful, and visually polished
@@ -88,6 +88,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Design System | 6/6 | Complete   | 2026-03-27 |
-| 2. Core Components | 3/4 | In Progress|  |
+| 2. Core Components | 4/4 | Complete   | 2026-03-27 |
 | 3. Page Redesigns | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
