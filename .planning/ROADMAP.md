@@ -49,7 +49,13 @@ Plans:
   3. Cards across all pages share the same padding, border, shadow, and hover behavior — no card looks different from any other
   4. Modals and dialogs use a consistent overlay, entrance animation, and internal layout
   5. The header, sidebar, and bottom nav share a unified active-state and styling treatment — the navigation feels like one system
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Create Button and Card components with z-index scale
+- [ ] 02-02-PLAN.md — Create Input, Badge, and EmptyState components
+- [ ] 02-03-PLAN.md — Create Modal component and standardize Toast
+- [ ] 02-04-PLAN.md — Standardize navigation active states and create barrel export
 
 ### Phase 3: Page Redesigns
 **Goal**: Every page in the app looks like it was designed by one person — cohesive, playful, and visually polished
@@ -82,6 +88,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Design System | 6/6 | Complete   | 2026-03-27 |
-| 2. Core Components | 0/TBD | Not started | - |
+| 2. Core Components | 0/4 | Not started | - |
 | 3. Page Redesigns | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
