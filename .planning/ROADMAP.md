@@ -12,7 +12,7 @@ Starting from an inconsistently styled brownfield React app, this roadmap delive
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Design System** - Establish the token foundation (spacing, color, typography, shadows) that all subsequent work draws from (completed 2026-03-27)
+- [ ] **Phase 1: Design System** - Establish the token foundation (spacing, color, typography, shadows) that all subsequent work draws from
 - [ ] **Phase 2: Core Components** - Standardize every shared UI primitive (buttons, inputs, cards, modals, nav) using the design system
 - [ ] **Phase 3: Page Redesigns** - Redesign all eight pages (Login, Dashboard, Leaderboard, Lessons, Rewards, Profile, Contests, Notifications) using the component library
 - [ ] **Phase 4: Polish** - Ensure the full app is responsive, dark-mode-intentional, animated, and accessible
@@ -29,13 +29,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Typography is applied from a consistent scale (h1–h4, body, caption, label) with matching font sizes and weights across all pages
   4. Border radii, shadows, and transition durations are defined as reusable Tailwind config values rather than duplicated inline utilities
   5. A design system reference file exists at `.planning/design-system.md` that documents every token decision
-**Plans:** 4/4 plans complete
+**Plans:** 6 plans (4 complete, 2 gap closure)
 
 Plans:
 - [x] 01-01-PLAN.md — Define design tokens and implement in Tailwind config
 - [x] 01-02-PLAN.md — Migrate core layout and page components to semantic tokens
 - [x] 01-03-PLAN.md — Migrate UI primitives, lessons, and profile features to semantic tokens
 - [x] 01-04-PLAN.md — Migrate contest features and complete full codebase migration
+- [ ] 01-05-PLAN.md — Gap closure: migrate pages and core components to semantic radius/duration tokens
+- [ ] 01-06-PLAN.md — Gap closure: migrate feature components to semantic radius/duration tokens
 
 ### Phase 2: Core Components
 **Goal**: Every shared UI primitive is a consistent, reusable component that enforces the design system
@@ -79,7 +81,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design System | 4/4 | Complete   | 2026-03-27 |
+| 1. Design System | 4/6 | Gap closure | - |
 | 2. Core Components | 0/TBD | Not started | - |
 | 3. Page Redesigns | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
