@@ -221,7 +221,7 @@ const AppContent: React.FC<{
     })();
 
     return (
-      <div key={currentView} className="w-full">
+      <div key={currentView} className="w-full animate-view-entry">
         {View}
       </div>
     );
