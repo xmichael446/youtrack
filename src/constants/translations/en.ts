@@ -337,5 +337,14 @@ export default {
   "openingShop": "Opening Shop...",
   "needMore": "Need {count} more",
   "needMoreCoins": "Need {count} more coins",
-  "granted": "Granted"
+  "granted": "Granted",
+  "confirmClaim": "Confirm Claim",
+  "confirm": "Confirm",
+  "availableToSpend": "Available to spend",
+  "confirmClaimDesc": "Are you sure you want to spend {cost} coins on \"{name}\"?",
+  "confirmClaimFreeDesc": "Claim \"{name}\" for free?",
+  "contestStatusOpen": "Live",
+  "contestStatusScheduled": "Upcoming",
+  "contestStatusFinalized": "Ended",
+  "contestStatusClosed": "Closed"
 }

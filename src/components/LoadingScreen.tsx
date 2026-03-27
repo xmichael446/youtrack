@@ -6,7 +6,7 @@ interface LoadingScreenProps {
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = 'Syncing YouTrack' }) => {
     return (
-        <div className="absolute inset-0 z-50 bg-surface-secondary dark:bg-surface-dark-primary flex flex-col items-center justify-center">
+        <div className="flex-1 w-full min-h-[60vh] flex flex-col items-center justify-center">
             <div className="flex flex-col items-center gap-4">
                 <div className="relative w-16 h-16">
                     <div className="absolute inset-0 border-[3px] border-brand-primary/10 rounded-full"></div>

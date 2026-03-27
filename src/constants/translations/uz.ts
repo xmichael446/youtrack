@@ -338,5 +338,14 @@ export default {
   "openingShop": "Do'kon Ochilmoqda...",
   "needMore": "Yana {count} ta kerak",
   "needMoreCoins": "Yana {count} ta coin kerak",
-  "granted": "Berilgan"
+  "granted": "Berilgan",
+  "confirmClaim": "Olishni Tasdiqlash",
+  "confirm": "Tasdiqlash",
+  "availableToSpend": "Sarflash mumkin",
+  "confirmClaimDesc": "\"{name}\" uchun {cost} coin sarflamoqchimisiz?",
+  "confirmClaimFreeDesc": "\"{name}\"ni bepul olasizmi?",
+  "contestStatusOpen": "Jonli",
+  "contestStatusScheduled": "Kutilmoqda",
+  "contestStatusFinalized": "Tugagan",
+  "contestStatusClosed": "Yopilgan"
 }

@@ -194,7 +194,7 @@ const LeaderboardContent: React.FC = () => {
         <>
           {/* Top-3 Podium */}
           {topThree.length >= 2 && (
-            <div className="flex items-end gap-2 md:gap-3 overflow-hidden">
+            <div className="flex items-end gap-2 md:gap-3 mb-2">
               {/* 2nd place (left) */}
               {topThree[1] && (() => {
                 const entry = topThree[1];
@@ -203,13 +203,13 @@ const LeaderboardContent: React.FC = () => {
                   <Card
                     hoverable
                     padding="md"
-                    className="flex-1 min-w-0 flex flex-col items-center gap-2 border-t-4 border-slate-400 cursor-pointer"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-1.5 border-t-4 border-slate-400 cursor-pointer"
                     onClick={() => isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id))}
                   >
-                    <div className="w-10 h-10 rounded-card bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
-                      <span className="text-body font-bold tabular-nums text-slate-700 dark:text-white">2</span>
+                    <div className="w-9 h-9 rounded-card bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
+                      <span className="text-caption font-bold tabular-nums text-slate-700 dark:text-white">2</span>
                     </div>
-                    <p className="text-caption text-brand-dark dark:text-text-theme-dark-primary text-center truncate w-full leading-tight">
+                    <p className="text-caption text-brand-dark dark:text-text-theme-dark-primary text-center w-full leading-tight line-clamp-2">
                       {entry.full_name}
                     </p>
                     <div className="flex items-center gap-1">
@@ -231,13 +231,13 @@ const LeaderboardContent: React.FC = () => {
                   <Card
                     hoverable
                     padding="md"
-                    className="flex-1 min-w-0 flex flex-col items-center gap-2 border-t-4 border-amber-400 pb-6 cursor-pointer"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-1.5 border-t-4 border-amber-400 pb-4 cursor-pointer"
                     onClick={() => isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id))}
                   >
-                    <div className="w-12 h-12 rounded-card bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40 ring-2 ring-amber-400/30">
-                      <Crown className="w-6 h-6 text-amber-900 fill-amber-900" />
+                    <div className="w-10 h-10 rounded-card bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40 ring-2 ring-amber-400/30">
+                      <Crown className="w-5 h-5 text-amber-900 fill-amber-900" />
                     </div>
-                    <p className="text-body text-brand-dark dark:text-text-theme-dark-primary text-center truncate w-full leading-tight">
+                    <p className="text-body text-brand-dark dark:text-text-theme-dark-primary text-center w-full leading-tight line-clamp-2">
                       {entry.full_name}
                     </p>
                     <div className="flex items-center gap-1">
@@ -264,13 +264,13 @@ const LeaderboardContent: React.FC = () => {
                   <Card
                     hoverable
                     padding="md"
-                    className="flex-1 min-w-0 flex flex-col items-center gap-2 border-t-4 border-orange-400 cursor-pointer"
+                    className="flex-1 min-w-0 flex flex-col items-center gap-1.5 border-t-4 border-orange-400 cursor-pointer"
                     onClick={() => isCurrentUser ? navigateToProfile(null) : (entry.id && navigateToProfile(entry.id))}
                   >
-                    <div className="w-10 h-10 rounded-card bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md shadow-orange-400/30 ring-2 ring-orange-400/30">
-                      <span className="text-body font-bold tabular-nums text-orange-900">3</span>
+                    <div className="w-9 h-9 rounded-card bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md shadow-orange-400/30 ring-2 ring-orange-400/30">
+                      <span className="text-caption font-bold tabular-nums text-orange-900">3</span>
                     </div>
-                    <p className="text-caption text-brand-dark dark:text-text-theme-dark-primary text-center truncate w-full leading-tight">
+                    <p className="text-caption text-brand-dark dark:text-text-theme-dark-primary text-center w-full leading-tight line-clamp-2">
                       {entry.full_name}
                     </p>
                     <div className="flex items-center gap-1">
