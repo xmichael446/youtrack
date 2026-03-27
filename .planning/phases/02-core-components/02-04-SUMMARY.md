@@ -60,6 +60,10 @@ metrics:
 
 None — plan executed exactly as written.
 
+## Self-Check: PASSED
+
+All created/modified files verified on disk. Both task commits (a522587, f14b19c) confirmed in git log.
+
 ## Known Stubs
 
 None — no UI stubs or placeholder data in the files created/modified by this plan.
