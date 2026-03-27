@@ -119,7 +119,7 @@ const ContestDetailView: React.FC<{
   };
 
   if (loading) return (
-    <div className="space-y-5 animate-in fade-in duration-300 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="space-y-5 animate-in fade-in duration-normal min-h-[60vh] flex flex-col items-center justify-center">
       <LoadingScreen message={t('inspectingBattle')} />
     </div>
   );
@@ -127,8 +127,8 @@ const ContestDetailView: React.FC<{
   if (error || !detail) return (
     <div className="space-y-4 animate-in fade-in duration-500">
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
-      <div className="flex flex-col items-center gap-3 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
-        <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-card border border-red-100 dark:border-red-500/10">
+        <div className="w-12 h-12 rounded-card bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <AlertCircle className="w-5 h-5 text-red-400" />
         </div>
         <p className="text-sm text-red-500 font-medium">{error || t('contestNotFound')}</p>
@@ -143,7 +143,7 @@ const ContestDetailView: React.FC<{
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
 
       {/* Header card -- light theme consistent with lesson cards */}
-      <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-card dark:shadow-card-dark">
+      <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card border border-gray-100 dark:border-slate-800 overflow-hidden shadow-card dark:shadow-card-dark">
         {/* Brand accent top strip */}
         <div className="h-1 w-full bg-gradient-to-r from-brand-primary via-cyan-400 to-brand-primary/40" />
 
@@ -181,7 +181,7 @@ const ContestDetailView: React.FC<{
 
           {/* Countdown */}
           {(detail.status === 'scheduled' || detail.status === 'open') && (
-            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono mb-4 bg-brand-primary/5 border border-brand-primary/15">
+            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-button text-xs font-mono mb-4 bg-brand-primary/5 border border-brand-primary/15">
               <Clock className="w-3 h-3 text-brand-primary" />
               <span className="text-text-theme-secondary dark:text-text-theme-dark-secondary">{detail.status === 'scheduled' ? t('contestStartsIn') : t('contestEndsIn')}:</span>
               <span className="text-gray-900 dark:text-white font-bold tabular-nums">{countdown}</span>
@@ -205,7 +205,7 @@ const ContestDetailView: React.FC<{
                   <div key={profileId || idx} onClick={() => {
                     if (isMe) navigateToProfile(null);
                     else if (profileId) navigateToProfile(profileId);
-                  }} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-surface-secondary dark:bg-surface-dark-secondary/50 border border-gray-100 dark:border-slate-700/50 shadow-card transition-all hover:bg-gray-100 dark:hover:bg-surface-dark-secondary cursor-pointer group">
+                  }} className="flex items-center justify-between gap-3 p-3 rounded-input bg-surface-secondary dark:bg-surface-dark-secondary/50 border border-gray-100 dark:border-slate-700/50 shadow-card transition-all hover:bg-gray-100 dark:hover:bg-surface-dark-secondary cursor-pointer group">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="shrink-0">
                         <RankBadge rank={place} />
@@ -218,7 +218,7 @@ const ContestDetailView: React.FC<{
                       </div>
                     </div>
                     {(xp || coins) && (
-                      <div className={`flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2 shrink-0 px-2 py-1 sm:py-2 rounded-lg border shadow-sm ${
+                      <div className={`flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2 shrink-0 px-2 py-1 sm:py-2 rounded-button border shadow-sm ${
                         place === 1 ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/30' :
                         place === 2 ? 'bg-surface-secondary dark:bg-surface-dark-secondary border-slate-200 dark:border-slate-700' :
                         'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700/30'
@@ -249,7 +249,7 @@ const ContestDetailView: React.FC<{
           ) : detail.prizes && detail.prizes.length > 0 ? (
             <div className="flex items-center gap-2 flex-wrap mt-2">
               {detail.prizes.map(p => (
-                <div key={p.place} className="inline-flex items-center gap-2 px-2 py-1 rounded-lg text-caption font-semibold bg-surface-secondary dark:bg-surface-dark-secondary border border-gray-100 dark:border-slate-700">
+                <div key={p.place} className="inline-flex items-center gap-2 px-2 py-1 rounded-button text-caption font-semibold bg-surface-secondary dark:bg-surface-dark-secondary border border-gray-100 dark:border-slate-700">
                   <PlaceIcon place={p.place} className="w-3.5 h-3.5" />
                   <span className="text-text-theme-secondary dark:text-text-theme-dark-secondary">{p.reward_name}</span>
                 </div>
@@ -259,7 +259,7 @@ const ContestDetailView: React.FC<{
 
           {/* Submitted -- show score inside the card */}
           {isSubmitted && detail.status === 'open' && localPlayState?.score !== undefined && (
-            <div className="mt-4 flex items-center gap-3 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/30">
+            <div className="mt-4 flex items-center gap-3 px-3 py-2 rounded-input bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/30">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               <span className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold">{t('contestSubmitted')}</span>
               <span className="ml-auto text-sm font-bold text-gray-900 dark:text-white tabular-nums">
@@ -268,7 +268,7 @@ const ContestDetailView: React.FC<{
             </div>
           )}
           {isSubmitted && detail.status === 'open' && localPlayState?.score === undefined && (
-            <div className="mt-4 flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/30">
+            <div className="mt-4 flex items-center gap-2 px-3 py-2 rounded-input bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/30">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               <span className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold">{t('contestSubmitted')} · {t('contestWaitingResults')}</span>
             </div>
@@ -288,7 +288,7 @@ const ContestDetailView: React.FC<{
                 {t('contestRegistrations').replace('{count}', String(detail.registrations?.length || detail.registration_count))}
               </h3>
               {detail.registrations && detail.registrations.length > 0 ? (
-                <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-surface-primary dark:bg-surface-dark-secondary/50">
+                <div className="overflow-hidden rounded-input border border-gray-100 dark:border-slate-800 bg-surface-primary dark:bg-surface-dark-secondary/50">
                   <table className="w-full text-left text-sm"><thead className="bg-gray-50/50 dark:bg-surface-dark-secondary/50 text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary font-mono uppercase tracking-wider"><tr><th className="px-4 py-3 font-medium text-center w-12">#</th><th className="px-4 py-3 font-medium">Student</th><th className="px-4 py-3 font-medium text-right">XP</th></tr></thead><tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
                       {detail.registrations.map((reg, idx) => {
                         const rawName = reg.full_name || (reg as any).name || (reg as any).student_name || (reg as any).student?.full_name || '';
@@ -332,10 +332,10 @@ const ContestDetailView: React.FC<{
             <div className="space-y-8 animate-in fade-in duration-700">
               {/* My result section -- redesigned to match lesson quiz style */}
               {results?.my_attempt && (
-                <div className="bg-surface-secondary dark:bg-surface-dark-secondary/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-card">
+                <div className="bg-surface-secondary dark:bg-surface-dark-secondary/50 p-4 rounded-card border border-gray-100 dark:border-slate-700/50 shadow-card">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-brand-primary/10 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 bg-brand-primary/10 rounded-input flex items-center justify-center">
                         <Trophy className="w-5 h-5 text-brand-primary" />
                       </div>
                       <div>
@@ -345,13 +345,13 @@ const ContestDetailView: React.FC<{
                     </div>
                     <div className="text-right">
                       <span className="text-label font-mono font-bold text-text-theme-muted uppercase tracking-widest block mb-1">{t('correctAnswers')}</span>
-                      <span className="text-h2 font-mono text-brand-primary">{results.my_attempt.score}<span className="text-gray-300 dark:text-slate-600 mx-1">/</span>{results.my_attempt.total}</span>
+                      <span className="text-h2 font-mono text-brand-primary">{results.my_attempt.score}<span className="text-gray-300 dark:text-text-theme-dark-muted mx-1">/</span>{results.my_attempt.total}</span>
                     </div>
                   </div>
 
                   <button
                     onClick={() => onNavigate({ view: 'review', contestId, answers: results.my_attempt?.answers || [] })}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary border border-brand-primary/20 rounded-xl font-bold text-body hover:bg-brand-primary/5 transition-all shadow-card active:scale-[0.98]"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary border border-brand-primary/20 rounded-input font-bold text-body hover:bg-brand-primary/5 transition-all shadow-card active:scale-[0.98]"
                   >
                     <Search className="w-4 h-4" />
                     {t('reviewAnswers')}
@@ -367,7 +367,7 @@ const ContestDetailView: React.FC<{
                   {t('contestLeaderboard')}
                 </h3>
 
-                <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-surface-primary dark:bg-surface-dark-secondary/50">
+                <div className="overflow-hidden rounded-input border border-gray-100 dark:border-slate-800 bg-surface-primary dark:bg-surface-dark-secondary/50">
                   <table className="w-full text-left text-sm"><thead className="bg-surface-secondary/50 dark:bg-surface-dark-secondary/50 text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary font-mono uppercase tracking-wider"><tr><th className="px-2 sm:px-4 py-3 font-medium text-center w-10 sm:w-14">Rank</th><th className="px-2 sm:px-4 py-3 font-medium">Student</th><th className="px-2 sm:px-4 py-3 font-medium text-right">Score</th></tr></thead><tbody className="divide-y divide-gray-100 dark:divide-slate-800/50">
                       {(results?.leaderboard || []).map((entry: any, idx: number) => {
                         const profileId = entry.id || entry.enrollment_id || entry.student_id || entry.student?.id;
@@ -400,7 +400,7 @@ const ContestDetailView: React.FC<{
                                   </div>
                                 </div>
                                 {prize && (
-                                  <div className="flex items-center gap-1 shrink-0 px-2 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-700/30">
+                                  <div className="flex items-center gap-1 shrink-0 px-2 sm:px-2 py-0.5 sm:py-1 rounded-button bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-700/30">
                                     <PlaceIcon place={prize.place} className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                                     <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-300 hidden md:inline">{prize.reward_name}</span>
                                     <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-300 md:hidden">{prize.reward_name.split(' ')[0]}</span>
@@ -427,7 +427,7 @@ const ContestDetailView: React.FC<{
                 Live Leaderboard
               </h3>
 
-              <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-surface-primary dark:bg-surface-dark-secondary/50">
+              <div className="overflow-hidden rounded-input border border-gray-100 dark:border-slate-800 bg-surface-primary dark:bg-surface-dark-secondary/50">
                 {!liveLeaderboard ? (
                   <div className="py-8 flex flex-col items-center justify-center gap-3">
                     <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
@@ -444,7 +444,7 @@ const ContestDetailView: React.FC<{
                           <tr key={profileId || idx} onClick={() => {
                             if (isMe) navigateToProfile(null);
                             else if (profileId) navigateToProfile(profileId);
-                          }} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors animate-in fade-in duration-300 cursor-pointer group">
+                          }} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors animate-in fade-in duration-normal cursor-pointer group">
                             <td className="px-2 sm:px-4 py-3 text-center">
                               <div className="flex justify-center"><PlaceIcon place={entry.rank || idx + 1} /></div>
                             </td>
@@ -487,7 +487,7 @@ const ContestDetailView: React.FC<{
                 </div>
                 {t('contestPrizes')}
               </h3>
-              <div className="divide-y divide-gray-100 dark:divide-slate-800/50 bg-surface-primary dark:bg-surface-dark-secondary/50 border border-gray-100 dark:border-slate-800 rounded-xl overflow-hidden">
+              <div className="divide-y divide-gray-100 dark:divide-slate-800/50 bg-surface-primary dark:bg-surface-dark-secondary/50 border border-gray-100 dark:border-slate-800 rounded-input overflow-hidden">
                 {detail.prizes.map(prize => {
                   const g = prizeGradient(prize.place);
                   return (

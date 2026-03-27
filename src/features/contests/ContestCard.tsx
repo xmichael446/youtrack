@@ -55,7 +55,7 @@ const ContestCard: React.FC<{
     if (item.status === 'scheduled') {
       if (item.is_registered) {
         return (
-          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
+          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {t('contestRegistered')}
           </span>
@@ -65,7 +65,7 @@ const ContestCard: React.FC<{
         <button
           onClick={handleAction}
           disabled={registeringId === item.id}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-white bg-brand-primary hover:bg-brand-primary/90 shadow-sm shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 transition-all duration-150 disabled:opacity-60 tracking-wide"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-white bg-brand-primary hover:bg-brand-primary/90 shadow-sm shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 transition-all duration-150 disabled:opacity-60 tracking-wide"
         >
           {registeringId === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
           {t('contestRegister')}
@@ -76,7 +76,7 @@ const ContestCard: React.FC<{
       if (item.is_registered) {
         if (isSubmitted) {
           return (
-            <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
+            <span className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
               <CheckCircle2 className="w-3.5 h-3.5" />
               {localPlay?.score !== undefined ? `${localPlay.score}/${localPlay.total}` : t('contestSubmitted')}
             </span>
@@ -85,7 +85,7 @@ const ContestCard: React.FC<{
         return null; // rendered as full-width banner below
       }
       return (
-        <span className="inline-flex items-center px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-text-theme-muted dark:text-text-theme-dark-muted bg-surface-secondary dark:bg-surface-dark-secondary cursor-not-allowed tracking-wide">
+        <span className="inline-flex items-center px-3 py-2 rounded-input text-[10px] font-bold font-mono text-text-theme-muted dark:text-text-theme-dark-muted bg-surface-secondary dark:bg-surface-dark-secondary cursor-not-allowed tracking-wide">
           {t('contestRegistrationClosed')}
         </span>
       );
@@ -94,7 +94,7 @@ const ContestCard: React.FC<{
       return (
         <button
           onClick={handleAction}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-brand-primary hover:bg-brand-primary/10 border border-brand-primary/30 hover:border-brand-primary/50 hover:scale-[1.02] active:scale-95 transition-all duration-150 tracking-wide"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-brand-primary hover:bg-brand-primary/10 border border-brand-primary/30 hover:border-brand-primary/50 hover:scale-[1.02] active:scale-95 transition-all duration-150 tracking-wide"
         >
           <Trophy className="w-3.5 h-3.5" />
           {t('contestViewResults')}
@@ -110,10 +110,10 @@ const ContestCard: React.FC<{
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       onMouseLeave={() => setPressed(false)}
-      className={`bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-card dark:shadow-card-dark
+      className={`bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-gray-100 dark:border-slate-800 overflow-hidden shadow-card dark:shadow-card-dark
         hover:border-brand-primary/25 dark:hover:border-brand-primary/20
         hover:shadow-lg dark:hover:shadow-brand-primary/5
-        transition-all duration-200 cursor-pointer group
+        transition-all duration-fast cursor-pointer group
         ${statusAccentClass(item.status)}
         ${pressed ? 'scale-[0.99]' : 'hover:-translate-y-0.5'}
       `}
@@ -129,7 +129,7 @@ const ContestCard: React.FC<{
       <div className="p-4">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
-            <h3 className="text-h4 text-gray-900 dark:text-text-theme-dark-primary group-hover:text-brand-primary transition-colors duration-200 tracking-tight">
+            <h3 className="text-h4 text-gray-900 dark:text-text-theme-dark-primary group-hover:text-brand-primary transition-colors duration-fast tracking-tight">
               {t('vocabContest')} #{item.number}
             </h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -142,7 +142,7 @@ const ContestCard: React.FC<{
               )}
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-gray-300 dark:text-slate-600 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all duration-200 shrink-0 mt-0.5" />
+          <ChevronRight className="w-4 h-4 text-gray-300 dark:text-text-theme-dark-muted group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all duration-fast shrink-0 mt-0.5" />
         </div>
 
         <div className="flex items-center gap-4 text-caption font-mono text-text-theme-muted dark:text-text-theme-dark-muted mb-4">
@@ -172,7 +172,7 @@ const ContestCard: React.FC<{
         {item.status === 'open' && item.is_registered && !isSubmitted && (
           <button
             onClick={handleAction}
-            className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold font-mono text-sm text-white bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/30 hover:shadow-emerald-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150"
+            className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-input font-bold font-mono text-sm text-white bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/30 hover:shadow-emerald-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150"
           >
             <Swords className="w-4 h-4" />
             {t('contestEnter')} →
@@ -181,7 +181,7 @@ const ContestCard: React.FC<{
 
         {/* Hint for registered+upcoming: tell them what happens next */}
         {item.status === 'scheduled' && item.is_registered && (
-          <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl px-3 py-2">
+          <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 rounded-input px-3 py-2">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span>{t('contestRegisteredHint')}</span>
           </div>

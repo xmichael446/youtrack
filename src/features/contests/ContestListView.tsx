@@ -52,7 +52,7 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
         <button
           onClick={fetchContests}
           disabled={loading}
-          className="p-2 rounded-xl hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary text-text-theme-muted dark:text-text-theme-dark-muted hover:text-brand-primary transition-all duration-200 active:scale-90 mt-1"
+          className="p-2 rounded-input hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary text-text-theme-muted dark:text-text-theme-dark-muted hover:text-brand-primary transition-all duration-fast active:scale-90 mt-1"
           title={t('refresh')}
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -61,22 +61,22 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
 
       {/* Content */}
       {error ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
-          <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-red-50/50 dark:bg-red-900/10 rounded-card border border-red-100 dark:border-red-500/10">
+          <div className="w-12 h-12 rounded-card bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
             <AlertCircle className="w-5 h-5 text-red-400" />
           </div>
           <p className="text-sm text-red-500 font-medium text-center px-4">{error}</p>
           <button
             onClick={fetchContests}
-            className="text-[11px] font-mono font-bold text-brand-primary hover:text-brand-primary/80 border border-brand-primary/30 hover:border-brand-primary/50 px-4 py-2 rounded-xl transition-colors"
+            className="text-[11px] font-mono font-bold text-brand-primary hover:text-brand-primary/80 border border-brand-primary/30 hover:border-brand-primary/50 px-4 py-2 rounded-input transition-colors"
           >
             {t('loading')}
           </button>
         </div>
       ) : contests.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-700">
-          <div className="w-16 h-16 rounded-2xl bg-surface-secondary dark:bg-surface-dark-secondary border border-gray-100 dark:border-slate-700 flex items-center justify-center">
-            <Swords className="w-7 h-7 text-gray-300 dark:text-slate-600" />
+        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center bg-surface-primary dark:bg-surface-dark-primary rounded-card border-2 border-dashed border-gray-200 dark:border-slate-700">
+          <div className="w-16 h-16 rounded-card bg-surface-secondary dark:bg-surface-dark-secondary border border-gray-100 dark:border-slate-700 flex items-center justify-center">
+            <Swords className="w-7 h-7 text-gray-300 dark:text-text-theme-dark-muted" />
           </div>
           <div>
             <p className="text-body font-semibold text-text-theme-secondary dark:text-text-theme-dark-secondary">{t('contestNoContests')}</p>

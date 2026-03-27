@@ -155,10 +155,10 @@ const ContestPlayView: React.FC<{
   if (loading) return <LoadingScreen message="Initializing Battle..." />;
 
   if (error === 'already_started') return (
-    <div className="space-y-4 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-normal">
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
       <div className="flex flex-col items-center gap-4 py-20 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-card bg-brand-primary/10 flex items-center justify-center">
           <Clock className="w-6 h-6 text-brand-primary" />
         </div>
         <div>
@@ -167,7 +167,7 @@ const ContestPlayView: React.FC<{
         </div>
         <button
           onClick={() => goBack('contests')}
-          className="px-4 py-2 rounded-xl text-body font-bold font-mono text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 transition-colors"
+          className="px-4 py-2 rounded-input text-body font-bold font-mono text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 transition-colors"
         >
           Back to Contest
         </button>
@@ -178,8 +178,8 @@ const ContestPlayView: React.FC<{
   if (error) return (
     <div className="space-y-4">
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
-      <div className="flex flex-col items-center gap-4 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-500/10">
-        <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-card border border-red-100 dark:border-red-500/10">
+        <div className="w-12 h-12 rounded-card bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <AlertCircle className="w-5 h-5 text-red-400" />
         </div>
         <p className="text-sm text-red-500 font-medium">{error}</p>
@@ -195,7 +195,7 @@ const ContestPlayView: React.FC<{
       ? Math.round((playState.score / playState.total) * 100)
       : null;
     return createPortal(
-      <div className="fixed inset-0 z-[100] bg-surface-primary dark:bg-surface-dark-primary overflow-hidden flex flex-col animate-in fade-in duration-300">
+      <div className="fixed inset-0 z-[100] bg-surface-primary dark:bg-surface-dark-primary overflow-hidden flex flex-col animate-in fade-in duration-normal">
         {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
         {/* Header */}
@@ -232,7 +232,7 @@ const ContestPlayView: React.FC<{
               <div className="bg-surface-secondary dark:bg-surface-dark-primary rounded-[24px] p-8 border border-gray-100 dark:border-slate-800">
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-7xl font-bold text-brand-primary tabular-nums">{playState.score}</span>
-                  <span className="text-3xl font-bold text-gray-300 dark:text-slate-600 tabular-nums">/{playState.total}</span>
+                  <span className="text-3xl font-bold text-gray-300 dark:text-text-theme-dark-muted tabular-nums">/{playState.total}</span>
                 </div>
                 {pct !== null && (
                   <p className="text-label font-mono font-bold text-text-theme-muted dark:text-text-theme-dark-muted uppercase tracking-[3px] mt-3">
@@ -353,7 +353,7 @@ const ContestPlayView: React.FC<{
                 <button
                   key={opt.id}
                   onClick={() => handleSelectOption(q.id, opt.id)}
-                  className={`w-full p-3 md:p-4 rounded-[20px] border-2 text-left flex items-center gap-3 transition-all duration-200 group/opt ${
+                  className={`w-full p-3 md:p-4 rounded-[20px] border-2 text-left flex items-center gap-3 transition-all duration-fast group/opt ${
                     isSelected
                       ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10 ring-4 ring-brand-primary/10 scale-[1.01]'
                       : 'border-gray-100 dark:border-slate-800/50 hover:border-brand-primary/40 bg-surface-primary dark:bg-surface-dark-secondary shadow-card active:scale-[0.99]'
