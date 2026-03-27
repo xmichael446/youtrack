@@ -7,6 +7,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useNavigation } from '../../context/NavigationContext';
 import type { ProfileData } from '../../services/apiTypes';
 import { getInitials, getAvatarBg } from './profileHelpers';
+import { Card, Button, Badge } from '../../components/ui';
 
 const ProfileHero: React.FC<{
   profile: ProfileData;
@@ -23,7 +24,7 @@ const ProfileHero: React.FC<{
   const hasAttendance = 'attendance_pct' in stats;
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm overflow-hidden">
+    <Card variant="default" padding="none" className="overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <button onClick={() => goBack('dashboard')}
@@ -33,15 +34,21 @@ const ProfileHero: React.FC<{
         </button>
         {profile.is_own_profile && (
           <div className="flex items-center gap-2">
-            <button onClick={onSettings} aria-label={t('settings')}
-              className="min-w-[44px] min-h-[44px] rounded-input bg-surface-secondary dark:bg-surface-dark-secondary flex items-center justify-center text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-brand-primary dark:hover:text-brand-primary transition-colors">
-              <Settings className="w-4 h-4" />
-            </button>
-            <button onClick={onEdit}
-              className="flex items-center gap-1 px-3 h-9 rounded-input bg-brand-primary/10 text-brand-primary text-caption hover:bg-brand-primary/20 transition-colors">
-              <Edit3 className="w-3.5 h-3.5" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSettings}
+              aria-label={t('settings')}
+              icon={<Settings className="w-4 h-4" />}
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onEdit}
+              icon={<Edit3 className="w-3.5 h-3.5" />}
+            >
               {t('editProfile')}
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -51,16 +58,16 @@ const ProfileHero: React.FC<{
         <div className="shrink-0 relative">
           {avatarUrl ? (
             <img src={avatarUrl} alt={profile.full_name}
-              className="w-20 h-20 rounded-card object-cover ring-2 ring-surface-secondary dark:ring-surface-dark-elevated" />
+              className="w-20 h-20 rounded-pill object-cover ring-2 ring-surface-secondary dark:ring-surface-dark-elevated" />
           ) : (
-            <div className="w-20 h-20 rounded-card flex items-center justify-center text-white text-h2 ring-2 ring-surface-secondary dark:ring-surface-dark-elevated"
+            <div className="w-20 h-20 rounded-pill flex items-center justify-center text-white text-h2 ring-2 ring-surface-secondary dark:ring-surface-dark-elevated"
               style={{ backgroundColor: getAvatarBg(id) }}>
               {getInitials(profile.full_name)}
             </div>
           )}
           {profile.rank > 0 && (
-            <div className="absolute -top-2 -right-2 px-1 py-0.5 rounded-button bg-brand-primary text-white text-caption font-bold tabular-nums shadow-md">
-              #{profile.rank}
+            <div className="absolute -top-2 -right-2">
+              <Badge variant="brand" size="sm">#{profile.rank}</Badge>
             </div>
           )}
         </div>
@@ -73,7 +80,7 @@ const ProfileHero: React.FC<{
             {profile.group_name} &middot; {profile.course_name}
           </p>
 
-          {/* Pills Row: Streak, Coins, XP */}
+          {/* Stats row: Streak, Coins, XP */}
           <div className="flex flex-wrap gap-2 mt-3">
             {profile.streak > 0 && (
               <div className="flex items-center gap-1 px-2 py-1 rounded-input bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
@@ -94,20 +101,18 @@ const ProfileHero: React.FC<{
       </div>
 
       {/* Attendance & Assignments Info Row */}
-      <div className="px-4 pb-4 flex items-center gap-6 divide-x divide-surface-secondary dark:divide-surface-dark-elevated">
-        {hasAttendance && (
+      {hasAttendance && (
+        <div className="px-4 pb-4 flex items-center gap-6 divide-x divide-surface-secondary dark:divide-surface-dark-elevated">
           <div className="flex flex-col">
             <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">{t('attendance')}</span>
             <span className="text-body font-bold text-brand-dark dark:text-text-theme-dark-primary tabular-nums">{Math.round(stats.attendance_pct!)}%</span>
           </div>
-        )}
-        {hasAttendance && (
           <div className="flex flex-col pl-6">
             <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">{t('assignments')}</span>
             <span className="text-body font-bold text-brand-dark dark:text-text-theme-dark-primary tabular-nums">{Math.round(stats.assignment_pct ?? 0)}%</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Contest Badges */}
       {profile.contest_badges && profile.contest_badges.length > 0 && (
@@ -187,7 +192,7 @@ const ProfileHero: React.FC<{
           </>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

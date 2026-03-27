@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigation } from '../context/NavigationContext';
 import { apiService } from '../services/ApiService';
 import LoadingScreen from '../components/LoadingScreen';
 import type { ProfileData, ActivityEntry, HeatmapEntry } from '../services/apiTypes';
+import { Toast, Button } from '../components/ui';
 
 import {
   ProfileHero,
@@ -15,19 +16,6 @@ import {
   ProfileEdit,
   PrivacySettings,
 } from '../features/profile';
-
-// ---------------------------------------------------------------------------
-// Inline Toast (profile-local, matches original styling)
-// ---------------------------------------------------------------------------
-
-const Toast: React.FC<{ message: string; type: 'success' | 'error' }> = ({ message, type }) => (
-  <div role={type === 'error' ? 'alert' : 'status'} aria-live={type === 'error' ? 'assertive' : 'polite'}
-    className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-3 rounded-card shadow-xl text-white text-sm font-medium animate-in fade-in duration-normal
-    ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}>
-    {type === 'success' ? <CheckCircle className="w-4 h-4 shrink-0" /> : <XCircle className="w-4 h-4 shrink-0" />}
-    {message}
-  </div>
-);
 
 // ---------------------------------------------------------------------------
 // Main Profile page
@@ -49,16 +37,9 @@ const Profile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<'notFound' | 'general' | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => { if (toastTimerRef.current) clearTimeout(toastTimerRef.current); };
-  }, []);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, type });
-    toastTimerRef.current = setTimeout(() => setToast(null), 3000);
   };
 
   const loadProfile = async () => {
@@ -142,10 +123,9 @@ const Profile: React.FC = () => {
             {error === 'notFound' ? t('studentNotFoundDesc') : t('somethingWentWrongDesc')}
           </p>
         </div>
-        <button onClick={loadProfile}
-          className="px-4 h-9 rounded-input bg-brand-primary/10 text-brand-primary text-caption hover:bg-brand-primary/20 transition-colors">
+        <Button variant="secondary" size="sm" onClick={loadProfile}>
           {t('tryAgain')}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -154,7 +134,7 @@ const Profile: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-10 animate-in fade-in duration-700">
-      {toast && <Toast message={toast.message} type={toast.type} />}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {subView === 'edit' && (
         <ProfileEdit profile={profile} enrollmentId={profileEnrollmentId}
