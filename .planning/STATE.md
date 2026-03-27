@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-core-components-02-PLAN.md
-last_updated: "2026-03-27T01:37:44.371Z"
+stopped_at: Completed 02-core-components-01-PLAN.md
+last_updated: "2026-03-27T01:39:14.510Z"
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 10
-  completed_plans: 7
+  completed_plans: 9
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 ## Current Position
 
 Phase: 02 (core-components) — EXECUTING
-Plan: 2 of 4
+Plan: 4 of 4
 
 ## Performance Metrics
 
@@ -52,6 +52,8 @@ Plan: 2 of 4
 | Phase 01-design-system P05 | 8 | 2 tasks | 12 files |
 | Phase 01-design-system P06 | 27 | 2 tasks | 18 files |
 | Phase 02-core-components P02 | 2 | 2 tasks | 3 files |
+| Phase 02-core-components P01 | 3 | 2 tasks | 3 files |
+| Phase 02 P03 | 3 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -76,6 +78,9 @@ Recent decisions affecting current work:
 - [Phase 02-core-components]: Input uses as='input'|'textarea' prop instead of separate components to reduce import surface
 - [Phase 02-core-components]: Badge variant maps defined as typed Record<variant, string> at module level for readability and extensibility
 - [Phase 02-core-components]: EmptyState icon wrapped in rounded-card container for consistent icon sizing/background treatment
+- [Phase 02-core-components]: Button variant class maps use typed Record<Variant, string> for exhaustive TypeScript coverage
+- [Phase 02-core-components]: Card dark mode glow (dark:ring-1 dark:ring-white/5) applied at variant level to all card variants
+- [Phase 02-core-components]: Z_INDEX const assertion used for type narrowing; filter+join pattern for class composition avoids clsx dependency
 
 ### Pending Todos
 
@@ -87,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T01:37:44.362Z
-Stopped at: Completed 02-core-components-02-PLAN.md
+Last session: 2026-03-27T01:39:06.267Z
+Stopped at: Completed 02-core-components-01-PLAN.md
 Resume file: None
