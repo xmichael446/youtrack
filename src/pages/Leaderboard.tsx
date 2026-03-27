@@ -54,17 +54,17 @@ const LeaderboardContent: React.FC = () => {
     const change = lastRank !== undefined ? renderRankChangeInline(rank, lastRank) : null;
     const badge = (() => {
       if (rank === 1) return (
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40 ring-2 ring-amber-400/30">
+        <div className="w-10 h-10 rounded-card bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40 ring-2 ring-amber-400/30">
           <Crown className="w-5 h-5 text-amber-900 fill-amber-900" />
         </div>
       );
       if (rank === 2) return (
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
+        <div className="w-10 h-10 rounded-card bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center shadow-md shadow-slate-400/30 ring-2 ring-slate-300/30">
           <span className="text-body tabular-nums text-slate-700 dark:text-text-theme-dark-primary">2</span>
         </div>
       );
       if (rank === 3) return (
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md shadow-orange-400/30 ring-2 ring-orange-400/30">
+        <div className="w-10 h-10 rounded-card bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center shadow-md shadow-orange-400/30 ring-2 ring-orange-400/30">
           <span className="text-sm font-bold tabular-nums text-orange-900">3</span>
         </div>
       );
@@ -116,13 +116,13 @@ const LeaderboardContent: React.FC = () => {
 
       {/* Tab Switcher */}
       <div className="max-w-sm mx-auto w-full">
-        <div role="tablist" aria-label={t('leaderboard')} className="bg-surface-secondary dark:bg-surface-dark-elevated/80 p-1 rounded-2xl flex border border-surface-secondary/50 dark:border-surface-dark-elevated/50 shadow-inner">
+        <div role="tablist" aria-label={t('leaderboard')} className="bg-surface-secondary dark:bg-surface-dark-elevated/80 p-1 rounded-card flex border border-surface-secondary/50 dark:border-surface-dark-elevated/50 shadow-inner">
           <button
             role="tab"
             aria-selected={activeTab === 'group'}
             aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('group')}
-            className={`flex-1 h-12 rounded-xl text-body transition-all duration-300 flex items-center justify-center gap-2
+            className={`flex-1 h-12 rounded-input text-body transition-all duration-normal flex items-center justify-center gap-2
               ${activeTab === 'group'
                 ? 'bg-surface-primary dark:bg-surface-dark-elevated text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
                 : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary'}`}
@@ -135,7 +135,7 @@ const LeaderboardContent: React.FC = () => {
             aria-selected={activeTab === 'course'}
             aria-controls="leaderboard-panel"
             onClick={() => setActiveTab('course')}
-            className={`flex-1 h-12 rounded-xl text-body transition-all duration-300 flex items-center justify-center gap-2
+            className={`flex-1 h-12 rounded-input text-body transition-all duration-normal flex items-center justify-center gap-2
               ${activeTab === 'course'
                 ? 'bg-surface-primary dark:bg-surface-dark-elevated text-brand-primary shadow-md shadow-black/5 dark:shadow-black/20'
                 : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary'}`}
@@ -147,7 +147,7 @@ const LeaderboardContent: React.FC = () => {
       </div>
 
       {/* Leaderboard Table */}
-      <div id="leaderboard-panel" role="tabpanel" aria-label={activeTab === 'group' ? t('groupRank') : t('courseRank')} className="bg-surface-primary dark:bg-surface-dark-secondary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark overflow-hidden">
+      <div id="leaderboard-panel" role="tabpanel" aria-label={activeTab === 'group' ? t('groupRank') : t('courseRank')} className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark overflow-hidden">
 
         {/* Desktop Table Header */}
         <div className="hidden sm:grid px-6 py-3 border-b border-surface-secondary dark:border-surface-dark-elevated/70 bg-surface-secondary/80 dark:bg-surface-dark-elevated/40"
@@ -183,7 +183,7 @@ const LeaderboardContent: React.FC = () => {
                     handleActivate();
                   }
                 }}
-                className={`group relative transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary
+                className={`group relative transition-all duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary
                   ${getPodiumRowClasses(entry.rank, isCurrentUser)}
                   ${entry.rank <= 3 ? 'sm:py-1' : ''}
                 `}

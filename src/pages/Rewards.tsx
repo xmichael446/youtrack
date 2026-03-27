@@ -82,7 +82,7 @@ const RewardsContent: React.FC = () => {
 
   if (error && rewards.length === 0 && levelRewards.length === 0) {
     return (
-      <div className="text-center py-20 bg-red-50 dark:bg-red-900/10 rounded-3xl border border-red-100 dark:border-red-500/10">
+      <div className="text-center py-20 bg-red-50 dark:bg-red-900/10 rounded-card border border-red-100 dark:border-red-500/10">
         <p className="text-red-500 font-bold text-sm">{error}</p>
       </div>
     );
@@ -104,7 +104,7 @@ const RewardsContent: React.FC = () => {
 
       {/* Unified Rewards Grid */}
       {(rewards.length === 0 && levelRewards.length === 0) ? (
-        <div className="bg-surface-primary dark:bg-surface-dark-secondary p-12 rounded-3xl border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated text-center">
+        <div className="bg-surface-primary dark:bg-surface-dark-secondary p-12 rounded-card border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated text-center">
           <ShoppingBag className="w-10 h-10 text-surface-secondary dark:text-surface-dark-elevated mx-auto mb-3" />
           <p className="text-text-theme-muted dark:text-text-theme-dark-muted text-body italic">"{t('noRewards')}"</p>
         </div>
@@ -119,7 +119,7 @@ const RewardsContent: React.FC = () => {
             return (
               <div
                 key={`balance-${reward.id}`}
-                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-3xl overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
+                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-card overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
                   ${reward.claimed
                     ? 'border-emerald-200 dark:border-emerald-500/20 shadow-md'
                     : affordable
@@ -182,7 +182,7 @@ const RewardsContent: React.FC = () => {
                     <button
                       disabled={(reward.claimed ? false : !affordable) || isProcessing}
                       onClick={() => handleClaim(reward)}
-                      className={`w-full py-3 rounded-2xl text-body transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3 rounded-card text-body transition-all flex items-center justify-center gap-2 active:scale-95
                         ${reward.claimed
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : affordable
@@ -221,7 +221,7 @@ const RewardsContent: React.FC = () => {
             return (
               <div
                 key={`level-${reward.id}`}
-                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-3xl overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
+                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-card overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
                   ${isGranted
                     ? 'border-emerald-200 dark:border-emerald-500/20 shadow-md'
                     : isUnlocked
@@ -289,7 +289,7 @@ const RewardsContent: React.FC = () => {
                     <button
                       disabled={(!isUnlocked && !isGranted) || isProcessing}
                       onClick={() => handleClaimLevel(reward)}
-                      className={`w-full py-3 rounded-2xl text-body transition-all flex items-center justify-center gap-2 active:scale-95
+                      className={`w-full py-3 rounded-card text-body transition-all flex items-center justify-center gap-2 active:scale-95
                         ${isGranted
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
                           : isUnlocked
@@ -321,7 +321,7 @@ const RewardsContent: React.FC = () => {
       {/* Coins History */}
       <section className="animate-in fade-in duration-700 delay-200 fill-mode-both">
         <div className="flex items-center gap-3 px-1 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-input bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
             <History className="w-[18px] h-[18px] text-amber-500" />
           </div>
           <div>
@@ -329,7 +329,7 @@ const RewardsContent: React.FC = () => {
             <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary">{t('trackingEarnings')}</p>
           </div>
         </div>
-        <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-3xl shadow-card dark:shadow-card-dark border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden">
+        <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-card dark:shadow-card-dark border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden">
           <CoinsHistory showTitle={false} transactions={transactions} compact={false} />
         </div>
       </section>

@@ -301,4 +301,17 @@ When redesigning a page or component, follow this order:
 
 ---
 
+## 9. Intentional Exceptions
+
+The following files use raw Tailwind classes intentionally, not as migration oversights:
+
+| File | Lines | Classes | Reason |
+|------|-------|---------|--------|
+| `src/utils/contestHelpers.ts` | 26-31 | `bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300` (place===2 silver) | Silver/2nd-place podium styling — slate is the semantic silver color, not a theme surface |
+| `src/features/contests/ContestDetailView.tsx` | 229, 234, 239 | `text-slate-600 dark:text-slate-400`, `bg-slate-300 dark:bg-slate-700` (place===2 silver) | Same silver podium theme — slate represents the metallic silver tier |
+
+These are **data-driven design values** (like RARITY_COLORS hex codes) that represent a visual concept (silver metal), not theme surfaces. They should NOT be migrated to semantic surface tokens.
+
+---
+
 *Reference created from locked decisions in `.planning/phases/01-design-system/01-CONTEXT.md`*

@@ -22,7 +22,7 @@ import {
 
 const Toast: React.FC<{ message: string; type: 'success' | 'error' }> = ({ message, type }) => (
   <div role={type === 'error' ? 'alert' : 'status'} aria-live={type === 'error' ? 'assertive' : 'polite'}
-    className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-white text-sm font-medium animate-in fade-in duration-300
+    className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-3 rounded-card shadow-xl text-white text-sm font-medium animate-in fade-in duration-normal
     ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}>
     {type === 'success' ? <CheckCircle className="w-4 h-4 shrink-0" /> : <XCircle className="w-4 h-4 shrink-0" />}
     {message}
@@ -143,7 +143,7 @@ const Profile: React.FC = () => {
           </p>
         </div>
         <button onClick={loadProfile}
-          className="px-4 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-caption hover:bg-brand-primary/20 transition-colors">
+          className="px-4 h-9 rounded-input bg-brand-primary/10 text-brand-primary text-caption hover:bg-brand-primary/20 transition-colors">
           {t('tryAgain')}
         </button>
       </div>

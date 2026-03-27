@@ -101,7 +101,7 @@ const Dashboard: React.FC = () => {
       <section aria-label={t('dashboard')} className={`grid grid-cols-1 ${event ? 'lg:grid-cols-3' : ''} gap-4`}>
 
         {/* Competitive Hero Card — theme-adaptive */}
-        <div className={`${event ? 'lg:col-span-2' : ''} bg-surface-primary dark:bg-surface-dark-secondary rounded-3xl p-4 md:p-6 relative overflow-hidden group animate-in fade-in duration-700 border-none shadow-none`}>
+        <div className={`${event ? 'lg:col-span-2' : ''} bg-surface-primary dark:bg-surface-dark-secondary rounded-card p-4 md:p-6 relative overflow-hidden group animate-in fade-in duration-700 border-none shadow-none`}>
           <div className="relative z-10">
             {/* Greeting */}
             <div className="mb-6 md:mb-8">
@@ -126,7 +126,7 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-2 divide-x divide-surface-secondary dark:divide-surface-dark-elevated">
               {/* Streak */}
               <div className="flex items-center gap-4 pr-6">
-                <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-card bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center shrink-0">
                   <Flame className="w-5 h-5 text-amber-500" />
                 </div>
                 <div>
@@ -141,7 +141,7 @@ const Dashboard: React.FC = () => {
 
               {/* Course Rank */}
               <div className="flex items-center gap-4 pl-6">
-                <div className="w-10 h-10 rounded-2xl bg-brand-primary/10 dark:bg-brand-primary/15 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-card bg-brand-primary/10 dark:bg-brand-primary/15 flex items-center justify-center shrink-0">
                   <Award className="w-5 h-5 text-brand-primary" />
                 </div>
                 <div>
@@ -176,7 +176,7 @@ const Dashboard: React.FC = () => {
         {/* Right Column — Event Card */}
         {event && (
           <div className="flex flex-col gap-4">
-            <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-3xl p-4 relative overflow-hidden group animate-in fade-in duration-700 border-none shadow-none">
+            <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card p-4 relative overflow-hidden group animate-in fade-in duration-700 border-none shadow-none">
               <div className="relative z-10 h-full flex flex-col">
                 <div className="flex items-center gap-2 mb-3">
                   <div className={`w-1.5 h-1.5 rounded-full ${event.is_active ? 'bg-emerald-500 animate-ping' : event.type === 'contest' ? 'bg-violet-500' : 'bg-brand-primary'} ${!event.is_active && 'animate-pulse'}`} />
@@ -208,7 +208,7 @@ const Dashboard: React.FC = () => {
                 {event.is_active ? (
                   <button 
                     onClick={() => navigateTo('lessons')}
-                    className="mt-auto w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 group/btn"
+                    className="mt-auto w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-card flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 group/btn"
                   >
                     <span className="text-xs font-bold">{t('markAttendance')}</span>
                     <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
@@ -222,7 +222,7 @@ const Dashboard: React.FC = () => {
                     ].map((item, i) => (
                       <div
                         key={i}
-                        className="bg-surface-secondary dark:bg-surface-dark-elevated rounded-2xl p-2 flex flex-col items-center border border-surface-secondary dark:border-surface-dark-elevated"
+                        className="bg-surface-secondary dark:bg-surface-dark-elevated rounded-card p-2 flex flex-col items-center border border-surface-secondary dark:border-surface-dark-elevated"
                       >
                         <span className={`text-xl md:text-2xl font-bold tabular-nums leading-none font-mono ${event.type === 'contest' ? 'text-violet-500' : 'text-brand-primary'}`}>
                           {item.value.toString().padStart(2, '0')}
@@ -241,7 +241,7 @@ const Dashboard: React.FC = () => {
       </section>
 
       {/* ── 3. COURSE INFO STRIP ── */}
-      <section aria-label={course.name} className="bg-surface-primary dark:bg-surface-dark-secondary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark overflow-hidden animate-in fade-in duration-500 delay-75 fill-mode-both">
+      <section aria-label={course.name} className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark overflow-hidden animate-in fade-in duration-500 delay-75 fill-mode-both">
         <div className="flex flex-col md:flex-row">
 
           {/* Image / Logo — full bleed on both axes */}
@@ -279,12 +279,12 @@ const Dashboard: React.FC = () => {
                     href={teacher.channel_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 pl-1 pr-3 py-1 bg-surface-secondary dark:bg-surface-dark-elevated/60 rounded-xl border border-surface-secondary dark:border-surface-dark-elevated/50 hover:border-brand-primary/30 hover:bg-brand-primary/5 transition-all duration-200 group/teacher"
+                    className="inline-flex items-center gap-2 pl-1 pr-3 py-1 bg-surface-secondary dark:bg-surface-dark-elevated/60 rounded-input border border-surface-secondary dark:border-surface-dark-elevated/50 hover:border-brand-primary/30 hover:bg-brand-primary/5 transition-all duration-fast group/teacher"
                   >
                     <img
                       src={`${BASE_URL}${teacher.image}`}
                       alt={teacher.name}
-                      className="w-6 h-6 rounded-lg border border-surface-secondary dark:border-surface-dark-elevated object-cover shrink-0"
+                      className="w-6 h-6 rounded-button border border-surface-secondary dark:border-surface-dark-elevated object-cover shrink-0"
                     />
                     <span className="text-caption text-brand-dark dark:text-text-theme-dark-primary group-hover/teacher:text-brand-primary transition-colors">
                       {teacher.name}
@@ -305,7 +305,7 @@ const Dashboard: React.FC = () => {
       </section>
 
       {/* ── 6. TUTORIAL / VIDEO BANNER (moved to bottom) ── */}
-      <section aria-label={t('guideVideo')} className="bg-brand-dark dark:bg-surface-dark-secondary rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in duration-700 delay-300 fill-mode-both">
+      <section aria-label={t('guideVideo')} className="bg-brand-dark dark:bg-surface-dark-secondary rounded-card p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in duration-700 delay-300 fill-mode-both">
         <div className="relative z-10 text-center md:text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/15 text-brand-primary rounded-full mb-4 border border-brand-primary/20 text-caption">
             <PlayCircle className="w-3 h-3" />
@@ -319,7 +319,7 @@ const Dashboard: React.FC = () => {
 
         <button
           onClick={() => openExternalLink('https://youtu.be/5xAfErTQvic')}
-          className="w-full md:w-auto shrink-0 px-6 py-3 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-2xl text-body transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 relative z-10 group/btn"
+          className="w-full md:w-auto shrink-0 px-6 py-3 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-card text-body transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 relative z-10 group/btn"
         >
           {t('watchTutorial')}
           <PlayCircle className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />

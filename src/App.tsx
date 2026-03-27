@@ -27,7 +27,7 @@ const NavItem = ({
   return (
     <button
       onClick={() => onNavigate(view)}
-      className={`flex flex-col md:flex-row items-center justify-center md:justify-start px-2 py-2 md:px-4 md:py-2 w-full md:w-auto rounded-2xl transition-all duration-300 group relative
+      className={`flex flex-col md:flex-row items-center justify-center md:justify-start px-2 py-2 md:px-4 md:py-2 w-full md:w-auto rounded-card transition-all duration-normal group relative
         ${isActive
           ? 'text-brand-primary bg-brand-primary/8 dark:bg-brand-primary/12 md:bg-gradient-to-r md:from-brand-primary/10 md:to-transparent shadow-sm'
           : 'text-text-theme-muted dark:text-text-theme-dark-muted hover:text-brand-primary dark:hover:text-brand-primary hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary/50'
@@ -36,8 +36,8 @@ const NavItem = ({
       {isActive && (
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-primary rounded-r-full hidden md:block shadow-[0_0_8px_rgba(18,194,220,0.6)]"></div>
       )}
-      <div className={`relative transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
-        <Icon className={`w-5 h-5 md:w-[18px] md:h-[18px] transition-all duration-300 ${isActive ? 'stroke-[2.5px] drop-shadow-[0_0_6px_rgba(18,194,220,0.5)]' : ''}`} />
+      <div className={`relative transition-transform duration-normal ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+        <Icon className={`w-5 h-5 md:w-[18px] md:h-[18px] transition-all duration-normal ${isActive ? 'stroke-[2.5px] drop-shadow-[0_0_6px_rgba(18,194,220,0.5)]' : ''}`} />
         {isActive && (
           <div className="absolute -inset-2 bg-brand-primary/15 blur-lg rounded-full md:hidden"></div>
         )}
@@ -53,7 +53,7 @@ const SidebarProgress = () => {
   const { course } = useDashboard();
   const { t } = useLanguage();
   return (
-    <div className="bg-brand-dark dark:bg-surface-dark-secondary rounded-2xl p-4 text-white shadow-sm relative overflow-hidden group border border-white/5">
+    <div className="bg-brand-dark dark:bg-surface-dark-secondary rounded-card p-4 text-white shadow-sm relative overflow-hidden group border border-white/5">
       <div className="relative z-10">
         <p className="section-label text-brand-primary mb-1">{t('overallProgress')}</p>
         <p className="text-h4 leading-tight mb-4 text-white/90">{course?.name || 'Loading...'}</p>
@@ -271,7 +271,7 @@ const AppContent: React.FC<{
           </main>
 
           {/* Bottom Nav (Mobile) */}
-          <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-surface-primary/90 dark:bg-surface-dark-secondary/90 backdrop-blur-2xl border-t border-surface-secondary dark:border-surface-dark-elevated pt-2 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-300">
+          <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-surface-primary/90 dark:bg-surface-dark-secondary/90 backdrop-blur-2xl border-t border-surface-secondary dark:border-surface-dark-elevated pt-2 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-normal">
             <div className="flex justify-around items-center px-1">
               <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={navigateTo} />
               <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={navigateTo} />
