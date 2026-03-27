@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Coins, History, Check, Lock, ExternalLink, Loader2, ShoppingBag, Gift } from 'lucide-react';
+import { Coins, History, Check, Lock, ExternalLink, ShoppingBag, Gift } from 'lucide-react';
 import CoinsHistory from '../components/CoinsHistory';
 import LoadingScreen from '../components/LoadingScreen';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,6 +7,11 @@ import { ShopProvider, useShop } from '../context/ShopContext';
 import { useDashboard } from '../context/DashboardContext';
 import { BalanceReward, LevelReward } from '../services/apiTypes';
 import { openTelegramLink } from '../utils/telegram';
+import { Card, Button, Badge, EmptyState, Modal } from '../components/ui';
+
+type ClaimTarget =
+  | { type: 'balance'; reward: BalanceReward }
+  | { type: 'level'; reward: LevelReward };
 
 const RewardsContent: React.FC = () => {
   const { t } = useLanguage();
@@ -15,6 +20,7 @@ const RewardsContent: React.FC = () => {
   const currentBalance = user?.coins || 0;
 
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [claimTarget, setClaimTarget] = useState<ClaimTarget | null>(null);
 
   const sortedRewards = [...rewards].sort((a, b) => {
     if (a.claimed && !b.claimed) return -1;
@@ -76,6 +82,16 @@ const RewardsContent: React.FC = () => {
     }
   };
 
+  const handleConfirmClaim = async () => {
+    if (!claimTarget) return;
+    setClaimTarget(null);
+    if (claimTarget.type === 'balance') {
+      await handleClaim(claimTarget.reward);
+    } else {
+      await handleClaimLevel(claimTarget.reward);
+    }
+  };
+
   if (loading && rewards.length === 0 && levelRewards.length === 0) {
     return <LoadingScreen message={t('openingShop')} />;
   }
@@ -88,13 +104,72 @@ const RewardsContent: React.FC = () => {
     );
   }
 
+  const claimTargetName = claimTarget
+    ? claimTarget.type === 'balance'
+      ? claimTarget.reward.name
+      : claimTarget.reward.name
+    : '';
+  const claimTargetCost = claimTarget?.type === 'balance' ? claimTarget.reward.cost : null;
+
   return (
     <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-10">
+
+      {/* Claim Confirmation Modal */}
+      <Modal
+        isOpen={!!claimTarget}
+        onClose={() => setClaimTarget(null)}
+        title={t('confirmClaim') || 'Confirm Claim'}
+        maxWidth="sm"
+        footer={
+          <div className="flex gap-3">
+            <Button
+              variant="ghost"
+              size="md"
+              fullWidth
+              onClick={() => setClaimTarget(null)}
+            >
+              {t('cancel') || 'Cancel'}
+            </Button>
+            <Button
+              variant="primary"
+              size="md"
+              fullWidth
+              loading={!!processingId}
+              onClick={handleConfirmClaim}
+            >
+              {t('confirm') || 'Confirm'}
+            </Button>
+          </div>
+        }
+      >
+        <div className="text-center space-y-3">
+          <div className="w-14 h-14 rounded-card bg-brand-primary/10 flex items-center justify-center mx-auto">
+            <Gift className="w-7 h-7 text-brand-primary" />
+          </div>
+          <p className="text-h4 text-text-theme-primary dark:text-text-theme-dark-primary">
+            {claimTargetName}
+          </p>
+          {claimTargetCost !== null && (
+            <div className="flex items-center justify-center gap-2">
+              <Coins className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <span className="text-body text-amber-600 dark:text-amber-400 font-semibold tabular-nums">
+                {claimTargetCost} {t('coins') || 'coins'}
+              </span>
+            </div>
+          )}
+          <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary">
+            {claimTargetCost !== null
+              ? (t('confirmClaimDesc') || `Are you sure you want to spend ${claimTargetCost} coins on "${claimTargetName}"?`).replace('{cost}', String(claimTargetCost)).replace('{name}', claimTargetName)
+              : (t('confirmClaimFreeDesc') || `Claim "${claimTargetName}" for free?`).replace('{name}', claimTargetName)
+            }
+          </p>
+        </div>
+      </Modal>
 
       {/* Page Header */}
       <div className="px-1">
         <h1 className="text-h1 tracking-tight text-brand-dark dark:text-text-theme-dark-primary flex items-center gap-2">
-          <Gift className="w-6 h-6 text-text-theme-muted dark:text-text-theme-dark-muted shrink-0" />
+          <ShoppingBag className="w-6 h-6 text-brand-primary shrink-0" />
           {t('rewardsShop')}
         </h1>
         <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1">
@@ -102,12 +177,34 @@ const RewardsContent: React.FC = () => {
         </p>
       </div>
 
+      {/* Balance Header Card */}
+      <Card variant="elevated" padding="lg" className="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10 border border-amber-200/50 dark:border-amber-700/20">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary uppercase tracking-wider mb-1">
+              {t('availableToSpend') || 'Available to spend'}
+            </p>
+            <div className="flex items-center gap-2">
+              <Coins className="w-6 h-6 text-amber-500 fill-amber-500 shrink-0" />
+              <span className="text-h1 text-amber-600 dark:text-amber-400 tabular-nums">
+                {currentBalance.toLocaleString()}
+              </span>
+            </div>
+          </div>
+          <div className="w-14 h-14 rounded-card bg-amber-500/10 flex items-center justify-center">
+            <Coins className="w-7 h-7 text-amber-500" />
+          </div>
+        </div>
+      </Card>
+
       {/* Unified Rewards Grid */}
       {(rewards.length === 0 && levelRewards.length === 0) ? (
-        <div className="bg-surface-primary dark:bg-surface-dark-secondary p-12 rounded-card border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated text-center">
-          <ShoppingBag className="w-10 h-10 text-surface-secondary dark:text-surface-dark-elevated mx-auto mb-3" />
-          <p className="text-text-theme-muted dark:text-text-theme-dark-muted text-body italic">"{t('noRewards')}"</p>
-        </div>
+        <Card padding="lg">
+          <EmptyState
+            icon={<Gift className="w-6 h-6" />}
+            message={t('noRewards')}
+          />
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Coin Rewards */}
@@ -117,18 +214,20 @@ const RewardsContent: React.FC = () => {
             const needed = reward.cost - currentBalance;
 
             return (
-              <div
+              <Card
                 key={`balance-${reward.id}`}
-                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-card overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
+                hoverable={!reward.claimed}
+                padding="none"
+                className={`overflow-hidden flex flex-col transition-all duration-500
                   ${reward.claimed
-                    ? 'border-emerald-200 dark:border-emerald-500/20 shadow-md'
+                    ? 'border border-emerald-200 dark:border-emerald-500/20'
                     : affordable
-                      ? 'border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark hover:shadow-xl hover:border-brand-primary/20'
-                      : 'border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark opacity-70 hover:opacity-90'
+                      ? 'border border-brand-primary/20 hover:-translate-y-1'
+                      : 'opacity-70 hover:opacity-90 hover:-translate-y-0.5'
                   }`}
               >
                 {/* Image */}
-                <div className="h-52 bg-surface-secondary dark:bg-surface-dark-elevated relative overflow-hidden">
+                <div className="h-52 bg-surface-secondary dark:bg-surface-dark-elevated relative overflow-hidden group/reward">
                   {reward.image ? (
                     <img
                       src={`${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/${(reward.image || '').replace(/^\/+/, '')}`}
@@ -146,30 +245,31 @@ const RewardsContent: React.FC = () => {
 
                   {reward.claimed && (
                     <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-emerald-500 text-white px-6 py-2 rounded-full text-caption inline-flex items-center gap-2 shadow-xl">
-                        <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('claimed')}
-                      </div>
+                      <Badge variant="success" size="md">
+                        <Check className="w-3 h-3 stroke-[3px]" /> {t('claimed')}
+                      </Badge>
                     </div>
                   )}
 
                   {!affordable && !reward.claimed && (
-                    <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-caption flex items-center gap-1">
+                    <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-pill text-caption flex items-center gap-1">
                       <Coins className="w-2.5 h-2.5" /> {t('needMore').replace('{count}', String(needed))}
                     </div>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="p-4 md:p-6 flex-1 flex flex-col">
+                <div className="p-4 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="text-body text-brand-dark dark:text-text-theme-dark-primary leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
-                    <span className={`flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded-full text-caption tabular-nums border
-                      ${affordable || reward.claimed
-                        ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
-                        : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted border-surface-secondary dark:border-surface-dark-elevated'}`}>
-                      <Coins className={`w-3.5 h-3.5 ${affordable || reward.claimed ? 'fill-amber-500' : 'fill-gray-400'}`} />
+                    <h3 className="text-h4 text-brand-dark dark:text-text-theme-dark-primary leading-tight break-words flex-1">{reward.name}</h3>
+                    <Badge
+                      variant={affordable || reward.claimed ? 'warning' : 'muted'}
+                      size="md"
+                      className="shrink-0"
+                    >
+                      <Coins className="w-3 h-3" />
                       {reward.cost}
-                    </span>
+                    </Badge>
                   </div>
 
                   {reward.description && (
@@ -179,35 +279,41 @@ const RewardsContent: React.FC = () => {
                   )}
 
                   <div className="mt-auto">
-                    <button
-                      disabled={(reward.claimed ? false : !affordable) || isProcessing}
-                      onClick={() => handleClaim(reward)}
-                      className={`w-full py-3 rounded-card text-body transition-all flex items-center justify-center gap-2 active:scale-95
-                        ${reward.claimed
-                          ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
-                          : affordable
-                            ? 'bg-gradient-to-r from-brand-primary to-brand-accent text-white shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02]'
-                            : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted dark:text-text-theme-dark-muted cursor-not-allowed border border-surface-secondary dark:border-surface-dark-elevated'
-                        }`}
-                    >
-                      {isProcessing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : reward.claimed ? (
-                        <>
-                          {t('claimed')}
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </>
-                      ) : affordable ? (
-                        t('claimNow')
-                      ) : (
-                        <>
-                          <Coins className="w-3.5 h-3.5" /> {t('needMoreCoins').replace('{count}', String(needed))}
-                        </>
-                      )}
-                    </button>
+                    {reward.claimed ? (
+                      <Button
+                        variant="secondary"
+                        size="md"
+                        fullWidth
+                        icon={<ExternalLink className="w-3.5 h-3.5" />}
+                        iconPosition="right"
+                        onClick={() => handleClaim(reward)}
+                      >
+                        {t('claimed')}
+                      </Button>
+                    ) : affordable ? (
+                      <Button
+                        variant="primary"
+                        size="md"
+                        fullWidth
+                        loading={isProcessing}
+                        onClick={() => setClaimTarget({ type: 'balance', reward })}
+                      >
+                        {t('claimNow')}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="md"
+                        fullWidth
+                        disabled
+                        icon={<Coins className="w-3.5 h-3.5" />}
+                      >
+                        {t('needMoreCoins').replace('{count}', String(needed))}
+                      </Button>
+                    )}
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
 
@@ -219,18 +325,20 @@ const RewardsContent: React.FC = () => {
             const levelColor = reward.required_level?.badge_color || '#8b5cf6';
 
             return (
-              <div
+              <Card
                 key={`level-${reward.id}`}
-                className={`bg-surface-primary dark:bg-surface-dark-secondary border rounded-card overflow-hidden flex flex-col group/reward transition-all duration-500 hover:-translate-y-1
+                hoverable={isUnlocked && !isGranted}
+                padding="none"
+                className={`overflow-hidden flex flex-col transition-all duration-500
                   ${isGranted
-                    ? 'border-emerald-200 dark:border-emerald-500/20 shadow-md'
+                    ? 'border border-emerald-200 dark:border-emerald-500/20'
                     : isUnlocked
-                      ? 'border-violet-200 dark:border-violet-500/20 shadow-card dark:shadow-card-dark hover:shadow-xl'
-                      : 'border-surface-secondary dark:border-surface-dark-elevated opacity-70 hover:opacity-90'
+                      ? 'border border-violet-200 dark:border-violet-500/20 hover:-translate-y-1'
+                      : 'opacity-70 hover:opacity-90'
                   }`}
               >
                 {/* Image */}
-                <div className="h-52 bg-surface-secondary dark:bg-surface-dark-elevated relative overflow-hidden">
+                <div className="h-52 bg-surface-secondary dark:bg-surface-dark-elevated relative overflow-hidden group/reward">
                   {reward.image ? (
                     <img
                       src={`${(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')}/${(reward.image || '').replace(/^\/+/, '')}`}
@@ -248,27 +356,27 @@ const RewardsContent: React.FC = () => {
 
                   {!isUnlocked && (
                     <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-black/60 text-white px-4 py-2 rounded-full text-xs font-medium inline-flex items-center gap-2">
-                        <Lock className="w-3.5 h-3.5" /> {t('levelRequired').replace('{level}', String(reward.required_level.number))}
-                      </div>
+                      <Badge variant="muted" size="md">
+                        <Lock className="w-3 h-3" /> {t('levelRequired').replace('{level}', String(reward.required_level.number))}
+                      </Badge>
                     </div>
                   )}
 
                   {isGranted && (
                     <div className="absolute inset-0 bg-emerald-950/30 backdrop-blur-[2px] flex items-center justify-center z-10">
-                      <div className="bg-emerald-500 text-white px-6 py-2 rounded-full text-caption inline-flex items-center gap-2 shadow-xl">
-                        <Check className="w-3.5 h-3.5 stroke-[3px]" /> {t('granted')}
-                      </div>
+                      <Badge variant="success" size="md">
+                        <Check className="w-3 h-3 stroke-[3px]" /> {t('granted')}
+                      </Badge>
                     </div>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="p-4 md:p-6 flex-1 flex flex-col">
+                <div className="p-4 flex-1 flex flex-col">
                   <div className="flex justify-between items-start gap-3 mb-3">
-                    <h3 className="text-body text-brand-dark dark:text-text-theme-dark-primary leading-tight tracking-tight break-words flex-1">{reward.name}</h3>
+                    <h3 className="text-h4 text-brand-dark dark:text-text-theme-dark-primary leading-tight break-words flex-1">{reward.name}</h3>
                     <span
-                      className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1 rounded-full text-caption tabular-nums border"
+                      className="flex-shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-pill text-label uppercase tracking-wider border font-semibold"
                       style={{
                         backgroundColor: `${levelColor}12`,
                         color: levelColor,
@@ -286,33 +394,42 @@ const RewardsContent: React.FC = () => {
                   )}
 
                   <div className="mt-auto">
-                    <button
-                      disabled={(!isUnlocked && !isGranted) || isProcessing}
-                      onClick={() => handleClaimLevel(reward)}
-                      className={`w-full py-3 rounded-card text-body transition-all flex items-center justify-center gap-2 active:scale-95
-                        ${isGranted
-                          ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20'
-                          : isUnlocked
-                            ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02]'
-                            : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted dark:text-text-theme-dark-muted cursor-not-allowed border border-surface-secondary dark:border-surface-dark-elevated'
-                        }`}
-                    >
-                      {isProcessing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : isGranted ? (
-                        <>
-                          {t('claimed') || 'Claimed'}
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </>
-                      ) : isUnlocked ? (
-                        t('claimFree')
-                      ) : (
-                        <><Lock className="w-3.5 h-3.5" /> {t('levelRequired').replace('{level}', String(reward.required_level.number))}</>
-                      )}
-                    </button>
+                    {isGranted ? (
+                      <Button
+                        variant="secondary"
+                        size="md"
+                        fullWidth
+                        icon={<ExternalLink className="w-3.5 h-3.5" />}
+                        iconPosition="right"
+                        onClick={() => handleClaimLevel(reward)}
+                      >
+                        {t('claimed') || 'Claimed'}
+                      </Button>
+                    ) : isUnlocked ? (
+                      <Button
+                        variant="primary"
+                        size="md"
+                        fullWidth
+                        loading={isProcessing}
+                        className="bg-gradient-to-r from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25"
+                        onClick={() => setClaimTarget({ type: 'level', reward })}
+                      >
+                        {t('claimFree')}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="md"
+                        fullWidth
+                        disabled
+                        icon={<Lock className="w-3.5 h-3.5" />}
+                      >
+                        {t('levelRequired').replace('{level}', String(reward.required_level.number))}
+                      </Button>
+                    )}
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
