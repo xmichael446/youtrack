@@ -38,8 +38,8 @@
 
 - [x] **UX-01**: All pages responsive and usable on mobile (375px+) and desktop
 - [x] **UX-02**: Dark mode feels intentional — distinct surface colors, proper contrast, not just inverted
-- [ ] **UX-03**: Micro-interactions and transitions on buttons, cards, page transitions, loading states
-- [ ] **UX-04**: Accessible contrast ratios (WCAG AA), visible focus states, semantic HTML
+- [x] **UX-03**: Micro-interactions and transitions on buttons, cards, page transitions, loading states
+- [x] **UX-04**: Accessible contrast ratios (WCAG AA), visible focus states, semantic HTML
 
 ## v2 Requirements
 
@@ -86,8 +86,8 @@
 | PAGE-08 | Phase 3 | Complete |
 | UX-01 | Phase 4 | Complete |
 | UX-02 | Phase 4 | Complete |
-| UX-03 | Phase 4 | Pending |
-| UX-04 | Phase 4 | Pending |
+| UX-03 | Phase 4 | Complete |
+| UX-04 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 24 total

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-polish-02-PLAN.md
-last_updated: "2026-03-27T03:03:48.237Z"
+stopped_at: Completed 04-polish-03-PLAN.md
+last_updated: "2026-03-27T03:11:36.580Z"
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 18
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Project State
@@ -62,6 +62,7 @@ Plan: 3 of 3
 | Phase 03-page-redesigns P03 | 6 | 2 tasks | 6 files |
 | Phase 04-polish P01 | 10 | 2 tasks | 6 files |
 | Phase 04-polish P02 | 25 | 2 tasks | 2 files |
+| Phase 04-polish P03 | 7 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 04-polish]: Sticky header uses surface-dark-primary and bottom nav uses surface-dark-primary to match page depth
 - [Phase 04-polish]: Dashboard hero grid uses md:grid-cols-3 (not lg:) so layout activates at 768px
 - [Phase 04-polish]: ContestCard info strip uses flex-wrap for 375px responsive layout
+- [Phase 04-polish]: Button BASE_CLASSES focus-visible ring covers all button instances app-wide (DRY)
+- [Phase 04-polish]: Input uses focus:ring (not focus-visible:) so ring shows on click and keyboard — inputs benefit from both
+- [Phase 04-polish]: Standard focus ring pattern: focus-visible:ring-2 ring-brand-primary ring-offset-2 dark:ring-offset-surface-dark-primary
 
 ### Pending Todos
 
@@ -120,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T03:03:48.232Z
-Stopped at: Completed 04-polish-02-PLAN.md
+Last session: 2026-03-27T03:11:36.572Z
+Stopped at: Completed 04-polish-03-PLAN.md
 Resume file: None
