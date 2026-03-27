@@ -12,6 +12,7 @@ import { Contests } from './pages/Contests';
 import Login from './pages/Login';
 import Footer from './components/Footer';
 import { LayoutDashboard, Trophy, BookOpen, Gift, Swords } from 'lucide-react';
+import { Z_INDEX } from './constants/zIndex';
 import { useLanguage } from './context/LanguageContext';
 import { DashboardProvider, useDashboard } from './context/DashboardContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -231,7 +232,7 @@ const AppContent: React.FC<{
     <>
       <div className="h-dvh w-full bg-surface-secondary dark:bg-surface-dark-primary flex flex-col md:flex-row font-sans text-text-theme-primary dark:text-text-theme-dark-primary overflow-hidden">
         {/* Sidebar (Desktop) */}
-        <aside className="hidden md:flex flex-col w-60 lg:w-64 bg-surface-primary dark:bg-surface-dark-secondary border-r border-surface-secondary dark:border-surface-dark-elevated h-full z-40 p-4 shrink-0">
+        <aside className="hidden md:flex flex-col w-60 lg:w-64 bg-surface-primary dark:bg-surface-dark-secondary border-r border-surface-secondary dark:border-surface-dark-elevated h-full p-4 shrink-0" style={{ zIndex: Z_INDEX.dropdown }}>
           {/* Logo */}
           <div className="px-2 py-4 mb-6 flex items-center justify-center">
             <img
@@ -274,7 +275,7 @@ const AppContent: React.FC<{
           </main>
 
           {/* Bottom Nav (Mobile) */}
-          <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-surface-primary/90 dark:bg-surface-dark-primary/90 backdrop-blur-2xl border-t border-surface-secondary dark:border-surface-dark-elevated pt-2 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-normal">
+          <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-surface-primary/90 dark:bg-surface-dark-primary/90 backdrop-blur-2xl border-t border-surface-secondary dark:border-surface-dark-elevated pt-2 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] shadow-[0_-4px_30px_rgba(0,0,0,0.06)] transition-colors duration-normal" style={{ zIndex: Z_INDEX.overlay }}>
             <div className="flex justify-around items-center px-1">
               <NavItem view="dashboard" icon={LayoutDashboard} label={t('dashboard')} currentView={currentView} onNavigate={navigateTo} />
               <NavItem view="leaderboard" icon={Trophy} label={t('leaderboard')} currentView={currentView} onNavigate={navigateTo} />
