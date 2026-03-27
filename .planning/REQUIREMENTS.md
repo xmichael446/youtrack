@@ -19,8 +19,8 @@
 - [x] **COMP-02**: Standardize form inputs (text, select, textarea) with consistent borders, focus rings, and error states
 - [x] **COMP-03**: Standardize card patterns with consistent padding, borders, shadows, and hover effects
 - [x] **COMP-04**: Standardize list items and badge components with consistent spacing and visual weight
-- [ ] **COMP-05**: Standardize modal/dialog components with consistent overlay, animation, and layout
-- [ ] **COMP-06**: Standardize toast/notification display with consistent positioning and animation
+- [x] **COMP-05**: Standardize modal/dialog components with consistent overlay, animation, and layout
+- [x] **COMP-06**: Standardize toast/notification display with consistent positioning and animation
 - [ ] **COMP-07**: Standardize navigation components (header, sidebar, bottom nav) with consistent styling and active states
 
 ### Page Redesigns
@@ -73,8 +73,8 @@
 | COMP-02 | Phase 2 | Complete |
 | COMP-03 | Phase 2 | Complete |
 | COMP-04 | Phase 2 | Complete |
-| COMP-05 | Phase 2 | Pending |
-| COMP-06 | Phase 2 | Pending |
+| COMP-05 | Phase 2 | Complete |
+| COMP-06 | Phase 2 | Complete |
 | COMP-07 | Phase 2 | Pending |
 | PAGE-01 | Phase 3 | Pending |
 | PAGE-02 | Phase 3 | Pending |

@@ -49,7 +49,7 @@ Plans:
   3. Cards across all pages share the same padding, border, shadow, and hover behavior — no card looks different from any other
   4. Modals and dialogs use a consistent overlay, entrance animation, and internal layout
   5. The header, sidebar, and bottom nav share a unified active-state and styling treatment — the navigation feels like one system
-**Plans:** 4 plans
+**Plans:** 3/4 plans executed
 
 Plans:
 - [x] 02-01-PLAN.md — Create Button and Card components with z-index scale
@@ -88,6 +88,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Design System | 6/6 | Complete   | 2026-03-27 |
-| 2. Core Components | 0/4 | Not started | - |
+| 2. Core Components | 3/4 | In Progress|  |
 | 3. Page Redesigns | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |

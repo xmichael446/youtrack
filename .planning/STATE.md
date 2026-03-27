@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-core-components-01-PLAN.md
-last_updated: "2026-03-27T01:39:14.510Z"
+stopped_at: Completed 02-core-components-03-PLAN.md
+last_updated: "2026-03-27T01:39:25.556Z"
 progress:
   total_phases: 4
   completed_phases: 1
@@ -81,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 02-core-components]: Button variant class maps use typed Record<Variant, string> for exhaustive TypeScript coverage
 - [Phase 02-core-components]: Card dark mode glow (dark:ring-1 dark:ring-white/5) applied at variant level to all card variants
 - [Phase 02-core-components]: Z_INDEX const assertion used for type narrowing; filter+join pattern for class composition avoids clsx dependency
+- [Phase 02-core-components]: Toast z-index changed from z-[100] to z-[70] matching shared scale; Modal uses z-[60]; both use literal values until zIndex.ts constants file exists
+- [Phase 02-core-components]: Modal component extracts common overlay shell from SubmissionModal with optional title/subtitle/footer slots and 3 maxWidth presets
 
 ### Pending Todos
 
@@ -92,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T01:39:06.267Z
-Stopped at: Completed 02-core-components-01-PLAN.md
+Last session: 2026-03-27T01:39:25.530Z
+Stopped at: Completed 02-core-components-03-PLAN.md
 Resume file: None
