@@ -17,9 +17,8 @@ import { useDashboard } from '../../context/DashboardContext';
 import { useContests } from '../../context/ContestContext';
 import { useNavigation } from '../../context/NavigationContext';
 import LoadingScreen from '../../components/LoadingScreen';
-import Toast from '../../components/ui/Toast';
+import { Card, Badge, Button, Toast } from '../../components/ui';
 import BackButton from '../../components/ui/BackButton';
-import StatusBadge from '../../components/ui/StatusBadge';
 import PlaceIcon from '../../components/ui/PlaceIcon';
 import RankBadge from '../../components/ui/RankBadge';
 import { useCountdown } from '../../hooks/useCountdown';
@@ -127,12 +126,12 @@ const ContestDetailView: React.FC<{
   if (error || !detail) return (
     <div className="space-y-4 animate-in fade-in duration-500">
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
-      <div className="flex flex-col items-center gap-3 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-card border border-red-100 dark:border-red-500/10">
+      <Card variant="bordered" padding="lg" className="flex flex-col items-center gap-3 bg-red-50/50 dark:bg-red-900/10 border-red-100 dark:border-red-500/10">
         <div className="w-12 h-12 rounded-card bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <AlertCircle className="w-5 h-5 text-red-400" />
         </div>
-        <p className="text-sm text-red-500 font-medium">{error || t('contestNotFound')}</p>
-      </div>
+        <p className="text-body text-red-500 font-medium">{error || t('contestNotFound')}</p>
+      </Card>
     </div>
   );
 
@@ -143,7 +142,7 @@ const ContestDetailView: React.FC<{
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
 
       {/* Header card -- light theme consistent with lesson cards */}
-      <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card border border-gray-100 dark:border-slate-800 overflow-hidden shadow-card dark:shadow-card-dark">
+      <Card variant="elevated" padding="none" className="overflow-hidden">
         {/* Brand accent top strip */}
         <div className="h-1 w-full bg-gradient-to-r from-brand-primary via-cyan-400 to-brand-primary/40" />
 
@@ -154,7 +153,9 @@ const ContestDetailView: React.FC<{
               <p className="text-label font-mono text-brand-primary uppercase tracking-[3px] mb-1">{t('contestDetails')}</p>
               <h2 className="text-h2 tracking-tight text-gray-900 dark:text-white">{t('vocabContest')} #{detail.number}</h2>
             </div>
-            <StatusBadge status={detail.status} t={t} />
+            <Badge variant={detail.status === 'open' ? 'success' : detail.status === 'scheduled' ? 'brand' : detail.status === 'finalized' ? 'muted' : 'error'} dot={detail.status === 'open'} pulse={detail.status === 'open'}>
+              {detail.status === 'open' ? (t('contestStatusOpen') || 'Live') : detail.status === 'scheduled' ? (t('contestStatusScheduled') || 'Upcoming') : detail.status === 'finalized' ? (t('contestStatusFinalized') || 'Ended') : (t('contestStatusClosed') || 'Closed')}
+            </Badge>
           </div>
 
           {/* Compact info grid */}
@@ -274,7 +275,7 @@ const ContestDetailView: React.FC<{
             </div>
           )}
         </div>
-      </div>
+      </Card>
 
       <div className={detail.status === 'finalized' ? "space-y-6" : "grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8"}>
         {/* Left Column: Registrations or Live/Final Leaderboard */}
@@ -332,7 +333,7 @@ const ContestDetailView: React.FC<{
             <div className="space-y-8 animate-in fade-in duration-700">
               {/* My result section -- redesigned to match lesson quiz style */}
               {results?.my_attempt && (
-                <div className="bg-surface-secondary dark:bg-surface-dark-secondary/50 p-4 rounded-card border border-gray-100 dark:border-slate-700/50 shadow-card">
+                <Card variant="default" padding="md">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-brand-primary/10 rounded-input flex items-center justify-center">
@@ -349,14 +350,16 @@ const ContestDetailView: React.FC<{
                     </div>
                   </div>
 
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    fullWidth
+                    icon={<Search className="w-4 h-4" />}
                     onClick={() => onNavigate({ view: 'review', contestId, answers: results.my_attempt?.answers || [] })}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary border border-brand-primary/20 rounded-input font-bold text-body hover:bg-brand-primary/5 transition-all shadow-card active:scale-[0.98]"
                   >
-                    <Search className="w-4 h-4" />
                     {t('reviewAnswers')}
-                  </button>
-                </div>
+                  </Button>
+                </Card>
               )}
 
               <div>

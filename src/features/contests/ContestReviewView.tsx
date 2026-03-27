@@ -9,6 +9,7 @@ import {
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { Button } from '../../components/ui';
 import type { ContestNav } from './contestTypes';
 
 const ContestReviewView: React.FC<{
@@ -84,25 +85,38 @@ const ContestReviewView: React.FC<{
 
       <div className="p-3 md:p-4 bg-surface-primary dark:bg-surface-dark-secondary border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <button
+          <Button
+            variant="ghost"
+            size="md"
+            icon={<ChevronLeft className="w-4 h-4" />}
             onClick={() => currentIndex > 0 && setCurrentIndex(prev => prev - 1)}
             disabled={currentIndex === 0}
-            className="flex-1 md:flex-none px-6 md:px-8 py-3 rounded-[12px] font-bold text-caption text-text-theme-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
+            className="flex-1 md:flex-none"
           >
-            <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span><span className="md:hidden">{t('back')}</span>
-          </button>
+            <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span>
+            <span className="md:hidden">{t('back')}</span>
+          </Button>
 
           {currentIndex === answers.length - 1 ? (
-            <button onClick={() => goBack('contests', { id: String(contestId) })} className="flex-[2] md:flex-none px-12 py-3 bg-brand-dark dark:bg-surface-dark-elevated text-white dark:text-white hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
-              {t('backToOverview')}
-            </button>
-          ) : (
-            <button
-              onClick={() => currentIndex < answers.length - 1 && setCurrentIndex(prev => prev + 1)}
-              className="flex-[2] md:flex-none px-12 py-3 bg-brand-dark dark:bg-surface-dark-elevated text-white dark:text-white rounded-[12px] font-bold text-body hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => goBack('contests', { id: String(contestId) })}
+              className="flex-[2] md:flex-none"
             >
-              {t('nextQuestion') || 'Next'} <ChevronRight className="w-4 h-4" />
-            </button>
+              {t('backToOverview')}
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="md"
+              icon={<ChevronRight className="w-4 h-4" />}
+              iconPosition="right"
+              onClick={() => currentIndex < answers.length - 1 && setCurrentIndex(prev => prev + 1)}
+              className="flex-[2] md:flex-none"
+            >
+              {t('nextQuestion') || 'Next'}
+            </Button>
           )}
         </div>
       </div>

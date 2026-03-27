@@ -5,14 +5,13 @@ import {
   CheckCircle2,
   ChevronLeft,
   AlertCircle,
-  Loader2,
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useContests } from '../../context/ContestContext';
 import { useNavigation } from '../../context/NavigationContext';
 import LoadingScreen from '../../components/LoadingScreen';
-import Toast from '../../components/ui/Toast';
+import { Button, Card, Toast } from '../../components/ui';
 import BackButton from '../../components/ui/BackButton';
 import { useCountdown, useTimerUrgency } from '../../hooks/useCountdown';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
@@ -157,7 +156,7 @@ const ContestPlayView: React.FC<{
   if (error === 'already_started') return (
     <div className="space-y-4 animate-in fade-in duration-normal">
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
-      <div className="flex flex-col items-center gap-4 py-20 text-center">
+      <Card variant="default" padding="lg" className="flex flex-col items-center gap-4 text-center">
         <div className="w-12 h-12 rounded-card bg-brand-primary/10 flex items-center justify-center">
           <Clock className="w-6 h-6 text-brand-primary" />
         </div>
@@ -165,25 +164,26 @@ const ContestPlayView: React.FC<{
           <p className="text-h4 text-gray-900 dark:text-text-theme-dark-primary">Already submitted</p>
           <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1 max-w-xs">Your answers are saved. Results will be available once the contest is finalized.</p>
         </div>
-        <button
+        <Button
+          variant="secondary"
+          size="md"
           onClick={() => goBack('contests')}
-          className="px-4 py-2 rounded-input text-body font-bold font-mono text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 transition-colors"
         >
           Back to Contest
-        </button>
-      </div>
+        </Button>
+      </Card>
     </div>
   );
 
   if (error) return (
     <div className="space-y-4">
       <BackButton label={t('contestBackToList')} onClick={() => goBack('contests')} />
-      <div className="flex flex-col items-center gap-4 py-20 bg-red-50/50 dark:bg-red-900/10 rounded-card border border-red-100 dark:border-red-500/10">
+      <Card variant="bordered" padding="lg" className="flex flex-col items-center gap-4 bg-red-50/50 dark:bg-red-900/10 border-red-100 dark:border-red-500/10">
         <div className="w-12 h-12 rounded-card bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <AlertCircle className="w-5 h-5 text-red-400" />
         </div>
-        <p className="text-sm text-red-500 font-medium">{error}</p>
-      </div>
+        <p className="text-body text-red-500 font-medium">{error}</p>
+      </Card>
     </div>
   );
 
@@ -246,12 +246,16 @@ const ContestPlayView: React.FC<{
 
         {/* Sticky bottom */}
         <div className="p-4 md:p-8 bg-surface-primary dark:bg-surface-dark-secondary border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-8">
-          <button
-            onClick={() => onNavigate({ view: 'list', contestId: null })}
-            className="w-full max-w-4xl mx-auto py-4 rounded-[16px] font-bold font-mono text-body text-white bg-brand-primary hover:bg-brand-primary/90 shadow-lg shadow-brand-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 block text-center"
-          >
-            {t('contestBackToList')}
-          </button>
+          <div className="w-full max-w-4xl mx-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={() => onNavigate({ view: 'list', contestId: null })}
+            >
+              {t('contestBackToList')}
+            </Button>
+          </div>
         </div>
       </div>,
       document.body
@@ -336,14 +340,14 @@ const ContestPlayView: React.FC<{
       <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
         <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 py-2">
           {/* Question card */}
-          <div className="bg-surface-secondary dark:bg-surface-dark-secondary/50 rounded-[24px] p-4 md:p-8 text-center border border-gray-100 dark:border-slate-800 shadow-card relative overflow-hidden">
+          <Card variant="default" padding="none" className="p-4 md:p-8 text-center relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-primary opacity-50 rounded-r-full" />
             <span className="text-[10px] md:text-[11px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-2 block opacity-70">Question</span>
             <h3 className={`${q.question_text.length > 80 ? 'text-h3' : 'text-h2'} text-brand-dark dark:text-white leading-tight mb-3`}>
               {q.question_text}
             </h3>
             <p className="text-caption font-medium text-text-theme-secondary dark:text-text-theme-dark-secondary italic opacity-80">Choose the correct answer from the options below</p>
-          </div>
+          </Card>
 
           {/* Options -- 2-col on all screen sizes (matches Lessons quiz) */}
           <div className="grid grid-cols-2 gap-3 pb-4">
@@ -380,25 +384,29 @@ const ContestPlayView: React.FC<{
       <div className="bg-surface-primary dark:bg-surface-dark-secondary border-t border-gray-100 dark:border-slate-800 px-4 py-3 md:px-8 md:py-4 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:pb-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center gap-3">
-            <button
+            <Button
+              variant="ghost"
+              size="md"
+              icon={<ChevronLeft className="w-4 h-4" />}
               onClick={() => setCurrentQ(q => Math.max(0, q - 1))}
               disabled={currentQ === 0}
-              className="px-4 md:px-8 py-3 rounded-[16px] font-bold text-caption text-text-theme-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
             >
-              <ChevronLeft className="w-4 h-4" />
               <span className="hidden md:inline">{t('previousQuestion')}</span>
               <span className="md:hidden">Back</span>
-            </button>
+            </Button>
 
             {currentQ === questions.length - 1 && (
-              <button
-                onClick={handleSubmit}
+              <Button
+                variant="primary"
+                size="md"
+                icon={<Trophy className="w-5 h-5" />}
+                loading={submitting || autoSubmitting}
                 disabled={!allAnswered || submitting || autoSubmitting}
-                className="px-8 md:px-12 py-3 bg-gradient-to-r from-brand-primary to-cyan-500 text-white rounded-[16px] font-bold text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+                onClick={handleSubmit}
+                className="uppercase tracking-widest"
               >
-                {(submitting || autoSubmitting) ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trophy className="w-5 h-5" />}
                 {t('finishQuiz')}
-              </button>
+              </Button>
             )}
           </div>
 
