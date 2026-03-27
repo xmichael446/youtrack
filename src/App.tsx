@@ -42,9 +42,12 @@ const NavItem = ({
           <div className="absolute -inset-2 bg-brand-primary/15 blur-lg rounded-full md:hidden"></div>
         )}
       </div>
-      <span className={`text-caption md:text-body mt-1 md:mt-0 md:ml-3 md:capitalize transition-all ${isActive ? 'text-brand-primary' : ''}`}>
+      <span className={`text-caption md:text-body mt-1 md:mt-0 md:ml-3 md:capitalize transition-all ${isActive ? 'text-brand-primary font-semibold' : 'font-normal'}`}>
         {label}
       </span>
+      {isActive && (
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-[3px] bg-brand-primary rounded-full shadow-[0_0_6px_rgba(18,194,220,0.5)] md:hidden"></div>
+      )}
     </button>
   );
 };
