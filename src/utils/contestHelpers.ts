@@ -38,10 +38,10 @@ export function prizeGradient(place: number): {
       value: 'text-orange-600 dark:text-orange-400',
     };
   return {
-    card: 'bg-gray-50 dark:bg-slate-800/40 border-gray-100 dark:border-slate-700/40',
+    card: 'bg-surface-secondary dark:bg-surface-dark-secondary/40 border-gray-100 dark:border-slate-700/40',
     badge:
-      'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-600',
-    value: 'text-gray-500 dark:text-slate-400',
+      'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-secondary dark:text-text-theme-dark-secondary border-gray-200 dark:border-slate-600',
+    value: 'text-text-theme-secondary dark:text-text-theme-dark-secondary',
   };
 }
 

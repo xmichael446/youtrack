@@ -9,7 +9,7 @@ export const assignmentStatusColor = (status: string) => {
   if (s === 'approved') return 'text-emerald-600 dark:text-emerald-400';
   if (s === 'rejected' || s === 'missed') return 'text-red-500 dark:text-red-400';
   if (s === 'submitted' || s === 'pending' || s.includes('awaiting')) return 'text-amber-600 dark:text-amber-500';
-  return 'text-gray-500 dark:text-slate-400';
+  return 'text-text-theme-secondary dark:text-text-theme-dark-secondary';
 };
 
 export const assignmentStatusDot = (status: string) => {
