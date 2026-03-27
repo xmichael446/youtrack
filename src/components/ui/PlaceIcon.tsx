@@ -6,8 +6,8 @@ const PlaceIcon: React.FC<{ place: number; className?: string }> = ({
   className = 'w-8 h-8',
 }) => {
   const isSmall = className.includes('w-3');
-  const medalSize = isSmall ? 'w-2.5 h-2.5' : 'w-4 h-4 sm:w-5 sm:h-5';
-  const fontSize = isSmall ? 'text-[10px]' : 'text-xs sm:text-sm';
+  const medalSize = isSmall ? 'w-2.5 h-2.5' : 'w-4 h-4 sm:w-4 h-4';
+  const fontSize = isSmall ? 'text-[10px]' : 'text-caption sm:text-body';
 
   if (place === 1)
     return (
@@ -20,7 +20,7 @@ const PlaceIcon: React.FC<{ place: number; className?: string }> = ({
   if (place === 2)
     return (
       <div
-        className={`flex items-center justify-center ${className} rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 shadow-sm border border-slate-100 dark:border-slate-700/50`}
+        className={`flex items-center justify-center ${className} rounded-full bg-surface-secondary dark:bg-surface-dark-secondary text-text-theme-muted shadow-sm border border-surface-secondary dark:border-surface-dark-elevated/50`}
       >
         <Medal className={medalSize} />
       </div>
@@ -36,7 +36,7 @@ const PlaceIcon: React.FC<{ place: number; className?: string }> = ({
 
   return (
     <span
-      className={`${className} rounded-full bg-gray-50 dark:bg-slate-800/50 flex items-center justify-center ${fontSize} font-bold font-mono text-gray-400 dark:text-slate-500 border border-gray-100 dark:border-slate-800/50`}
+      className={`${className} rounded-full bg-surface-secondary dark:bg-surface-dark-secondary/50 flex items-center justify-center ${fontSize} font-bold font-mono text-text-theme-muted dark:text-text-theme-dark-muted border border-surface-secondary dark:border-surface-dark-secondary/50`}
     >
       {place}
     </span>

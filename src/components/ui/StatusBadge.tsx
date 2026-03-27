@@ -22,7 +22,7 @@ const StatusBadge: React.FC<{ status: string; t: (k: string) => string }> = ({ s
     },
     finalized: {
       label: t('contestFinalized'),
-      cls: 'bg-gray-100 text-gray-500 border border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+      cls: 'bg-surface-secondary text-text-theme-muted border border-surface-secondary dark:bg-surface-dark-secondary dark:text-text-theme-dark-secondary dark:border-surface-dark-elevated',
       dotCls: 'bg-gray-400 dark:bg-slate-500',
     },
     closed: {
@@ -34,13 +34,13 @@ const StatusBadge: React.FC<{ status: string; t: (k: string) => string }> = ({ s
 
   const cfg = map[status] ?? {
     label: status,
-    cls: 'bg-gray-100 text-gray-600 border border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+    cls: 'bg-surface-secondary text-text-theme-secondary border border-surface-secondary dark:bg-surface-dark-secondary dark:text-text-theme-dark-secondary dark:border-surface-dark-elevated',
     dotCls: 'bg-gray-400',
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider ${cfg.cls}`}
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-label uppercase tracking-wider ${cfg.cls}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dotCls} ${cfg.pulse ? 'animate-pulse' : ''}`} />
       {cfg.label}

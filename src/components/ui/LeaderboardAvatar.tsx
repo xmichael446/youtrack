@@ -11,13 +11,13 @@ const LeaderboardAvatar: React.FC<{
       <img
         src={url}
         alt={name}
-        className={`${className} rounded-full object-cover shrink-0 bg-gray-100 dark:bg-slate-800 ring-1 ring-gray-200 dark:ring-slate-700`}
+        className={`${className} rounded-full object-cover shrink-0 bg-surface-secondary dark:bg-surface-dark-secondary ring-1 ring-surface-secondary dark:ring-surface-dark-elevated`}
       />
     );
   }
   return (
     <div
-      className={`${className} rounded-full shrink-0 flex items-center justify-center text-[10px] sm:text-[12px] font-bold text-white bg-gradient-to-br from-brand-primary to-cyan-600 ring-1 ring-brand-primary/20`}
+      className={`${className} rounded-full shrink-0 flex items-center justify-center text-[10px] sm:text-caption font-bold text-white bg-gradient-to-br from-brand-primary to-cyan-600 ring-1 ring-brand-primary/20`}
     >
       {(name || '?').charAt(0).toUpperCase()}
     </div>
