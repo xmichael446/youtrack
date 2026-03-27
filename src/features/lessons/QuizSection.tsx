@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   XCircle,
   Trophy,
-  Loader2,
   PlayCircle,
   AlertTriangle,
   Coins
@@ -285,14 +284,17 @@ const QuizSection: React.FC<{
             </button>
 
             {currentQuestionIndex === questionsData!.questions.length - 1 && (
-              <button
-                onClick={handleSubmitQuiz}
+              <Button
+                variant="primary"
+                size="lg"
+                loading={submitting}
+                icon={<Trophy className="w-4 h-4" />}
                 disabled={submitting || Object.keys(answers).length < questionsData!.questions.length}
-                className="px-12 py-4 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-[16px] font-bold text-body shadow-brand-primary/20 hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+                onClick={handleSubmitQuiz}
+                className="uppercase tracking-widest"
               >
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trophy className="w-4 h-4" />}
                 {t('finishQuiz')}
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -474,7 +476,6 @@ const QuizSection: React.FC<{
               icon={<PlayCircle className="w-4 h-4" />}
               onClick={() => startQuiz('solving')}
               disabled={loading}
-              className="flex-1"
             >
               {t('startQuiz')}
             </Button>
