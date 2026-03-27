@@ -22,7 +22,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
   const earnedCount = achievements.filter(a => !!a.earned_at).length;
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-surface-secondary dark:border-surface-dark-elevated p-4 shadow-sm">
+    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <p className="section-label">
           {t('achievements')}
@@ -54,7 +54,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                 aria-expanded={isSelected}
                 aria-controls={`badge-detail-${def.key}`}
                 aria-label={`${def.name} — ${def.rarity}`}
-                className="shrink-0 w-[88px] flex flex-col items-center p-2 rounded-xl transition-all duration-200 text-left relative"
+                className="shrink-0 w-[88px] flex flex-col items-center p-2 rounded-input transition-all duration-fast text-left relative"
                 style={{
                   border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : 'transparent'}`,
                   backgroundColor: isSelected
@@ -88,7 +88,7 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
 
       {/* Inline detail panel — shown when a badge is selected */}
       {selectedDef && (
-        <div id={`badge-detail-${selectedDef.key}`} className="mt-3 p-3 rounded-xl border animate-in fade-in duration-200"
+        <div id={`badge-detail-${selectedDef.key}`} className="mt-3 p-3 rounded-input border animate-in fade-in duration-fast"
           style={{
             borderColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}40`,
             backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}08`,

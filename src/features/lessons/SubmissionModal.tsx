@@ -82,14 +82,14 @@ const SubmissionModal: React.FC<{
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
-      <div className="absolute inset-0 bg-surface-dark-primary/60 animate-in fade-in duration-300" onClick={onClose} />
-      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-t-[24px] md:rounded-[24px] shadow-modal dark:shadow-modal-dark w-full max-w-2xl relative z-10 flex flex-col border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden max-h-[90vh] animate-in duration-300 ease-out">
+      <div className="absolute inset-0 bg-surface-dark-primary/60 animate-in fade-in duration-normal" onClick={onClose} />
+      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-t-[24px] md:rounded-[24px] shadow-modal dark:shadow-modal-dark w-full max-w-2xl relative z-10 flex flex-col border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden max-h-[90vh] animate-in duration-normal ease-out">
         <div className="p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-between items-center bg-surface-secondary/50 dark:bg-surface-dark-secondary/50">
           <div>
             <h3 className="text-h3 md:text-h2 text-brand-dark dark:text-text-theme-dark-primary">{t('submitAssignment')}</h3>
             <p className="text-caption text-text-theme-secondary mt-1 uppercase tracking-widest">LSN {assignment.number}: {assignment.lesson_topic}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary rounded-xl transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary rounded-input transition-colors">
             <X className="w-4 h-4 text-text-theme-secondary" />
           </button>
         </div>
@@ -160,7 +160,7 @@ const SubmissionModal: React.FC<{
                       <span className="text-caption font-mono text-text-theme-muted">{(attachment.file.size / 1024 / 1024).toFixed(2)} MB</span>
                     </div>
                   )}
-                  <button onClick={() => handleRemoveAttachment(idx)} className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors shrink-0">
+                  <button onClick={() => handleRemoveAttachment(idx)} className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-input transition-colors shrink-0">
                     <X className="w-4 h-4" />
                   </button>
                 </div>

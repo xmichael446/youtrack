@@ -68,7 +68,7 @@ const ActiveAttendanceCard: React.FC<{
   };
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden shadow-sm">
+    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden shadow-sm">
       <div className="p-4 md:p-6">
         <div className="flex items-center gap-3">
           <div className="shrink-0 bg-brand-primary/10 border border-brand-primary/20 rounded-[10px] px-2 py-1 flex flex-col items-center min-w-[40px]">
@@ -94,7 +94,7 @@ const ActiveAttendanceCard: React.FC<{
               <span className="hidden sm:inline">{t('missed')}</span>
             </span>
           ) : (
-            <div className="shrink-0 flex items-center gap-1 bg-surface-dark-primary dark:bg-surface-dark-secondary px-3 py-2 rounded-xl border border-surface-dark-elevated">
+            <div className="shrink-0 flex items-center gap-1 bg-surface-dark-primary dark:bg-surface-dark-secondary px-3 py-2 rounded-input border border-surface-dark-elevated">
               <Clock className="w-3.5 h-3.5 text-brand-primary shrink-0" />
               <span className="text-body font-bold text-brand-primary tabular-nums font-mono tracking-tight">{timeLeft}</span>
             </div>
@@ -113,12 +113,12 @@ const ActiveAttendanceCard: React.FC<{
               value={attendanceCode}
               onChange={(e) => setAttendanceCode(e.target.value.toLowerCase())}
               placeholder={t('enterKeywordPlaceholder')}
-              className="flex-1 h-11 rounded-xl border border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary dark:bg-surface-dark-secondary px-4 text-body font-bold focus:border-brand-primary focus:bg-surface-primary dark:focus:bg-surface-dark-primary focus:outline-none transition-all lowercase"
+              className="flex-1 h-11 rounded-input border border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary dark:bg-surface-dark-secondary px-4 text-body font-bold focus:border-brand-primary focus:bg-surface-primary dark:focus:bg-surface-dark-primary focus:outline-none transition-all lowercase"
             />
             <button
               onClick={handleMarkAttendance}
               disabled={isSubmitting || !attendanceCode.trim()}
-              className="shrink-0 h-11 px-4 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl font-bold text-label uppercase tracking-wider shadow-md shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="shrink-0 h-11 px-4 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-button font-bold text-label uppercase tracking-wider shadow-md shadow-brand-primary/20 hover:shadow-brand-primary/35 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? '...' : t('mark')}
             </button>

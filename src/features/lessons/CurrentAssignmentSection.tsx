@@ -74,13 +74,13 @@ const CurrentAssignmentSection: React.FC<{
         <div className="flex bg-surface-secondary dark:bg-surface-dark-primary p-1 rounded-[14px] items-center shadow-inner border border-surface-secondary/50 dark:border-surface-dark-elevated max-w-sm mx-auto md:mx-0">
           <button
             onClick={() => setActiveTab('assignment')}
-            className={`flex-1 h-10 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-300 ${activeTab === 'assignment' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
+            className={`flex-1 h-10 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-normal ${activeTab === 'assignment' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
           >
             {t('assignment')}
           </button>
           <button
             onClick={() => setActiveTab('quiz')}
-            className={`flex-1 h-10 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-300 ${activeTab === 'quiz' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
+            className={`flex-1 h-10 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-normal ${activeTab === 'quiz' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
           >
             {t('quiz')}
           </button>
@@ -89,7 +89,7 @@ const CurrentAssignmentSection: React.FC<{
 
       <div className="p-4 md:p-6">
         {activeTab === 'assignment' ? (
-          <div className="space-y-4 animate-in fade-in duration-300">
+          <div className="space-y-4 animate-in fade-in duration-normal">
             <div className="space-y-3">
               <div>
                 <span className="section-label text-text-theme-muted dark:text-text-theme-dark-muted block mb-1">{t('activeTopic')}</span>
@@ -108,7 +108,7 @@ const CurrentAssignmentSection: React.FC<{
               </div>
 
               {canSubmit && isOverdue && !isExpired && (
-                <div className="flex items-start gap-2 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-xl px-3 py-3">
+                <div className="flex items-start gap-2 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-input px-3 py-3">
                   <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-caption font-semibold text-orange-700 dark:text-orange-400 leading-snug">{t('lateSubmission')}</p>
@@ -120,7 +120,7 @@ const CurrentAssignmentSection: React.FC<{
               {canSubmit && (
                 <button
                   onClick={onSubmit}
-                  className={`w-full flex items-center justify-center gap-2 py-2 font-semibold text-body rounded-xl transition-all active:scale-[0.99] ${
+                  className={`w-full flex items-center justify-center gap-2 py-2 font-semibold text-body rounded-input transition-all active:scale-[0.99] ${
                     isOverdue
                       ? 'bg-orange-500 hover:bg-orange-600 text-white'
                       : 'bg-brand-primary hover:bg-brand-primary/90 text-white'
@@ -189,7 +189,7 @@ const CurrentAssignmentSection: React.FC<{
             )}
           </div>
         ) : (
-          <div className="animate-in fade-in duration-300">
+          <div className="animate-in fade-in duration-normal">
             <QuizSection lessonId={assignment.id} showToast={showToast} initialData={assignment.quiz} />
           </div>
         )}

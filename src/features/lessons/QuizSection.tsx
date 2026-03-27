@@ -87,7 +87,7 @@ const QuizSection: React.FC<{
   };
 
   const renderArticleMode = () => (
-    <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary animate-in fade-in duration-300">
+    <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary animate-in fade-in duration-normal">
       <div className="flex items-center justify-between p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated bg-surface-primary/80 dark:bg-surface-dark-primary/80 backdrop-blur-md sticky top-0 z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
         <button onClick={() => setMode('info')} className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors">
           <X className="w-6 h-6" />
@@ -224,7 +224,7 @@ const QuizSection: React.FC<{
     const isLongText = questionText.length > 80;
 
     return (
-      <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary animate-in fade-in duration-300">
+      <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary animate-in fade-in duration-normal">
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated bg-surface-primary/80 dark:bg-surface-dark-primary/80 backdrop-blur-md sticky top-0 z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
           <button onClick={() => setMode('info')} className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors">
             <X className="w-6 h-6" />
@@ -257,7 +257,7 @@ const QuizSection: React.FC<{
                   <button
                     key={option.id}
                     onClick={() => handleSelectOption(questionsData!.questions[currentQuestionIndex].id, option.id)}
-                    className={`w-full p-4 md:p-6 rounded-[20px] border-2 text-left flex items-center gap-4 transition-all duration-200 group/opt ${isSelected
+                    className={`w-full p-4 md:p-6 rounded-[20px] border-2 text-left flex items-center gap-4 transition-all duration-fast group/opt ${isSelected
                         ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10 ring-4 ring-brand-primary/10 scale-[1.01]'
                         : 'border-surface-secondary dark:border-surface-dark-elevated/50 hover:border-brand-primary/40 bg-surface-primary dark:bg-surface-dark-primary shadow-sm'
                       }`}
@@ -300,7 +300,7 @@ const QuizSection: React.FC<{
   };
 
   const renderResultsMode = () => (
-    <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary p-4 md:p-8 overflow-y-auto animate-in fade-in duration-300 custom-scrollbar pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-8">
+    <div className="flex flex-col h-full bg-surface-primary dark:bg-surface-dark-primary p-4 md:p-8 overflow-y-auto animate-in fade-in duration-normal custom-scrollbar pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-8">
       <div className="max-w-md mx-auto w-full text-center py-6 space-y-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
         <div className={`inline-flex items-center gap-2 px-4 py-1 rounded-full text-body font-semibold ${lastSubmissionResult!.passed ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20' : 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20'}`}>
           {lastSubmissionResult!.passed ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
@@ -469,7 +469,7 @@ const QuizSection: React.FC<{
             <button
               onClick={() => startQuiz('solving')}
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-brand-primary hover:bg-brand-primary/90 active:scale-[0.98] text-white rounded-xl font-semibold text-body transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-brand-primary hover:bg-brand-primary/90 active:scale-[0.98] text-white rounded-input font-semibold text-body transition-all disabled:opacity-50"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
               {t('startQuiz')}
@@ -477,7 +477,7 @@ const QuizSection: React.FC<{
             <button
               onClick={() => startQuiz('article')}
               disabled={loading}
-              className="flex items-center justify-center gap-2 px-4 py-2 text-text-theme-secondary dark:text-text-theme-dark-secondary bg-surface-primary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated rounded-xl text-body hover:border-surface-secondary dark:hover:border-surface-dark-elevated hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary transition-all disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-text-theme-secondary dark:text-text-theme-dark-secondary bg-surface-primary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated rounded-input text-body hover:border-surface-secondary dark:hover:border-surface-dark-elevated hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary transition-all disabled:opacity-50"
             >
               <BookOpen className="w-4 h-4" />
               {t('article')}
@@ -506,7 +506,7 @@ const QuizSection: React.FC<{
                     <button
                       onClick={() => handleReviewClick(attempt.id)}
                       aria-label={`${attempt.score}/${attempt.total} — ${isPassed ? t('passed') : t('failed')}, ${new Date(attempt.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-surface-secondary dark:bg-surface-dark-secondary/60 border border-surface-secondary dark:border-surface-dark-elevated/50 hover:border-surface-secondary dark:hover:border-surface-dark-elevated hover:bg-surface-primary dark:hover:bg-surface-dark-secondary transition-all group text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-input bg-surface-secondary dark:bg-surface-dark-secondary/60 border border-surface-secondary dark:border-surface-dark-elevated/50 hover:border-surface-secondary dark:hover:border-surface-dark-elevated hover:bg-surface-primary dark:hover:bg-surface-dark-secondary transition-all group text-left"
                     >
                       <div className="flex items-baseline gap-0.5 min-w-[44px]">
                         <span className="text-h4 font-bold tabular-nums leading-none text-text-theme-primary dark:text-text-theme-dark-primary">
@@ -534,7 +534,7 @@ const QuizSection: React.FC<{
                     </button>
 
                     {showReviewWarning === attempt.id && (
-                      <div className="mt-1 rounded-xl border border-amber-200 dark:border-amber-500/25 bg-amber-50 dark:bg-amber-500/10 p-4 animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="mt-1 rounded-input border border-amber-200 dark:border-amber-500/25 bg-amber-50 dark:bg-amber-500/10 p-4 animate-in fade-in slide-in-from-top-1 duration-150">
                         <div className="flex gap-2 items-start mb-3">
                           <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                           <p className="text-caption font-semibold text-amber-800 dark:text-amber-300 leading-snug">
@@ -544,13 +544,13 @@ const QuizSection: React.FC<{
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setShowReviewWarning(null)}
-                            className="flex-1 py-2 rounded-lg text-caption font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
+                            className="flex-1 py-2 rounded-button text-caption font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
                           >
                             {t('cancel')}
                           </button>
                           <button
                             onClick={() => loadReview(showReviewWarning)}
-                            className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white rounded-lg text-caption font-semibold transition-all"
+                            className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white rounded-button text-caption font-semibold transition-all"
                           >
                             {t('viewReview')}
                           </button>
@@ -566,7 +566,7 @@ const QuizSection: React.FC<{
 
         {/* Review warning fallback */}
         {showReviewWarning !== null && !(quizSummary.previous_attempts && quizSummary.previous_attempts.length > 0) && (
-          <div className="rounded-xl border border-amber-200 dark:border-amber-500/25 bg-amber-50 dark:bg-amber-500/10 p-4 animate-in fade-in duration-150">
+          <div className="rounded-input border border-amber-200 dark:border-amber-500/25 bg-amber-50 dark:bg-amber-500/10 p-4 animate-in fade-in duration-150">
             <div className="flex gap-2 items-start mb-3">
               <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
               <p className="text-caption font-semibold text-amber-800 dark:text-amber-300 leading-snug">
@@ -576,13 +576,13 @@ const QuizSection: React.FC<{
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowReviewWarning(null)}
-                className="flex-1 py-2 rounded-lg text-caption font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
+                className="flex-1 py-2 rounded-button text-caption font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={() => loadReview(showReviewWarning)}
-                className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white rounded-lg text-caption font-semibold transition-all"
+                className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white rounded-button text-caption font-semibold transition-all"
               >
                 {t('viewReview')}
               </button>

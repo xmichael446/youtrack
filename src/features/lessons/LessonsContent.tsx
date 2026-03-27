@@ -74,7 +74,7 @@ const LessonsContent: React.FC = () => {
         {attendance ? (
           <ActiveAttendanceCard attendance={attendance} quiz={lessonsData?.quiz} showToast={showToast} />
         ) : (
-          <div className="text-center py-12 bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-sm">
+          <div className="text-center py-12 bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm">
             <BookOpen className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted mx-auto mb-3" />
             <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noLessonsSubtitle')}</p>
           </div>
@@ -118,7 +118,7 @@ const LessonsContent: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated p-12 text-center">
+          <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border-2 border-dashed border-surface-secondary dark:border-surface-dark-elevated p-12 text-center">
             <ClipboardList className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted mx-auto mb-3" />
             <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noAssignmentsSubtitle')}</p>
           </div>

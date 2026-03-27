@@ -34,7 +34,7 @@ const AssignmentHistoryCard: React.FC<{
   else if (isPastDeadline) statusLabel = t('missed');
 
   return (
-    <div className={`bg-surface-primary dark:bg-surface-dark-primary rounded-[16px] border transition-all duration-300 overflow-hidden ${isExpanded ? 'border-brand-primary/40 shadow-xl ring-1 ring-brand-primary/10' : 'border-surface-secondary dark:border-surface-dark-elevated hover:border-brand-primary/30'}`}>
+    <div className={`bg-surface-primary dark:bg-surface-dark-primary rounded-[16px] border transition-all duration-normal overflow-hidden ${isExpanded ? 'border-brand-primary/40 shadow-xl ring-1 ring-brand-primary/10' : 'border-surface-secondary dark:border-surface-dark-elevated hover:border-brand-primary/30'}`}>
       <button
         type="button"
         onClick={onExpand}
@@ -53,25 +53,25 @@ const AssignmentHistoryCard: React.FC<{
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${assignmentStatusDot(latestSubmission?.status || statusLabel)}`}></span>
             {statusLabel}
           </span>
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-surface-secondary dark:bg-surface-dark-secondary transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-brand-primary/10 text-brand-primary' : 'text-text-theme-muted'}`}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-surface-secondary dark:bg-surface-dark-secondary transition-transform duration-normal ${isExpanded ? 'rotate-180 bg-brand-primary/10 text-brand-primary' : 'text-text-theme-muted'}`}>
             <ChevronDown className="w-4 h-4" />
           </div>
         </div>
       </button>
 
       {isExpanded && (
-        <div className="border-t border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary/30 dark:bg-surface-dark-secondary/10 animate-in duration-300">
+        <div className="border-t border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary/30 dark:bg-surface-dark-secondary/10 animate-in duration-normal">
           <div className="px-4 py-3 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-center md:justify-start">
             <div className="flex bg-surface-secondary dark:bg-surface-dark-primary p-1 rounded-[14px] items-center shadow-inner border border-surface-secondary/50 dark:border-surface-dark-elevated w-full max-w-[280px]">
               <button
                 onClick={() => setActiveTab('assignment')}
-                className={`flex-1 h-9 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-300 ${activeTab === 'assignment' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
+                className={`flex-1 h-9 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-normal ${activeTab === 'assignment' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
               >
                 {t('assignment')}
               </button>
               <button
                 onClick={() => setActiveTab('quiz')}
-                className={`flex-1 h-9 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-300 ${activeTab === 'quiz' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
+                className={`flex-1 h-9 rounded-[10px] font-bold text-label uppercase tracking-wider transition-all duration-normal ${activeTab === 'quiz' ? 'bg-surface-primary dark:bg-surface-dark-secondary text-brand-primary shadow-sm' : 'text-text-theme-secondary'}`}
               >
                 {t('quiz')}
               </button>
@@ -80,7 +80,7 @@ const AssignmentHistoryCard: React.FC<{
 
           <div className="p-4 md:p-4">
             {activeTab === 'assignment' ? (
-              <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="space-y-4 animate-in fade-in duration-normal">
                 {canSubmit && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
                     <span className={`flex items-center gap-1 text-caption ${isOverdue ? 'text-orange-500 dark:text-orange-400' : 'text-red-500 dark:text-red-400'}`}>
@@ -91,7 +91,7 @@ const AssignmentHistoryCard: React.FC<{
                 )}
 
                 {canSubmit && isOverdue && !isPastDeadline && (
-                  <div className="flex items-start gap-2 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-xl px-3 py-3">
+                  <div className="flex items-start gap-2 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 rounded-input px-3 py-3">
                     <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-caption font-semibold text-orange-700 dark:text-orange-400 leading-snug">{t('lateSubmission')}</p>
@@ -103,7 +103,7 @@ const AssignmentHistoryCard: React.FC<{
                 {canSubmit && onSubmit && (
                   <button
                     onClick={onSubmit}
-                    className={`w-full flex items-center justify-center gap-2 py-2 font-semibold text-body rounded-xl transition-all active:scale-[0.99] ${
+                    className={`w-full flex items-center justify-center gap-2 py-2 font-semibold text-body rounded-input transition-all active:scale-[0.99] ${
                       isOverdue
                         ? 'bg-orange-500 hover:bg-orange-600 text-white'
                         : 'bg-brand-primary hover:bg-brand-primary/90 text-white'
@@ -163,7 +163,7 @@ const AssignmentHistoryCard: React.FC<{
                 )}
               </div>
             ) : (
-              <div className="animate-in fade-in duration-300">
+              <div className="animate-in fade-in duration-normal">
                 <QuizSection lessonId={assignment.id} showToast={showToast} initialData={assignment.quiz} />
               </div>
             )}

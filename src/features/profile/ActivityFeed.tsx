@@ -15,14 +15,14 @@ const ActivityFeed: React.FC<{
 
   if (entries.length === 0) {
     return (
-      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-surface-secondary dark:border-surface-dark-elevated p-6 shadow-sm text-center">
+      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated p-6 shadow-sm text-center">
         <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary leading-relaxed">{t('noActivity')}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-surface-secondary dark:border-surface-dark-elevated shadow-sm overflow-hidden">
+    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm overflow-hidden">
       <div className="px-4 py-3 border-b border-surface-secondary/70 dark:border-surface-dark-elevated/70">
         <p className="section-label">
           {t('activityFeed')}
@@ -31,7 +31,7 @@ const ActivityFeed: React.FC<{
       <div className="divide-y divide-surface-secondary dark:divide-surface-dark-elevated/50">
         {entries.map((entry, i) => (
           <div key={i} className="flex items-center px-4 py-3 gap-3">
-            <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
+            <div className={`w-7 h-7 rounded-input flex items-center justify-center shrink-0 ${
               entry.negative ? 'bg-red-50 dark:bg-red-500/10' : 'bg-emerald-50 dark:bg-emerald-500/10'}`}>
               {entry.negative
                 ? <TrendingDown className="w-3.5 h-3.5 text-red-500" />
@@ -57,7 +57,7 @@ const ActivityFeed: React.FC<{
       {hasMore && (
         <div className="px-4 py-3 border-t border-surface-secondary/70 dark:border-surface-dark-elevated/70">
           <button onClick={onLoadMore} disabled={loadingMore}
-            className="w-full h-9 rounded-xl bg-surface-secondary dark:bg-surface-dark-secondary text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full h-9 rounded-input bg-surface-secondary dark:bg-surface-dark-secondary text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loadingMore
               ? <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
               : <ChevronDown className="w-3.5 h-3.5" />}

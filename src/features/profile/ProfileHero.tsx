@@ -23,7 +23,7 @@ const ProfileHero: React.FC<{
   const hasAttendance = 'attendance_pct' in stats;
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-sm overflow-hidden">
+    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <button onClick={() => goBack('dashboard')}
@@ -34,11 +34,11 @@ const ProfileHero: React.FC<{
         {profile.is_own_profile && (
           <div className="flex items-center gap-2">
             <button onClick={onSettings} aria-label={t('settings')}
-              className="min-w-[44px] min-h-[44px] rounded-xl bg-surface-secondary dark:bg-surface-dark-secondary flex items-center justify-center text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-brand-primary dark:hover:text-brand-primary transition-colors">
+              className="min-w-[44px] min-h-[44px] rounded-input bg-surface-secondary dark:bg-surface-dark-secondary flex items-center justify-center text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-brand-primary dark:hover:text-brand-primary transition-colors">
               <Settings className="w-4 h-4" />
             </button>
             <button onClick={onEdit}
-              className="flex items-center gap-1 px-3 h-9 rounded-xl bg-brand-primary/10 text-brand-primary text-caption hover:bg-brand-primary/20 transition-colors">
+              className="flex items-center gap-1 px-3 h-9 rounded-input bg-brand-primary/10 text-brand-primary text-caption hover:bg-brand-primary/20 transition-colors">
               <Edit3 className="w-3.5 h-3.5" />
               {t('editProfile')}
             </button>
@@ -51,15 +51,15 @@ const ProfileHero: React.FC<{
         <div className="shrink-0 relative">
           {avatarUrl ? (
             <img src={avatarUrl} alt={profile.full_name}
-              className="w-20 h-20 rounded-2xl object-cover ring-2 ring-surface-secondary dark:ring-surface-dark-elevated" />
+              className="w-20 h-20 rounded-card object-cover ring-2 ring-surface-secondary dark:ring-surface-dark-elevated" />
           ) : (
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-h2 ring-2 ring-surface-secondary dark:ring-surface-dark-elevated"
+            <div className="w-20 h-20 rounded-card flex items-center justify-center text-white text-h2 ring-2 ring-surface-secondary dark:ring-surface-dark-elevated"
               style={{ backgroundColor: getAvatarBg(id) }}>
               {getInitials(profile.full_name)}
             </div>
           )}
           {profile.rank > 0 && (
-            <div className="absolute -top-2 -right-2 px-1 py-0.5 rounded-lg bg-brand-primary text-white text-caption font-bold tabular-nums shadow-md">
+            <div className="absolute -top-2 -right-2 px-1 py-0.5 rounded-button bg-brand-primary text-white text-caption font-bold tabular-nums shadow-md">
               #{profile.rank}
             </div>
           )}
@@ -76,16 +76,16 @@ const ProfileHero: React.FC<{
           {/* Pills Row: Streak, Coins, XP */}
           <div className="flex flex-wrap gap-2 mt-3">
             {profile.streak > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-input bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
                 <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
                 <span className="text-caption font-bold text-amber-600 dark:text-amber-400 tabular-nums">{t('streakDays').replace('{count}', String(profile.streak))}</span>
               </div>
             )}
-            <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-input bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 shadow-sm">
               <Coins className="w-3.5 h-3.5 text-amber-500" />
               <span className="text-caption font-bold text-amber-600 dark:text-amber-400 tabular-nums">{stats.balance ?? 0}</span>
             </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-brand-primary/10 border border-brand-primary/20 shadow-sm">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-input bg-brand-primary/10 border border-brand-primary/20 shadow-sm">
               <Zap className="w-3.5 h-3.5 text-brand-primary fill-brand-primary/20" />
               <span className="text-caption font-bold text-brand-primary tabular-nums">{stats.total_points} XP</span>
             </div>
@@ -118,8 +118,8 @@ const ProfileHero: React.FC<{
             const isBronze = badge.place === 3;
             return (
               <div key={badge.id}
-                className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-secondary/50 dark:bg-surface-dark-secondary/40 border border-surface-secondary/50 dark:border-surface-dark-elevated/50 transition-all hover:bg-surface-primary dark:hover:bg-surface-dark-secondary hover:shadow-sm">
-                <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center shadow-sm
+                className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-input bg-surface-secondary/50 dark:bg-surface-dark-secondary/40 border border-surface-secondary/50 dark:border-surface-dark-elevated/50 transition-all hover:bg-surface-primary dark:hover:bg-surface-dark-secondary hover:shadow-sm">
+                <div className={`shrink-0 w-7 h-7 rounded-button flex items-center justify-center shadow-sm
                   ${isGold ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-500' :
                     isSilver ? 'bg-surface-secondary dark:bg-surface-dark-elevated/50 text-text-theme-muted' :
                     isBronze ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-400' :

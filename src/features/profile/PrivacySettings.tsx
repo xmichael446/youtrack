@@ -26,9 +26,9 @@ const ToggleRow: React.FC<{
       aria-label={label}
       onClick={onToggle}
       disabled={disabled}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-300 shrink-0 mt-0.5 disabled:opacity-60 ${checked ? 'bg-brand-primary' : 'bg-surface-secondary dark:bg-surface-dark-elevated'}`}
+      className={`relative w-11 h-6 rounded-pill transition-colors duration-normal shrink-0 mt-0.5 disabled:opacity-60 ${checked ? 'bg-brand-primary' : 'bg-surface-secondary dark:bg-surface-dark-elevated'}`}
     >
-      <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+      <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-normal ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
     </button>
   </div>
 );
@@ -61,7 +61,7 @@ const PrivacySettings: React.FC<{
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-normal">
       <div className="flex items-center gap-3">
         <button onClick={onBack}
           className="flex items-center gap-1 text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-brand-primary transition-colors text-caption">
@@ -70,7 +70,7 @@ const PrivacySettings: React.FC<{
         </button>
         <h2 className="text-h3 text-brand-dark dark:text-text-theme-dark-primary">{t('privacySettings')}</h2>
       </div>
-      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-sm px-4">
+      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-sm px-4">
         <ToggleRow
           label={t('hideBalance')} desc={t('hideBalanceDesc')}
           checked={localPrivacy.hide_balance} disabled={pending !== null}
