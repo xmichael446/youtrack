@@ -3,9 +3,9 @@ import {
   Swords,
   Users,
   CheckCircle2,
-  Loader2,
 } from 'lucide-react';
 import { ContestDetailData } from '../../services/apiTypes';
+import { Button } from '../../components/ui';
 
 const ContestActionButton: React.FC<{
   detail: ContestDetailData;
@@ -23,33 +23,45 @@ const ContestActionButton: React.FC<{
       );
     }
     return (
-      <button
-        onClick={onAction}
+      <Button
+        variant="primary"
+        size="lg"
+        fullWidth
+        icon={<Users className="w-5 h-5" />}
+        loading={loading}
         disabled={loading || detail.question_count === 0}
-        className="w-full py-3 rounded-card font-bold font-mono text-body text-white bg-brand-primary hover:bg-brand-primary/90 shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 disabled:opacity-60 disabled:scale-100 flex items-center justify-center gap-2"
+        onClick={onAction}
       >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Users className="w-5 h-5" />}
         {detail.question_count === 0 ? t('contestBeingPrepared') : t('contestRegister')}
-      </button>
+      </Button>
     );
   }
   if (detail.status === 'open' && detail.is_registered) {
     return (
-      <button
-        onClick={onAction}
+      <Button
+        variant="primary"
+        size="lg"
+        fullWidth
+        icon={<Swords className="w-5 h-5" />}
         disabled={detail.question_count === 0}
-        className="w-full py-3 rounded-card font-bold font-mono text-body text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 disabled:opacity-60 disabled:scale-100 flex items-center justify-center gap-2"
+        onClick={onAction}
+        className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 from-emerald-500 to-emerald-600"
       >
-        <Swords className="w-5 h-5" />
         {t('contestEnter')}
-      </button>
+      </Button>
     );
   }
   if (detail.status === 'open' && !detail.is_registered) {
     return (
-      <div className="flex items-center justify-center py-3 px-4 rounded-card bg-surface-secondary dark:bg-surface-dark-secondary text-text-theme-muted dark:text-text-theme-dark-muted font-mono font-bold text-body cursor-not-allowed border border-gray-200 dark:border-slate-700">
+      <Button
+        variant="secondary"
+        size="lg"
+        fullWidth
+        disabled
+        className="cursor-not-allowed"
+      >
         {t('contestRegistrationClosed')}
-      </div>
+      </Button>
     );
   }
   return null;

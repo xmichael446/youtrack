@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Swords,
   Trophy,
@@ -6,16 +6,36 @@ import {
   Users,
   CheckCircle2,
   ChevronRight,
-  Loader2,
   Calendar,
   BookOpen,
 } from 'lucide-react';
 import { ContestListItem } from '../../services/apiTypes';
-import StatusBadge from '../../components/ui/StatusBadge';
+import { Card, Badge, Button } from '../../components/ui';
 import { useCountdown } from '../../hooks/useCountdown';
 import { formatDateTime } from '../../utils/formatDateTime';
 import { statusAccentClass, CONTEST_STORAGE_KEY } from '../../utils/contestHelpers';
 import type { ContestNav } from './contestTypes';
+
+// Map contest status to Badge variant
+const statusToBadgeVariant = (status: string): 'brand' | 'success' | 'warning' | 'error' | 'muted' => {
+  switch (status) {
+    case 'open': return 'success';
+    case 'scheduled': return 'brand';
+    case 'finalized': return 'muted';
+    case 'closed': return 'error';
+    default: return 'muted';
+  }
+};
+
+const statusToLabel = (status: string, t: (k: string) => string): string => {
+  switch (status) {
+    case 'open': return t('contestStatusOpen') || 'Live';
+    case 'scheduled': return t('contestStatusScheduled') || 'Upcoming';
+    case 'finalized': return t('contestStatusFinalized') || 'Ended';
+    case 'closed': return t('contestStatusClosed') || 'Closed';
+    default: return status;
+  }
+};
 
 const ContestCard: React.FC<{
   item: ContestListItem;
@@ -24,8 +44,6 @@ const ContestCard: React.FC<{
   registeringId: number | null;
   t: (k: string) => string;
 }> = ({ item, onNavigate, onRegister, registeringId, t }) => {
-  const [pressed, setPressed] = useState(false);
-
   // Check if user has already submitted this contest
   const localPlay = (() => {
     try {
@@ -55,68 +73,64 @@ const ContestCard: React.FC<{
     if (item.status === 'scheduled') {
       if (item.is_registered) {
         return (
-          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
-            <CheckCircle2 className="w-3.5 h-3.5" />
+          <Badge variant="success" size="sm">
+            <CheckCircle2 className="w-3 h-3" />
             {t('contestRegistered')}
-          </span>
+          </Badge>
         );
       }
       return (
-        <button
+        <Button
+          variant="primary"
+          size="sm"
+          icon={<Users className="w-3.5 h-3.5" />}
+          loading={registeringId === item.id}
           onClick={handleAction}
-          disabled={registeringId === item.id}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-white bg-brand-primary hover:bg-brand-primary/90 shadow-sm shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 transition-all duration-150 disabled:opacity-60 tracking-wide"
         >
-          {registeringId === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
           {t('contestRegister')}
-        </button>
+        </Button>
       );
     }
     if (item.status === 'open') {
       if (item.is_registered) {
         if (isSubmitted) {
           return (
-            <span className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
-              <CheckCircle2 className="w-3.5 h-3.5" />
+            <Badge variant="success" size="sm">
+              <CheckCircle2 className="w-3 h-3" />
               {localPlay?.score !== undefined ? `${localPlay.score}/${localPlay.total}` : t('contestSubmitted')}
-            </span>
+            </Badge>
           );
         }
         return null; // rendered as full-width banner below
       }
       return (
-        <span className="inline-flex items-center px-3 py-2 rounded-input text-[10px] font-bold font-mono text-text-theme-muted dark:text-text-theme-dark-muted bg-surface-secondary dark:bg-surface-dark-secondary cursor-not-allowed tracking-wide">
+        <Badge variant="muted" size="sm">
           {t('contestRegistrationClosed')}
-        </span>
+        </Badge>
       );
     }
     if (item.status === 'finalized') {
       return (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<Trophy className="w-3.5 h-3.5" />}
           onClick={handleAction}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-input text-[10px] font-bold font-mono text-brand-primary hover:bg-brand-primary/10 border border-brand-primary/30 hover:border-brand-primary/50 hover:scale-[1.02] active:scale-95 transition-all duration-150 tracking-wide"
         >
-          <Trophy className="w-3.5 h-3.5" />
           {t('contestViewResults')}
-        </button>
+        </Button>
       );
     }
     return null;
   };
 
   return (
-    <div
+    <Card
+      variant="default"
+      padding="none"
+      hoverable
       onClick={() => onNavigate({ view: 'detail', contestId: item.id })}
-      onMouseDown={() => setPressed(true)}
-      onMouseUp={() => setPressed(false)}
-      onMouseLeave={() => setPressed(false)}
-      className={`bg-surface-primary dark:bg-surface-dark-primary rounded-card border border-gray-100 dark:border-slate-800 overflow-hidden shadow-card dark:shadow-card-dark
-        hover:border-brand-primary/25 dark:hover:border-brand-primary/20
-        hover:shadow-lg dark:hover:shadow-brand-primary/5
-        transition-all duration-fast cursor-pointer group
-        ${statusAccentClass(item.status)}
-        ${pressed ? 'scale-[0.99]' : 'hover:-translate-y-0.5'}
-      `}
+      className={`overflow-hidden cursor-pointer group ${statusAccentClass(item.status)}`}
     >
       {/* Gradient top edge accent */}
       {item.status === 'open' && (
@@ -133,7 +147,14 @@ const ContestCard: React.FC<{
               {t('vocabContest')} #{item.number}
             </h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <StatusBadge status={item.status} t={t} />
+              <Badge
+                variant={statusToBadgeVariant(item.status)}
+                size="sm"
+                dot={item.status === 'open'}
+                pulse={item.status === 'open'}
+              >
+                {statusToLabel(item.status, t)}
+              </Badge>
               {(item.status === 'scheduled' || item.status === 'open') && (
                 <span className="text-caption font-mono text-text-theme-muted dark:text-text-theme-dark-muted flex items-center gap-1">
                   <Clock className="w-3 h-3" />
@@ -170,13 +191,16 @@ const ContestCard: React.FC<{
 
         {/* Full-width CTA for open+registered+not submitted */}
         {item.status === 'open' && item.is_registered && !isSubmitted && (
-          <button
+          <Button
+            variant="primary"
+            size="md"
+            fullWidth
+            icon={<Swords className="w-4 h-4" />}
             onClick={handleAction}
-            className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-input font-bold font-mono text-sm text-white bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/30 hover:shadow-emerald-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150"
+            className="mt-3 bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/30 hover:shadow-emerald-500/40 from-emerald-500 to-emerald-600"
           >
-            <Swords className="w-4 h-4" />
             {t('contestEnter')} →
-          </button>
+          </Button>
         )}
 
         {/* Hint for registered+upcoming: tell them what happens next */}
@@ -187,7 +211,7 @@ const ContestCard: React.FC<{
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 
