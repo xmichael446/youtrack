@@ -110,7 +110,6 @@ const CurrentAssignmentSection: React.FC<{
                 <Button
                   variant="primary"
                   size="md"
-                  fullWidth
                   icon={<UploadCloud className="w-4 h-4" />}
                   onClick={onSubmit}
                   className={isOverdue ? 'from-orange-500 to-orange-600 shadow-orange-500/20 hover:shadow-orange-500/35' : ''}

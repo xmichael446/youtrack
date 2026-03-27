@@ -83,7 +83,7 @@ const SubmissionModal: React.FC<{
         variant="ghost"
         size="md"
         onClick={onClose}
-        className="flex-1"
+        className="min-w-[100px]"
       >
         {t('cancel')}
       </Button>
@@ -93,7 +93,7 @@ const SubmissionModal: React.FC<{
         loading={isSubmitting}
         icon={<UploadCloud className="w-4 h-4" />}
         onClick={handleSubmit}
-        className="flex-1"
+        className="min-w-[100px]"
       >
         <span className="truncate">{t('submitAssignment')}</span>
       </Button>

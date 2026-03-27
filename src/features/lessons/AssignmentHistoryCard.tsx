@@ -121,8 +121,7 @@ const AssignmentHistoryCard: React.FC<{
                 {canSubmit && onSubmit && (
                   <Button
                     variant="primary"
-                    size="sm"
-                    fullWidth
+                    size="md"
                     icon={<UploadCloud className="w-4 h-4" />}
                     onClick={onSubmit}
                     className={isOverdue ? 'from-orange-500 to-orange-600 shadow-orange-500/20 hover:shadow-orange-500/35' : ''}
