@@ -53,7 +53,7 @@ Plans:
 
 Plans:
 - [ ] 02-01-PLAN.md — Create Button and Card components with z-index scale
-- [ ] 02-02-PLAN.md — Create Input, Badge, and EmptyState components
+- [x] 02-02-PLAN.md — Create Input, Badge, and EmptyState components
 - [ ] 02-03-PLAN.md — Create Modal component and standardize Toast
 - [ ] 02-04-PLAN.md — Standardize navigation active states and create barrel export
 

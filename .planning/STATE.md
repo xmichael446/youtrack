@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 01-design-system-06-PLAN.md
-last_updated: "2026-03-27T01:16:01.092Z"
+stopped_at: Completed 02-core-components-02-PLAN.md
+last_updated: "2026-03-27T01:37:44.371Z"
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 10
+  completed_plans: 7
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Every page feels like it was designed by one person — consistent, playful, and polished.
-**Current focus:** Phase 01 — design-system
+**Current focus:** Phase 02 — core-components
 
 ## Current Position
 
-Phase: 01 (design-system) — EXECUTING
-Plan: 4 of 4
+Phase: 02 (core-components) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: 4 of 4
 | Phase 01-design-system P02 | 27 | 2 tasks | 11 files |
 | Phase 01-design-system P05 | 8 | 2 tasks | 12 files |
 | Phase 01-design-system P06 | 27 | 2 tasks | 18 files |
+| Phase 02-core-components P02 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Phase 01-design-system]: Silver podium styling in contestHelpers.ts documented as intentional exception in design-system.md Section 9
 - [Phase 01-design-system]: rounded-3xl containers normalized to rounded-card (16px) per design system card standard
 - [Phase 01-design-system]: Migrated all 18 feature components to semantic radius tokens (rounded-card/input/button/pill) and duration tokens (duration-fast/normal) completing full codebase adoption
+- [Phase 02-core-components]: Input uses as='input'|'textarea' prop instead of separate components to reduce import surface
+- [Phase 02-core-components]: Badge variant maps defined as typed Record<variant, string> at module level for readability and extensibility
+- [Phase 02-core-components]: EmptyState icon wrapped in rounded-card container for consistent icon sizing/background treatment
 
 ### Pending Todos
 
@@ -83,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T01:16:01.086Z
-Stopped at: Completed 01-design-system-06-PLAN.md
+Last session: 2026-03-27T01:37:44.362Z
+Stopped at: Completed 02-core-components-02-PLAN.md
 Resume file: None
