@@ -29,14 +29,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Typography is applied from a consistent scale (h1–h4, body, caption, label) with matching font sizes and weights across all pages
   4. Border radii, shadows, and transition durations are defined as reusable Tailwind config values rather than duplicated inline utilities
   5. A design system reference file exists at `.planning/design-system.md` that documents every token decision
-**Plans:** 6 plans (4 complete, 2 gap closure)
+**Plans:** 5/6 plans executed
 
 Plans:
 - [x] 01-01-PLAN.md — Define design tokens and implement in Tailwind config
 - [x] 01-02-PLAN.md — Migrate core layout and page components to semantic tokens
 - [x] 01-03-PLAN.md — Migrate UI primitives, lessons, and profile features to semantic tokens
 - [x] 01-04-PLAN.md — Migrate contest features and complete full codebase migration
-- [ ] 01-05-PLAN.md — Gap closure: migrate pages and core components to semantic radius/duration tokens
+- [x] 01-05-PLAN.md — Gap closure: migrate pages and core components to semantic radius/duration tokens
 - [ ] 01-06-PLAN.md — Gap closure: migrate feature components to semantic radius/duration tokens
 
 ### Phase 2: Core Components
@@ -81,7 +81,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design System | 4/6 | Gap closure | - |
+| 1. Design System | 5/6 | In Progress|  |
 | 2. Core Components | 0/TBD | Not started | - |
 | 3. Page Redesigns | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
