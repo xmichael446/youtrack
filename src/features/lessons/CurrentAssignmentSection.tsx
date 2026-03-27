@@ -13,6 +13,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { AssignmentData } from '../../services/apiTypes';
 import { ShowToast, humanizeStatus, assignmentStatusColor, assignmentStatusDot, assignmentStatusBg } from './lessonTypes';
 import QuizSection from './QuizSection';
+import { Card, Badge, Button } from '../../components/ui';
 
 const CurrentAssignmentSection: React.FC<{
   assignment: AssignmentData;
@@ -29,34 +30,20 @@ const CurrentAssignmentSection: React.FC<{
   const canSubmit = assignment.can_submit && !isApproved;
 
   const statusBadge = isApproved ? (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-caption bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-      {t('assignmentApproved')}
-    </span>
+    <Badge variant="success" dot>{t('assignmentApproved')}</Badge>
   ) : isExpired ? (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-caption bg-red-500/10 text-red-500 dark:text-red-400">
-      <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></span>
-      {t('assignmentExpired')}
-    </span>
+    <Badge variant="error" dot>{t('assignmentExpired')}</Badge>
   ) : isOverdue ? (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-caption bg-orange-500/10 text-orange-600 dark:text-orange-400">
-      <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0"></span>
-      {t('assignmentOverdue')}
-    </span>
+    <Badge variant="warning" dot>{t('assignmentOverdue')}</Badge>
   ) : latestSubmission ? (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-caption bg-amber-500/10 text-amber-600 dark:text-amber-500">
-      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
-      {t('submitted')}
-    </span>
+    <Badge variant="warning" dot>{t('submitted')}</Badge>
   ) : (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-caption bg-brand-primary/10 text-brand-primary">
-      <span className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0"></span>
-      {t('active')}
-    </span>
+    <Badge variant="brand" dot>{t('active')}</Badge>
   );
 
   return (
-    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-[24px] border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden shadow-sm">
+    <Card variant="default" padding="none" className="overflow-hidden">
+      {/* Header */}
       <div className="p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated flex items-center justify-between bg-surface-secondary/50 dark:bg-surface-dark-secondary/50">
         <h3 className="text-h4 text-brand-dark dark:text-text-theme-dark-primary flex items-center gap-2">
           <ClipboardList className="w-4 h-4 text-text-theme-muted dark:text-text-theme-dark-muted" />
@@ -64,12 +51,13 @@ const CurrentAssignmentSection: React.FC<{
         </h3>
         <div className="flex flex-wrap items-center gap-2 justify-end">
           {statusBadge}
-          <span className="bg-surface-dark-primary dark:bg-surface-primary text-white dark:text-surface-dark-primary px-3 py-1 rounded-[10px] text-label uppercase tracking-wider">
+          <span className="bg-surface-dark-primary dark:bg-surface-primary text-white dark:text-surface-dark-primary px-3 py-1 rounded-input text-label uppercase tracking-wider">
             LSN {assignment.number}
           </span>
         </div>
       </div>
 
+      {/* Tab switcher */}
       <div className="px-4 py-3 border-b border-surface-secondary dark:border-surface-dark-elevated">
         <div className="flex bg-surface-secondary dark:bg-surface-dark-primary p-1 rounded-[14px] items-center shadow-inner border border-surface-secondary/50 dark:border-surface-dark-elevated max-w-sm mx-auto md:mx-0">
           <button
@@ -87,6 +75,7 @@ const CurrentAssignmentSection: React.FC<{
         </div>
       </div>
 
+      {/* Tab content */}
       <div className="p-4 md:p-6">
         {activeTab === 'assignment' ? (
           <div className="space-y-4 animate-in fade-in duration-normal">
@@ -118,19 +107,18 @@ const CurrentAssignmentSection: React.FC<{
               )}
 
               {canSubmit && (
-                <button
+                <Button
+                  variant="primary"
+                  size="md"
+                  fullWidth
+                  icon={<UploadCloud className="w-4 h-4" />}
                   onClick={onSubmit}
-                  className={`w-full flex items-center justify-center gap-2 py-2 font-semibold text-body rounded-input transition-all active:scale-[0.99] ${
-                    isOverdue
-                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                      : 'bg-brand-primary hover:bg-brand-primary/90 text-white'
-                  }`}
+                  className={isOverdue ? 'from-orange-500 to-orange-600 shadow-orange-500/20 hover:shadow-orange-500/35' : ''}
                 >
-                  <UploadCloud className="w-4 h-4" />
                   {isOverdue
                     ? (latestSubmission ? t('resubmitLate') : t('submitLate'))
                     : (latestSubmission ? t('resubmit') : t('startSubmission'))}
-                </button>
+                </Button>
               )}
             </div>
 
@@ -160,7 +148,7 @@ const CurrentAssignmentSection: React.FC<{
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {assignment.submissions.map((sub, idx) => (
-                    <div key={idx} className="border border-surface-secondary dark:border-surface-dark-elevated rounded-[12px] p-3 md:p-4 space-y-2">
+                    <div key={idx} className="border border-surface-secondary dark:border-surface-dark-elevated rounded-input p-3 md:p-4 space-y-2">
                       <div className="flex justify-between items-center gap-3">
                         <span className="text-caption md:text-body text-text-theme-secondary dark:text-text-theme-dark-secondary shrink-0 tabular-nums">{new Date(sub.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption shrink-0 ${assignmentStatusColor(sub.status)} ${assignmentStatusBg(sub.status)}`}>
@@ -194,7 +182,7 @@ const CurrentAssignmentSection: React.FC<{
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

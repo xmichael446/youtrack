@@ -4,13 +4,12 @@ import {
   UploadCloud,
   X,
   Link as LinkIcon,
-  ExternalLink,
-  Loader2
+  ExternalLink
 } from 'lucide-react';
-import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { AssignmentData, HomeworkSubmissionData } from '../../services/apiTypes';
 import { ShowToast } from './lessonTypes';
+import { Modal, Button } from '../../components/ui';
 
 const SubmissionModal: React.FC<{
   isOpen: boolean;
@@ -24,8 +23,6 @@ const SubmissionModal: React.FC<{
   const [attachments, setAttachments] = useState<({ type: 'link', value: string } | { type: 'file', file: File })[]>([{ type: 'link', value: '' }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  if (!isOpen) return null;
 
   const handleAddLink = () => setAttachments([...attachments, { type: 'link', value: '' }]);
   const handleRemoveAttachment = (index: number) => setAttachments(attachments.filter((_, i) => i !== index));
@@ -80,119 +77,120 @@ const SubmissionModal: React.FC<{
     }
   };
 
-  return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
-      <div className="absolute inset-0 bg-surface-dark-primary/60 animate-in fade-in duration-normal" onClick={onClose} />
-      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-t-[24px] md:rounded-[24px] shadow-modal dark:shadow-modal-dark w-full max-w-2xl relative z-10 flex flex-col border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden max-h-[90vh] animate-in duration-normal ease-out">
-        <div className="p-4 md:p-6 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-between items-center bg-surface-secondary/50 dark:bg-surface-dark-secondary/50">
-          <div>
-            <h3 className="text-h3 md:text-h2 text-brand-dark dark:text-text-theme-dark-primary">{t('submitAssignment')}</h3>
-            <p className="text-caption text-text-theme-secondary mt-1 uppercase tracking-widest">LSN {assignment.number}: {assignment.lesson_topic}</p>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary rounded-input transition-colors">
-            <X className="w-4 h-4 text-text-theme-secondary" />
-          </button>
+  const footer = (
+    <div className="flex gap-3">
+      <Button
+        variant="ghost"
+        size="md"
+        onClick={onClose}
+        className="flex-1"
+      >
+        {t('cancel')}
+      </Button>
+      <Button
+        variant="primary"
+        size="md"
+        loading={isSubmitting}
+        icon={<UploadCloud className="w-4 h-4" />}
+        onClick={handleSubmit}
+        className="flex-1"
+      >
+        <span className="truncate">{t('submitAssignment')}</span>
+      </Button>
+    </div>
+  );
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('submitAssignment')}
+      subtitle={`LSN ${assignment.number}: ${assignment.lesson_topic}`}
+      maxWidth="md"
+      footer={footer}
+    >
+      <div className="space-y-6">
+        {/* Comment field */}
+        <div className="space-y-2">
+          <label className="section-label text-text-theme-muted flex items-center">
+            <FileText className="w-3.5 h-3.5 mr-2 text-brand-primary" />
+            {t('commentOptional')}
+          </label>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder={t('anyNotes')}
+            className="w-full rounded-input border border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary/50 dark:bg-surface-dark-secondary/50 px-4 py-3 text-body focus:border-brand-primary focus:outline-none transition-all dark:text-text-theme-dark-primary min-h-[100px]"
+          />
         </div>
 
-        <div className="p-4 md:p-6 overflow-y-auto space-y-6 custom-scrollbar">
-          <div className="space-y-2">
+        {/* Attachments field */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
             <label className="section-label text-text-theme-muted flex items-center">
-              <FileText className="w-3.5 h-3.5 mr-2 text-brand-primary" />
-              {t('commentOptional')}
+              <LinkIcon className="w-3.5 h-3.5 mr-2 text-brand-primary" />
+              {t('addAttachment')}
             </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={t('anyNotes')}
-              className="w-full rounded-[16px] border border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary/50 dark:bg-surface-dark-secondary/50 px-4 py-3 text-body focus:border-brand-primary focus:outline-none transition-all dark:text-text-theme-dark-primary min-h-[100px]"
-            />
+            <div className="flex bg-surface-secondary dark:bg-surface-dark-primary p-1 rounded-[12px] border border-surface-secondary/50 dark:border-surface-dark-elevated">
+              <button
+                onClick={handleAddLink}
+                className="px-4 py-1 rounded-[10px] text-caption font-bold tracking-wider transition-all text-text-theme-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary"
+              >
+                {t('addLink')}
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-1 rounded-[10px] text-caption font-bold tracking-wider transition-all text-text-theme-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary"
+              >
+                {t('addFile')}
+              </button>
+              <input
+                type="file"
+                multiple
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="section-label text-text-theme-muted flex items-center">
-                <LinkIcon className="w-3.5 h-3.5 mr-2 text-brand-primary" />
-                {t('addAttachment')}
-              </label>
-              <div className="flex bg-surface-secondary dark:bg-surface-dark-primary p-1 rounded-[12px] border border-surface-secondary/50 dark:border-surface-dark-elevated">
-                <button
-                  onClick={handleAddLink}
-                  className="px-4 py-1 rounded-[10px] text-caption font-bold tracking-wider transition-all text-text-theme-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary"
-                >
-                  {t('addLink')}
+          <div className="space-y-2">
+            {attachments.map((attachment, idx) => (
+              <div key={idx} className="flex gap-2 group items-center">
+                {attachment.type === 'link' ? (
+                  <div className="relative flex-1">
+                    <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-theme-muted" />
+                    <input
+                      type="url"
+                      value={attachment.value}
+                      onChange={(e) => handleLinkChange(idx, e.target.value)}
+                      placeholder="https://..."
+                      className="w-full rounded-input border border-surface-secondary dark:border-surface-dark-elevated bg-surface-primary dark:bg-surface-dark-primary pl-10 pr-3 py-2 text-body font-mono focus:border-brand-primary focus:outline-none transition-all dark:text-text-theme-dark-primary"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-between p-2 bg-surface-secondary dark:bg-surface-dark-secondary rounded-input border border-surface-secondary dark:border-surface-dark-elevated hover:border-brand-primary/30 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-3.5 h-3.5 text-brand-primary" />
+                      <span className="text-body text-text-theme-primary dark:text-text-theme-dark-primary truncate max-w-[150px] md:max-w-[200px]">{attachment.file.name}</span>
+                    </div>
+                    <span className="text-caption font-mono text-text-theme-muted">{(attachment.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                  </div>
+                )}
+                <button onClick={() => handleRemoveAttachment(idx)} className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-input transition-colors shrink-0">
+                  <X className="w-4 h-4" />
                 </button>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-1 rounded-[10px] text-caption font-bold tracking-wider transition-all text-text-theme-secondary hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary"
-                >
-                  {t('addFile')}
-                </button>
-                <input
-                  type="file"
-                  multiple
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              {attachments.map((attachment, idx) => (
-                <div key={idx} className="flex gap-2 group items-center">
-                  {attachment.type === 'link' ? (
-                    <div className="relative flex-1">
-                      <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-theme-muted" />
-                      <input
-                        type="url"
-                        value={attachment.value}
-                        onChange={(e) => handleLinkChange(idx, e.target.value)}
-                        placeholder="https://..."
-                        className="w-full rounded-[12px] border border-surface-secondary dark:border-surface-dark-elevated bg-surface-primary dark:bg-surface-dark-primary pl-10 pr-3 py-2 text-body font-mono focus:border-brand-primary focus:outline-none transition-all dark:text-text-theme-dark-primary"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex-1 flex items-center justify-between p-2 bg-surface-secondary dark:bg-surface-dark-secondary rounded-[12px] border border-surface-secondary dark:border-surface-dark-elevated hover:border-brand-primary/30 transition-colors">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-3.5 h-3.5 text-brand-primary" />
-                        <span className="text-body text-text-theme-primary dark:text-text-theme-dark-primary truncate max-w-[150px] md:max-w-[200px]">{attachment.file.name}</span>
-                      </div>
-                      <span className="text-caption font-mono text-text-theme-muted">{(attachment.file.size / 1024 / 1024).toFixed(2)} MB</span>
-                    </div>
-                  )}
-                  <button onClick={() => handleRemoveAttachment(idx)} className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-input transition-colors shrink-0">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-              {attachments.length === 0 && (
-                <div className="text-center py-6 text-body text-text-theme-muted">
-                  {t('noAttachments')}
-                </div>
-              )}
-            </div>
+            ))}
+            {attachments.length === 0 && (
+              <div className="text-center py-6 text-body text-text-theme-muted">
+                {t('noAttachments')}
+              </div>
+            )}
           </div>
-        </div>
-
-        <div className="p-4 md:p-6 border-t border-surface-secondary dark:border-surface-dark-elevated flex gap-3 bg-surface-secondary/50 dark:bg-surface-dark-secondary/50">
-          <button
-            onClick={onClose}
-            className="flex-1 px-3 py-3 md:px-4 rounded-[12px] text-body font-bold text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary transition-colors"
-          >
-            {t('cancel')}
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="flex-1 px-3 py-3 md:px-4 rounded-[12px] text-body font-bold text-white bg-brand-primary hover:bg-brand-primary/90 shadow-brand-primary/20 hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
-            <span className="truncate">{t('submitAssignment')}</span>
-          </button>
         </div>
       </div>
-    </div>,
-    document.body
+    </Modal>
   );
 };
 

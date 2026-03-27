@@ -26,6 +26,7 @@ import {
   QuizQuestionResult
 } from '../../services/apiTypes';
 import { ShowToast } from './lessonTypes';
+import { Badge, Button } from '../../components/ui';
 
 const QuizSection: React.FC<{
   lessonId: number;
@@ -213,7 +214,7 @@ const QuizSection: React.FC<{
   };
 
   if (!quizSummary) return (
-    <div className="bg-surface-secondary dark:bg-surface-dark-secondary/50 p-8 rounded-[14px] border border-surface-secondary dark:border-surface-dark-elevated text-center">
+    <div className="bg-surface-secondary dark:bg-surface-dark-secondary/50 p-8 rounded-card border border-surface-secondary dark:border-surface-dark-elevated text-center">
       <ClipboardList className="w-10 h-10 text-text-theme-muted dark:text-text-theme-dark-muted mx-auto mb-3" />
       <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted">{t('noQuizYet')}</p>
     </div>
@@ -466,22 +467,26 @@ const QuizSection: React.FC<{
             {t('quizReadyDesc').replace('{count}', quizSummary.question_count.toString())}
           </p>
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              loading={loading}
+              icon={<PlayCircle className="w-4 h-4" />}
               onClick={() => startQuiz('solving')}
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-brand-primary hover:bg-brand-primary/90 active:scale-[0.98] text-white rounded-input font-semibold text-body transition-all disabled:opacity-50"
+              className="flex-1"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
               {t('startQuiz')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
+              size="md"
+              icon={<BookOpen className="w-4 h-4" />}
               onClick={() => startQuiz('article')}
               disabled={loading}
-              className="flex items-center justify-center gap-2 px-4 py-2 text-text-theme-secondary dark:text-text-theme-dark-secondary bg-surface-primary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated rounded-input text-body hover:border-surface-secondary dark:hover:border-surface-dark-elevated hover:text-text-theme-primary dark:hover:text-text-theme-dark-primary transition-all disabled:opacity-50"
             >
-              <BookOpen className="w-4 h-4" />
               {t('article')}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -517,12 +522,9 @@ const QuizSection: React.FC<{
                         </span>
                       </div>
 
-                      <span className={`shrink-0 inline-flex items-center gap-1 text-caption ${
-                        isPassed ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isPassed ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                      <Badge variant={isPassed ? 'success' : 'error'} dot size="sm" className="shrink-0">
                         {isPassed ? t('passed') : t('failed')}
-                      </span>
+                      </Badge>
 
                       <span className="flex-1 text-caption text-text-theme-muted dark:text-text-theme-dark-muted tabular-nums text-right">
                         {new Date(attempt.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}

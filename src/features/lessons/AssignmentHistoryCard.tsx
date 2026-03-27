@@ -12,6 +12,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { AssignmentData } from '../../services/apiTypes';
 import { ShowToast, humanizeStatus, assignmentStatusColor, assignmentStatusDot, assignmentStatusBg } from './lessonTypes';
 import QuizSection from './QuizSection';
+import { Card, Badge, Button } from '../../components/ui';
 
 const AssignmentHistoryCard: React.FC<{
   assignment: AssignmentData;
@@ -33,34 +34,51 @@ const AssignmentHistoryCard: React.FC<{
   if (latestSubmission) statusLabel = humanizeStatus(latestSubmission.status);
   else if (isPastDeadline) statusLabel = t('missed');
 
+  const statusVariant = (() => {
+    if (isApproved) return 'success' as const;
+    if (isPastDeadline && !latestSubmission) return 'error' as const;
+    if (isOverdue) return 'warning' as const;
+    if (latestSubmission) return 'warning' as const;
+    return 'muted' as const;
+  })();
+
   return (
-    <div className={`bg-surface-primary dark:bg-surface-dark-primary rounded-[16px] border transition-all duration-normal overflow-hidden ${isExpanded ? 'border-brand-primary/40 shadow-xl ring-1 ring-brand-primary/10' : 'border-surface-secondary dark:border-surface-dark-elevated hover:border-brand-primary/30'}`}>
+    <Card
+      variant="bordered"
+      padding="none"
+      className={`overflow-hidden transition-all duration-normal ${isExpanded ? 'border-brand-primary/40 shadow-xl ring-1 ring-brand-primary/10' : 'hover:border-brand-primary/30'}`}
+    >
+      {/* Collapsed header row — clickable */}
       <button
         type="button"
         onClick={onExpand}
         className="w-full p-4 md:p-6 cursor-pointer flex items-center gap-3 text-left focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
       >
-        <div className="shrink-0 bg-surface-dark-primary dark:bg-surface-primary text-white dark:text-surface-dark-primary rounded-[8px] px-2 py-1 flex flex-col items-center min-w-[36px]">
+        {/* Lesson number */}
+        <div className="shrink-0 bg-surface-dark-primary dark:bg-surface-primary text-white dark:text-surface-dark-primary rounded-button px-2 py-1 flex flex-col items-center min-w-[36px]">
           <span className="text-caption font-bold uppercase leading-none opacity-50">LSN</span>
           <span className="font-bold text-body leading-tight">{assignment.number}</span>
         </div>
+
         <div className="flex-1 min-w-0">
           <h3 className="text-h4 text-brand-dark dark:text-text-theme-dark-primary truncate leading-snug">{assignment.lesson_topic}</h3>
           <p className="text-caption text-text-theme-muted mt-0.5">{new Date(assignment.start_datetime).toLocaleDateString()}</p>
         </div>
+
         <div className="flex items-center gap-2 shrink-0">
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption ${assignmentStatusColor(latestSubmission?.status || statusLabel)} ${assignmentStatusBg(latestSubmission?.status || statusLabel)}`}>
-            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${assignmentStatusDot(latestSubmission?.status || statusLabel)}`}></span>
+          <Badge variant={statusVariant} dot size="sm">
             {statusLabel}
-          </span>
+          </Badge>
           <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-surface-secondary dark:bg-surface-dark-secondary transition-transform duration-normal ${isExpanded ? 'rotate-180 bg-brand-primary/10 text-brand-primary' : 'text-text-theme-muted'}`}>
             <ChevronDown className="w-4 h-4" />
           </div>
         </div>
       </button>
 
+      {/* Expanded content */}
       {isExpanded && (
         <div className="border-t border-surface-secondary dark:border-surface-dark-elevated bg-surface-secondary/30 dark:bg-surface-dark-secondary/10 animate-in duration-normal">
+          {/* Tab switcher */}
           <div className="px-4 py-3 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-center md:justify-start">
             <div className="flex bg-surface-secondary dark:bg-surface-dark-primary p-1 rounded-[14px] items-center shadow-inner border border-surface-secondary/50 dark:border-surface-dark-elevated w-full max-w-[280px]">
               <button
@@ -78,7 +96,7 @@ const AssignmentHistoryCard: React.FC<{
             </div>
           </div>
 
-          <div className="p-4 md:p-4">
+          <div className="p-4">
             {activeTab === 'assignment' ? (
               <div className="space-y-4 animate-in fade-in duration-normal">
                 {canSubmit && (
@@ -101,19 +119,18 @@ const AssignmentHistoryCard: React.FC<{
                 )}
 
                 {canSubmit && onSubmit && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    fullWidth
+                    icon={<UploadCloud className="w-4 h-4" />}
                     onClick={onSubmit}
-                    className={`w-full flex items-center justify-center gap-2 py-2 font-semibold text-body rounded-input transition-all active:scale-[0.99] ${
-                      isOverdue
-                        ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                        : 'bg-brand-primary hover:bg-brand-primary/90 text-white'
-                    }`}
+                    className={isOverdue ? 'from-orange-500 to-orange-600 shadow-orange-500/20 hover:shadow-orange-500/35' : ''}
                   >
-                    <UploadCloud className="w-4 h-4" />
                     {isOverdue
                       ? (latestSubmission ? t('resubmitLate') : t('submitLate'))
                       : (latestSubmission ? t('resubmit') : t('startSubmission'))}
-                  </button>
+                  </Button>
                 )}
 
                 <div>
@@ -142,7 +159,7 @@ const AssignmentHistoryCard: React.FC<{
                     </label>
                     <div className="grid grid-cols-1 gap-2">
                       {assignment.submissions.map((sub, idx) => (
-                        <div key={idx} className="rounded-[10px] p-3 border border-surface-secondary dark:border-surface-dark-elevated flex flex-col gap-2">
+                        <div key={idx} className="rounded-input p-3 border border-surface-secondary dark:border-surface-dark-elevated flex flex-col gap-2">
                           <div className="flex justify-between items-center gap-3">
                             <span className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary shrink-0 tabular-nums">{new Date(sub.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</span>
                             <span className={`inline-flex items-center gap-1 text-caption shrink-0 ${assignmentStatusColor(sub.status)}`}>
@@ -170,7 +187,7 @@ const AssignmentHistoryCard: React.FC<{
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
