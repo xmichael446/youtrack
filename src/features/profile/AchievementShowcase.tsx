@@ -22,18 +22,18 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
   const earnedCount = achievements.filter(a => !!a.earned_at).length;
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
+    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-surface-secondary dark:border-surface-dark-elevated p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <p className="section-label">
           {t('achievements')}
         </p>
-        <span className="text-xs text-gray-400 dark:text-slate-500">
+        <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">
           {earnedCount}/{achievements.length}
         </span>
       </div>
 
       {/* Badge cards — horizontal scroll */}
-      <div className="flex gap-2.5 overflow-x-auto pb-2 no-scrollbar items-stretch">
+      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar items-stretch">
         {sorted.map((def, idx) => {
           const earned = !!def.earned_at;
           const prevEarned = idx > 0 ? !!sorted[idx - 1].earned_at : true;
@@ -47,14 +47,14 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
           return (
             <React.Fragment key={def.key}>
               {showSeparator && (
-                <div className="w-px self-stretch bg-gray-100 dark:bg-slate-800 mx-1" />
+                <div className="w-px self-stretch bg-surface-secondary dark:bg-surface-dark-elevated mx-1" />
               )}
               <button
                 onClick={() => setSelected(isSelected ? null : def.key)}
                 aria-expanded={isSelected}
                 aria-controls={`badge-detail-${def.key}`}
                 aria-label={`${def.name} — ${def.rarity}`}
-                className="shrink-0 w-[88px] flex flex-col items-center p-2.5 rounded-xl transition-all duration-200 text-left relative"
+                className="shrink-0 w-[88px] flex flex-col items-center p-2 rounded-xl transition-all duration-200 text-left relative"
                 style={{
                   border: `1.5px solid ${isSelected ? borderColor : earned ? `${borderColor}60` : 'transparent'}`,
                   backgroundColor: isSelected
@@ -63,21 +63,21 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                   boxShadow: isSelected ? `0 0 0 3px ${borderColor}20` : undefined,
                 }}
               >
-                <span className="text-2xl leading-none mt-0.5 mb-1.5">{def.icon}</span>
-                <p className="text-xs font-medium text-center leading-tight text-gray-700 dark:text-slate-200 line-clamp-2 w-full flex-1">
+                <span className="text-h2 leading-none mt-0.5 mb-1">{def.icon}</span>
+                <p className="text-caption text-center leading-tight text-text-theme-primary dark:text-text-theme-dark-secondary line-clamp-2 w-full flex-1">
                   {def.name}
                 </p>
-                <span className="mt-auto text-xs font-medium px-1.5 py-0.5 rounded-full leading-none"
+                <span className="mt-auto text-caption px-1 py-0.5 rounded-full leading-none"
                   style={{ backgroundColor: `${borderColor}20`, color: borderColor }}>
                   {def.rarity}
                 </span>
                 {earned ? (
-                  <p className="text-xs text-brand-primary leading-none mt-1">
+                  <p className="text-caption text-brand-primary leading-none mt-1">
                     ✓ {formatRelative(def.earned_at, t)}
                   </p>
                 ) : (
-                  <div className="absolute top-1.5 right-1.5 bg-white/80 dark:bg-slate-900/80 rounded-full p-0.5 shadow-sm">
-                    <Lock className="w-2.5 h-2.5 text-gray-400" />
+                  <div className="absolute top-1.5 right-1.5 bg-surface-primary/80 dark:bg-surface-dark-primary/80 rounded-full p-0.5 shadow-sm">
+                    <Lock className="w-2.5 h-2.5 text-text-theme-muted" />
                   </div>
                 )}
               </button>
@@ -88,21 +88,21 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
 
       {/* Inline detail panel — shown when a badge is selected */}
       {selectedDef && (
-        <div id={`badge-detail-${selectedDef.key}`} className="mt-3 p-3.5 rounded-xl border animate-in fade-in duration-200"
+        <div id={`badge-detail-${selectedDef.key}`} className="mt-3 p-3 rounded-xl border animate-in fade-in duration-200"
           style={{
             borderColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}40`,
             backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}08`,
           }}>
           <div className="flex items-start gap-3">
-            <span className="text-3xl leading-none shrink-0 mt-0.5">
+            <span className="text-[28px] leading-none shrink-0 mt-0.5">
               {selectedDef.icon}
             </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <p className="text-sm font-semibold text-brand-dark dark:text-white">
+                <p className="text-h4 text-brand-dark dark:text-text-theme-dark-primary">
                   {selectedDef.name}
                 </p>
-                <span className="text-xs font-medium px-1.5 py-0.5 rounded-full"
+                <span className="text-caption px-1 py-0.5 rounded-full"
                   style={{
                     backgroundColor: `${RARITY_COLORS[selectedDef.rarity] || '#9ca3af'}25`,
                     color: RARITY_COLORS[selectedDef.rarity] || '#9ca3af',
@@ -110,15 +110,15 @@ const AchievementShowcase: React.FC<{ achievements: Achievement[] }> = ({ achiev
                   {selectedDef.rarity}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary leading-relaxed">
                 {selectedDef.description}
               </p>
               {selectedDef.earned_at ? (
-                <p className="text-xs text-brand-primary font-medium mt-1.5">
+                <p className="text-caption text-brand-primary mt-1">
                   ✓ {t('earned')} {formatRelative(selectedDef.earned_at, t)}
                 </p>
               ) : (
-                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">
+                <p className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted mt-1">
                   🔒 {t('notYetEarned')}
                 </p>
               )}

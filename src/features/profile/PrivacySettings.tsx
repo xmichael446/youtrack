@@ -15,10 +15,10 @@ const ToggleRow: React.FC<{
   disabled: boolean;
   onToggle: () => void;
 }> = ({ label, desc, checked, disabled, onToggle }) => (
-  <div className="flex items-start justify-between gap-4 py-4 border-b border-gray-50 dark:border-slate-800/70 last:border-0">
+  <div className="flex items-start justify-between gap-4 py-4 border-b border-surface-secondary/70 dark:border-surface-dark-elevated/70 last:border-0">
     <div className="flex-1">
-      <p className="text-sm font-medium text-brand-dark dark:text-white">{label}</p>
-      <p className="text-xs font-normal text-gray-400 dark:text-slate-500 mt-0.5 leading-relaxed">{desc}</p>
+      <p className="text-body text-brand-dark dark:text-text-theme-dark-primary">{label}</p>
+      <p className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted mt-0.5 leading-relaxed">{desc}</p>
     </div>
     <button
       role="switch"
@@ -26,9 +26,9 @@ const ToggleRow: React.FC<{
       aria-label={label}
       onClick={onToggle}
       disabled={disabled}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-300 shrink-0 mt-0.5 disabled:opacity-60 ${checked ? 'bg-brand-primary' : 'bg-gray-200 dark:bg-slate-700'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors duration-300 shrink-0 mt-0.5 disabled:opacity-60 ${checked ? 'bg-brand-primary' : 'bg-surface-secondary dark:bg-surface-dark-elevated'}`}
     >
-      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+      <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
     </button>
   </div>
 );
@@ -61,16 +61,16 @@ const PrivacySettings: React.FC<{
   };
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
         <button onClick={onBack}
-          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary transition-colors text-xs font-medium">
+          className="flex items-center gap-1 text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-brand-primary transition-colors text-caption">
           <ArrowLeft className="w-4 h-4" />
           {t('back')}
         </button>
-        <h2 className="text-lg font-bold text-brand-dark dark:text-white">{t('privacySettings')}</h2>
+        <h2 className="text-h3 text-brand-dark dark:text-text-theme-dark-primary">{t('privacySettings')}</h2>
       </div>
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm px-5">
+      <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-sm px-4">
         <ToggleRow
           label={t('hideBalance')} desc={t('hideBalanceDesc')}
           checked={localPrivacy.hide_balance} disabled={pending !== null}

@@ -12,7 +12,7 @@ const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => 
   const lastDate  = new Date(grid[grid.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
+    <div className="bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-surface-secondary dark:border-surface-dark-elevated p-4 shadow-sm">
       <p className="section-label mb-3">
         {t('activityHeatmap')}
       </p>
@@ -34,10 +34,10 @@ const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => 
                 <div className={`w-full h-full rounded-md ${colorCls}`} />
               </button>
               {tooltip === i && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 whitespace-nowrap bg-slate-900 dark:bg-slate-950 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg border border-slate-700 pointer-events-none">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-50 whitespace-nowrap bg-surface-dark-primary dark:bg-surface-dark-primary text-white text-caption rounded-lg px-2 py-1 shadow-lg border border-surface-dark-elevated pointer-events-none">
                   {cell.count > 0 ? t('heatmapActivities').replace('{count}', String(cell.count)) : t('heatmapNoActivity')}
-                  <div className="text-slate-400">{cell.date}</div>
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-[5px] border-x-transparent border-t-[5px] border-t-slate-900 dark:border-t-slate-950" />
+                  <div className="text-text-theme-dark-muted">{cell.date}</div>
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-[5px] border-x-transparent border-t-[5px] border-t-surface-dark-primary" />
                 </div>
               )}
             </div>
@@ -45,8 +45,8 @@ const ActivityHeatmap: React.FC<{ entries: HeatmapEntry[] }> = ({ entries }) => 
         })}
       </div>
       <div className="flex justify-between mt-2">
-        <span className="text-xs text-gray-400 dark:text-slate-500">{firstDate}</span>
-        <span className="text-xs text-gray-400 dark:text-slate-500">{lastDate}</span>
+        <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">{firstDate}</span>
+        <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">{lastDate}</span>
       </div>
     </div>
   );

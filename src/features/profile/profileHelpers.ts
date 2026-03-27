@@ -67,7 +67,7 @@ export function buildHeatmapGrid(entries: HeatmapEntry[]) {
 }
 
 export function heatmapColorClass(count: number) {
-  if (count === 0) return 'bg-gray-100 dark:bg-slate-800';
+  if (count === 0) return 'bg-surface-secondary dark:bg-surface-dark-secondary';
   if (count <= 2)  return 'bg-green-200 dark:bg-green-900/70';
   if (count <= 4)  return 'bg-green-400 dark:bg-green-600';
   return 'bg-green-600 dark:bg-green-500';

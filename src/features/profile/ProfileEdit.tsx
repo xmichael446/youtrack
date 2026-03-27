@@ -39,25 +39,25 @@ const ProfileEdit: React.FC<{
   };
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
         <button onClick={onBack}
-          className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 hover:text-brand-primary transition-colors text-xs font-medium">
+          className="flex items-center gap-1 text-text-theme-secondary dark:text-text-theme-dark-secondary hover:text-brand-primary transition-colors text-caption">
           <ArrowLeft className="w-4 h-4" />
           {t('back')}
         </button>
-        <h2 className="text-lg font-bold text-brand-dark dark:text-white">{t('editProfile')}</h2>
+        <h2 className="text-h3 text-brand-dark dark:text-text-theme-dark-primary">{t('editProfile')}</h2>
       </div>
 
       <form onSubmit={async e => { e.preventDefault(); await onSave(bio, avatar ?? undefined); }}
-        className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm p-5 space-y-5">
+        className="bg-surface-primary dark:bg-surface-dark-primary rounded-3xl border border-surface-secondary dark:border-surface-dark-elevated shadow-sm p-4 space-y-4">
         {/* Avatar */}
         <div className="flex flex-col items-center gap-3">
           <button type="button" aria-label={t('uploadPhoto')} className="relative cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
             {preview ? (
-              <img src={preview} alt="avatar" className="w-24 h-24 rounded-2xl object-cover ring-2 ring-gray-100 dark:ring-slate-700" />
+              <img src={preview} alt="avatar" className="w-24 h-24 rounded-2xl object-cover ring-2 ring-surface-secondary dark:ring-surface-dark-elevated" />
             ) : (
-              <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-white text-2xl font-bold ring-2 ring-gray-100 dark:ring-slate-700"
+              <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-white text-h1 ring-2 ring-surface-secondary dark:ring-surface-dark-elevated"
                 style={{ backgroundColor: getAvatarBg(id) }}>
                 {getInitials(profile.full_name)}
               </div>
@@ -67,11 +67,11 @@ const ProfileEdit: React.FC<{
             </div>
           </button>
           <button type="button" onClick={() => fileInputRef.current?.click()}
-            className="text-xs text-brand-primary font-medium hover:text-brand-primary/80 transition-colors">
+            className="text-caption text-brand-primary hover:text-brand-primary/80 transition-colors">
             {t('uploadPhoto')}
           </button>
           {fileError && (
-            <div className="flex items-center gap-1.5 text-red-500 text-xs">
+            <div className="flex items-center gap-1 text-red-500 text-caption">
               <AlertCircle className="w-3.5 h-3.5" />{fileError}
             </div>
           )}
@@ -82,12 +82,12 @@ const ProfileEdit: React.FC<{
         <div>
           <label className="block section-label mb-2">{t('bio')}</label>
           <textarea value={bio} onChange={e => setBio(e.target.value.slice(0, 280))} placeholder={t('bioPlaceholder')} rows={4}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-normal text-brand-dark dark:text-white placeholder-gray-300 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary resize-none font-sans transition-all" />
-          <p className="text-right text-xs text-gray-300 dark:text-slate-600 mt-1">{bio.length} / 280</p>
+            className="w-full px-4 py-3 bg-surface-secondary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated rounded-xl text-body text-brand-dark dark:text-text-theme-dark-primary placeholder-text-theme-muted dark:placeholder-text-theme-dark-muted focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary resize-none font-sans transition-all" />
+          <p className="text-right text-caption text-text-theme-muted dark:text-text-theme-dark-muted mt-1">{bio.length} / 280</p>
         </div>
 
         <button type="submit" disabled={saving}
-          className="w-full h-12 rounded-xl bg-brand-primary text-white font-bold text-sm hover:bg-brand-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20">
+          className="w-full h-12 rounded-xl bg-brand-primary text-white font-bold text-body hover:bg-brand-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20">
           {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
           {t('saveChanges')}
         </button>
