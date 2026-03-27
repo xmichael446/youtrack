@@ -6,6 +6,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { useNavigation } from '../context/NavigationContext';
 import { apiService } from '../services/ApiService';
 import { Z_INDEX } from '../constants/zIndex';
+import { Card, Badge, Button, EmptyState } from '../components/ui';
 
 interface HeaderProps {
   isDark: boolean;
@@ -18,6 +19,19 @@ function getInitials(name: string) {
 }
 function getAvatarBg(id: number) {
   return `hsl(${(id * 137) % 360}, 60%, 50%)`;
+}
+
+type NotificationGroup = 'Today' | 'Yesterday' | 'Earlier';
+
+function getNotificationGroup(isoString: string): NotificationGroup {
+  const date = new Date(isoString);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+  const notifDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  if (notifDate.getTime() === today.getTime()) return 'Today';
+  if (notifDate.getTime() === yesterday.getTime()) return 'Yesterday';
+  return 'Earlier';
 }
 
 const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
@@ -112,22 +126,26 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
       ?.focus();
   }, [showProfileMenu]);
 
-  const getNotificationTypeInfo = (type: string) => {
+  const getNotificationTypeInfo = (type: string): {
+    label: string;
+    header: string;
+    badgeVariant: 'brand' | 'success' | 'muted';
+  } => {
     switch (type) {
       case 'lesson_times': return {
         label: t('reminder'),
         header: t('lessonReminder'),
-        color: 'bg-brand-primary/10 text-brand-primary border-brand-primary/20'
+        badgeVariant: 'brand',
       };
       case 'hw_approved': return {
         label: t('assignment'),
         header: t('assignmentApproved'),
-        color: 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+        badgeVariant: 'success',
       };
       default: return {
         label: t('info'),
         header: t('info'),
-        color: 'bg-surface-secondary text-text-theme-secondary border-surface-secondary dark:bg-surface-dark-elevated dark:text-text-theme-dark-secondary'
+        badgeVariant: 'muted',
       };
     }
   };
@@ -225,48 +243,77 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
               </button>
 
               {showNotifications && (
-                <div
+                <Card
                   ref={notificationPanelRef}
+                  variant="elevated"
+                  padding="none"
                   role="region"
                   aria-label={t('notifications')}
-                  className="absolute top-full right-0 mt-2 w-[280px] md:w-[340px] bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden animate-in fade-in duration-fast"
+                  className="absolute top-full right-0 mt-2 w-[280px] md:w-[340px] overflow-hidden animate-in fade-in duration-fast"
                   style={{ zIndex: Z_INDEX.overlay }}
                 >
-                  <div className="px-4 py-3 bg-surface-secondary/50 dark:bg-surface-dark-elevated/50 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-between items-center">
-                    <h3 className="text-caption text-text-theme-primary dark:text-text-theme-dark-primary">{t('notifications')}</h3>
-                    <button onClick={() => markAllAsRead()}
-                      className="text-xs font-medium text-brand-primary hover:text-brand-accent transition-colors">
+                  {/* Header row */}
+                  <div className="px-4 py-3 bg-surface-secondary/50 dark:bg-surface-dark-secondary/50 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-between items-center">
+                    <h3 className="text-h4 text-text-theme-primary dark:text-text-theme-dark-primary">{t('notifications')}</h3>
+                    <Button variant="ghost" size="sm" onClick={() => markAllAsRead()}>
                       {t('markAllRead')}
-                    </button>
+                    </Button>
                   </div>
-                  <div className="max-h-[65vh] md:max-h-96 overflow-y-auto divide-y divide-surface-secondary dark:divide-surface-dark-elevated/50">
+
+                  {/* Notification list */}
+                  <div className="max-h-[65vh] md:max-h-96 overflow-y-auto">
                     {notifications.length === 0 ? (
-                      <div className="p-8 text-center">
-                        <Bell className="w-8 h-8 text-surface-secondary dark:text-surface-dark-elevated mx-auto mb-2" />
-                        <p className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted">{t('noNotifications')}</p>
-                      </div>
+                      <EmptyState
+                        icon={<Bell className="w-5 h-5" />}
+                        message={t('noNotifications')}
+                        className="py-8"
+                      />
                     ) : (
-                      notifications.map(notification => {
-                        const typeInfo = getNotificationTypeInfo(notification.type);
-                        const message = language === 'uz' ? notification.message_uz : notification.message_en;
-                        return (
-                          <div key={notification.id} className={`p-3 hover:bg-surface-secondary/50 dark:hover:bg-surface-dark-elevated/30 transition-colors ${!notification.read ? 'bg-brand-primary/5 dark:bg-brand-primary/10' : ''}`}>
-                            <div className="flex justify-between items-start mb-1">
-                              <span className={`text-caption px-2 py-0.5 rounded-full border ${typeInfo.color}`}>
-                                {typeInfo.label}
-                              </span>
-                              <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted tabular-nums">
-                                {formatTime(notification.scheduled_datetime)}
-                              </span>
+                      (() => {
+                        const groups: NotificationGroup[] = ['Today', 'Yesterday', 'Earlier'];
+                        const grouped = groups.reduce<Record<NotificationGroup, typeof notifications>>((acc, g) => {
+                          acc[g] = notifications.filter(n => getNotificationGroup(n.scheduled_datetime) === g);
+                          return acc;
+                        }, { Today: [], Yesterday: [], Earlier: [] });
+
+                        return groups.map(groupLabel => {
+                          const group = grouped[groupLabel];
+                          if (group.length === 0) return null;
+                          return (
+                            <div key={groupLabel}>
+                              <div className="px-4 py-2 text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary bg-surface-secondary dark:bg-surface-dark-secondary border-b border-surface-secondary dark:border-surface-dark-elevated">
+                                {groupLabel}
+                              </div>
+                              <div className="divide-y divide-surface-secondary dark:divide-surface-dark-elevated/50">
+                                {group.map(notification => {
+                                  const typeInfo = getNotificationTypeInfo(notification.type);
+                                  const message = language === 'uz' ? notification.message_uz : notification.message_en;
+                                  return (
+                                    <div
+                                      key={notification.id}
+                                      className={`p-3 hover:bg-surface-secondary/50 dark:hover:bg-surface-dark-secondary/50 transition-colors ${!notification.read ? 'border-l-4 border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10' : ''}`}
+                                    >
+                                      <div className="flex justify-between items-start mb-1">
+                                        <Badge variant={typeInfo.badgeVariant} size="sm">
+                                          {typeInfo.label}
+                                        </Badge>
+                                        <span className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted tabular-nums">
+                                          {formatTime(notification.scheduled_datetime)}
+                                        </span>
+                                      </div>
+                                      <p className="text-body text-brand-dark dark:text-text-theme-dark-primary leading-snug">{typeInfo.header}</p>
+                                      <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary mt-0.5 leading-relaxed whitespace-pre-line">{message}</p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
-                            <p className="text-body text-brand-dark dark:text-text-theme-dark-primary leading-snug">{typeInfo.header}</p>
-                            <p className="text-caption text-text-theme-secondary dark:text-text-theme-dark-secondary mt-0.5 leading-relaxed whitespace-pre-line">{message}</p>
-                          </div>
-                        );
-                      })
+                          );
+                        });
+                      })()
                     )}
                   </div>
-                </div>
+                </Card>
               )}
             </div>
 
