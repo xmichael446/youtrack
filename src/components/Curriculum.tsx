@@ -116,7 +116,7 @@ const Curriculum: React.FC = () => {
                                         className={`group/row transition-all duration-normal animate-in fade-in duration-500 fill-mode-both ${delayClass} ${isUpcoming ? 'hover:bg-surface-secondary/40 dark:hover:bg-surface-dark-elevated/20' : 'opacity-50'}`}
                                     >
                                         <td className="px-6 py-4">
-                                            <span className="text-body font-mono text-surface-secondary dark:text-surface-dark-elevated tabular-nums">
+                                            <span className="text-body font-mono text-text-theme-muted dark:text-text-theme-dark-muted tabular-nums">
                                                 {item.number.toString().padStart(2, '0')}
                                             </span>
                                         </td>

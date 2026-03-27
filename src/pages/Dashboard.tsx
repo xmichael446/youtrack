@@ -331,7 +331,7 @@ const Dashboard: React.FC = () => {
       <Card
         variant="default"
         padding="none"
-        className="p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 bg-brand-dark dark:bg-surface-dark-secondary"
+        className="!bg-brand-dark dark:!bg-surface-dark-secondary p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5"
       >
         <div className="relative z-10 text-center md:text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/15 text-brand-primary rounded-full mb-4 border border-brand-primary/20 text-caption">
