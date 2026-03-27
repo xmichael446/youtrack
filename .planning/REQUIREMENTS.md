@@ -27,9 +27,9 @@
 
 - [ ] **PAGE-01**: Redesign Login page — set the visual tone, playful branding, clear Telegram auth flow
 - [ ] **PAGE-02**: Redesign Dashboard — clear visual hierarchy, enrollment cards, course progress, gamification elements
-- [ ] **PAGE-03**: Redesign Leaderboard — engaging ranking display, playful competition visuals, rank badges
+- [x] **PAGE-03**: Redesign Leaderboard — engaging ranking display, playful competition visuals, rank badges
 - [ ] **PAGE-04**: Redesign Lessons page — attendance view, assignment submission, quiz flow with clear states
-- [ ] **PAGE-05**: Redesign Rewards/Shop — product-style cards, point balance, claiming flow
+- [x] **PAGE-05**: Redesign Rewards/Shop — product-style cards, point balance, claiming flow
 - [ ] **PAGE-06**: Redesign Profile page — user info, stats, achievement display
 - [ ] **PAGE-07**: Redesign Contest views — listing, detail, play/results views
 - [ ] **PAGE-08**: Redesign Notification display — clear notification types, read/unread states
@@ -78,9 +78,9 @@
 | COMP-07 | Phase 2 | Complete |
 | PAGE-01 | Phase 3 | Pending |
 | PAGE-02 | Phase 3 | Pending |
-| PAGE-03 | Phase 3 | Pending |
+| PAGE-03 | Phase 3 | Complete |
 | PAGE-04 | Phase 3 | Pending |
-| PAGE-05 | Phase 3 | Pending |
+| PAGE-05 | Phase 3 | Complete |
 | PAGE-06 | Phase 3 | Pending |
 | PAGE-07 | Phase 3 | Pending |
 | PAGE-08 | Phase 3 | Pending |
