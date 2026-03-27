@@ -25,9 +25,9 @@ const ContestReviewView: React.FC<{
   if (!item) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[110] flex flex-col bg-white dark:bg-slate-950 animate-in fade-in duration-500 overflow-hidden">
-      <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
-        <h4 className="font-bold text-lg md:text-xl text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
+    <div className="fixed inset-0 z-[110] flex flex-col bg-surface-primary dark:bg-surface-dark-primary animate-in fade-in duration-500 overflow-hidden">
+      <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-white/80 dark:bg-surface-dark-primary/80 backdrop-blur-md z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
+        <h4 className="text-h3 text-brand-dark dark:text-white tracking-tight">{t('detailedReview')}</h4>
         <div className="flex items-center gap-4">
           <div className="text-[11px] font-mono font-bold text-brand-primary uppercase tracking-widest whitespace-nowrap tabular-nums">
             {currentIndex + 1} / {answers.length}
@@ -38,7 +38,7 @@ const ContestReviewView: React.FC<{
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 md:p-5 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-3 md:p-4 custom-scrollbar">
         <div className="max-w-4xl mx-auto py-2">
           <div className={`rounded-[24px] border-2 overflow-hidden transition-all shadow-sm ${item.is_correct ? 'border-emerald-500/20 bg-emerald-50/5' : 'border-red-500/20 bg-red-50/5'}`}>
             <div className="p-4 md:p-6 space-y-4">
@@ -56,7 +56,7 @@ const ContestReviewView: React.FC<{
                 {item.options?.map((option: any) => {
                   const isSelected = item.selected_option_id === option.id;
                   const isCorrect = option.is_correct;
-                  let stateClass = 'bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 text-gray-500';
+                  let stateClass = 'bg-surface-primary dark:bg-surface-dark-primary border-gray-100 dark:border-slate-800 text-text-theme-secondary';
                   if (isSelected && isCorrect) stateClass = 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20';
                   else if (isSelected && !isCorrect) stateClass = 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20';
                   else if (isCorrect) stateClass = 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30';
@@ -71,10 +71,10 @@ const ContestReviewView: React.FC<{
               </div>
 
               {item.explanation && (
-                <div className="bg-white/80 dark:bg-slate-900/50 p-4 rounded-[16px] border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                <div className="bg-surface-primary/80 dark:bg-surface-dark-secondary/50 p-4 rounded-[16px] border border-gray-100 dark:border-slate-800 shadow-card relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-brand-primary opacity-30"></div>
                   <span className="text-[10px] font-mono font-bold text-brand-primary uppercase tracking-[2px] block mb-1 opacity-70">{t('explanation')}</span>
-                  <p className="text-[11px] md:text-[13px] font-medium text-gray-600 dark:text-slate-400 italic leading-relaxed">{item.explanation}</p>
+                  <p className="text-caption font-medium text-text-theme-secondary dark:text-text-theme-dark-secondary italic leading-relaxed">{item.explanation}</p>
                 </div>
               )}
             </div>
@@ -82,24 +82,24 @@ const ContestReviewView: React.FC<{
         </div>
       </div>
 
-      <div className="p-3 md:p-5 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-5">
+      <div className="p-3 md:p-4 bg-surface-primary dark:bg-surface-dark-secondary border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <button
             onClick={() => currentIndex > 0 && setCurrentIndex(prev => prev - 1)}
             disabled={currentIndex === 0}
-            className="flex-1 md:flex-none px-6 md:px-10 py-3 rounded-[12px] font-bold text-xs md:text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
+            className="flex-1 md:flex-none px-6 md:px-8 py-3 rounded-[12px] font-bold text-caption text-text-theme-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
           >
             <ChevronLeft className="w-4 h-4" /> <span className="hidden md:inline">{t('previousQuestion') || 'Previous'}</span><span className="md:hidden">{t('back')}</span>
           </button>
 
           {currentIndex === answers.length - 1 ? (
-            <button onClick={() => goBack('contests', { id: String(contestId) })} className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
+            <button onClick={() => goBack('contests', { id: String(contestId) })} className="flex-[2] md:flex-none px-12 py-3 bg-brand-dark dark:bg-surface-dark-elevated text-white dark:text-white hover:shadow-2xl transition-all uppercase tracking-widest font-mono block text-center active:scale-95 rounded-[12px]">
               {t('backToOverview')}
             </button>
           ) : (
             <button
               onClick={() => currentIndex < answers.length - 1 && setCurrentIndex(prev => prev + 1)}
-              className="flex-[2] md:flex-none px-12 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[12px] font-bold text-[14px] hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+              className="flex-[2] md:flex-none px-12 py-3 bg-brand-dark dark:bg-surface-dark-elevated text-white dark:text-white rounded-[12px] font-bold text-body hover:opacity-90 transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
             >
               {t('nextQuestion') || 'Next'} <ChevronRight className="w-4 h-4" />
             </button>

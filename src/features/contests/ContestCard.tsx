@@ -55,7 +55,7 @@ const ContestCard: React.FC<{
     if (item.status === 'scheduled') {
       if (item.is_registered) {
         return (
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
+          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {t('contestRegistered')}
           </span>
@@ -65,7 +65,7 @@ const ContestCard: React.FC<{
         <button
           onClick={handleAction}
           disabled={registeringId === item.id}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-bold font-mono text-white bg-brand-primary hover:bg-brand-primary/90 shadow-sm shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 transition-all duration-150 disabled:opacity-60 tracking-wide"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-white bg-brand-primary hover:bg-brand-primary/90 shadow-sm shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 transition-all duration-150 disabled:opacity-60 tracking-wide"
         >
           {registeringId === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
           {t('contestRegister')}
@@ -76,7 +76,7 @@ const ContestCard: React.FC<{
       if (item.is_registered) {
         if (isSubmitted) {
           return (
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
+            <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 cursor-default tracking-wide">
               <CheckCircle2 className="w-3.5 h-3.5" />
               {localPlay?.score !== undefined ? `${localPlay.score}/${localPlay.total}` : t('contestSubmitted')}
             </span>
@@ -85,7 +85,7 @@ const ContestCard: React.FC<{
         return null; // rendered as full-width banner below
       }
       return (
-        <span className="inline-flex items-center px-3.5 py-2 rounded-xl text-[10px] font-bold font-mono text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800/60 cursor-not-allowed tracking-wide">
+        <span className="inline-flex items-center px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-text-theme-muted dark:text-text-theme-dark-muted bg-surface-secondary dark:bg-surface-dark-secondary cursor-not-allowed tracking-wide">
           {t('contestRegistrationClosed')}
         </span>
       );
@@ -94,7 +94,7 @@ const ContestCard: React.FC<{
       return (
         <button
           onClick={handleAction}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-bold font-mono text-brand-primary hover:bg-brand-primary/10 border border-brand-primary/30 hover:border-brand-primary/50 hover:scale-[1.02] active:scale-95 transition-all duration-150 tracking-wide"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold font-mono text-brand-primary hover:bg-brand-primary/10 border border-brand-primary/30 hover:border-brand-primary/50 hover:scale-[1.02] active:scale-95 transition-all duration-150 tracking-wide"
         >
           <Trophy className="w-3.5 h-3.5" />
           {t('contestViewResults')}
@@ -110,7 +110,7 @@ const ContestCard: React.FC<{
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       onMouseLeave={() => setPressed(false)}
-      className={`bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden
+      className={`bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-card dark:shadow-card-dark
         hover:border-brand-primary/25 dark:hover:border-brand-primary/20
         hover:shadow-lg dark:hover:shadow-brand-primary/5
         transition-all duration-200 cursor-pointer group
@@ -126,18 +126,18 @@ const ContestCard: React.FC<{
         <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
       )}
 
-      <div className="p-5">
+      <div className="p-4">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
-            <h3 className="font-semibold text-sm text-gray-900 dark:text-slate-100 group-hover:text-brand-primary transition-colors duration-200 tracking-tight">
+            <h3 className="text-h4 text-gray-900 dark:text-text-theme-dark-primary group-hover:text-brand-primary transition-colors duration-200 tracking-tight">
               {t('vocabContest')} #{item.number}
             </h3>
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
               <StatusBadge status={item.status} t={t} />
               {(item.status === 'scheduled' || item.status === 'open') && (
-                <span className="text-[10px] font-mono text-gray-400 dark:text-slate-500 flex items-center gap-1">
+                <span className="text-caption font-mono text-text-theme-muted dark:text-text-theme-dark-muted flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  {item.status === 'scheduled' ? t('contestStartsIn') : t('contestEndsIn')}: <span className="font-bold text-gray-600 dark:text-slate-300 ml-0.5">{countdown}</span>
+                  {item.status === 'scheduled' ? t('contestStartsIn') : t('contestEndsIn')}: <span className="font-bold text-text-theme-secondary dark:text-text-theme-dark-secondary ml-0.5">{countdown}</span>
                 </span>
               )}
             </div>
@@ -145,23 +145,23 @@ const ContestCard: React.FC<{
           <ChevronRight className="w-4 h-4 text-gray-300 dark:text-slate-600 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all duration-200 shrink-0 mt-0.5" />
         </div>
 
-        <div className="flex items-center gap-4 text-[11px] font-mono text-gray-400 dark:text-slate-500 mb-4">
-          <span className="flex items-center gap-1.5">
+        <div className="flex items-center gap-4 text-caption font-mono text-text-theme-muted dark:text-text-theme-dark-muted mb-4">
+          <span className="flex items-center gap-2">
             <BookOpen className="w-3.5 h-3.5 text-brand-primary/60" />
             {t('contestQuestions').replace('{count}', String(item.question_count))}
           </span>
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-2">
             <Users className="w-3.5 h-3.5 text-brand-primary/60" />
             {t('contestRegistrations').replace('{count}', String(item.registration_count))}
           </span>
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-2">
             <Clock className="w-3.5 h-3.5 text-brand-primary/60" />
             {t('contestDuration')}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="text-[10px] font-mono text-gray-400 dark:text-slate-500 flex items-center gap-1">
+          <div className="text-caption font-mono text-text-theme-muted dark:text-text-theme-dark-muted flex items-center gap-1">
             <Calendar className="w-3 h-3" />
             {formatDateTime(item.scheduled_start)}
           </div>

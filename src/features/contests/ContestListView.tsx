@@ -42,17 +42,17 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
 
       {/* Header */}
       <div className="px-1">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
+        <h1 className="text-h2 tracking-tight text-brand-dark dark:text-white flex items-center gap-2">
           <Swords className="w-6 h-6 text-brand-primary shrink-0" />
           {t('contests')}
         </h1>
-        <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+        <p className="text-body font-medium text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1">
           {t('contestsSubtitle')}
         </p>
         <button
           onClick={fetchContests}
           disabled={loading}
-          className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 dark:text-slate-500 hover:text-brand-primary transition-all duration-200 active:scale-90 mt-1"
+          className="p-2 rounded-xl hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary text-text-theme-muted dark:text-text-theme-dark-muted hover:text-brand-primary transition-all duration-200 active:scale-90 mt-1"
           title={t('refresh')}
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -74,13 +74,13 @@ const ContestListView: React.FC<{ onNavigate: (nav: ContestNav) => void }> = ({ 
           </button>
         </div>
       ) : contests.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-700">
-          <div className="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-700">
+          <div className="w-16 h-16 rounded-2xl bg-surface-secondary dark:bg-surface-dark-secondary border border-gray-100 dark:border-slate-700 flex items-center justify-center">
             <Swords className="w-7 h-7 text-gray-300 dark:text-slate-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-500 dark:text-slate-400">{t('contestNoContests')}</p>
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('contestUpcomingHint')}</p>
+            <p className="text-body font-semibold text-text-theme-secondary dark:text-text-theme-dark-secondary">{t('contestNoContests')}</p>
+            <p className="text-caption text-text-theme-muted dark:text-text-theme-dark-muted mt-1">{t('contestUpcomingHint')}</p>
           </div>
         </div>
       ) : (

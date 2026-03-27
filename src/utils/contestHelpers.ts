@@ -5,7 +5,7 @@ export function statusAccentClass(status: string): string {
     case 'scheduled':
       return 'border-l-4 border-l-blue-400';
     case 'finalized':
-      return 'border-l-4 border-l-gray-300 dark:border-l-slate-600';
+      return 'border-l-4 border-l-gray-300 dark:border-l-slate-500';
     default:
       return 'border-l-4 border-l-orange-400';
   }

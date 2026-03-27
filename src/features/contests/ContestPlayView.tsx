@@ -162,12 +162,12 @@ const ContestPlayView: React.FC<{
           <Clock className="w-6 h-6 text-brand-primary" />
         </div>
         <div>
-          <p className="text-base font-bold text-gray-900 dark:text-slate-100">Already submitted</p>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-xs">Your answers are saved. Results will be available once the contest is finalized.</p>
+          <p className="text-h4 text-gray-900 dark:text-text-theme-dark-primary">Already submitted</p>
+          <p className="text-body text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1 max-w-xs">Your answers are saved. Results will be available once the contest is finalized.</p>
         </div>
         <button
           onClick={() => goBack('contests')}
-          className="px-5 py-2.5 rounded-xl text-sm font-bold font-mono text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 transition-colors"
+          className="px-4 py-2 rounded-xl text-body font-bold font-mono text-brand-primary border border-brand-primary/30 hover:bg-brand-primary/10 transition-colors"
         >
           Back to Contest
         </button>
@@ -195,14 +195,14 @@ const ContestPlayView: React.FC<{
       ? Math.round((playState.score / playState.total) * 100)
       : null;
     return createPortal(
-      <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-hidden flex flex-col animate-in fade-in duration-300">
+      <div className="fixed inset-0 z-[100] bg-surface-primary dark:bg-surface-dark-primary overflow-hidden flex flex-col animate-in fade-in duration-300">
         {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
         {/* Header */}
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-surface-primary/80 dark:bg-surface-dark-secondary/80 backdrop-blur-md sticky top-0 z-20 pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6">
           <button
             onClick={() => onNavigate({ view: 'list', contestId: null })}
-            className="p-2 -ml-2 text-gray-400 hover:text-brand-primary transition-colors"
+            className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -220,22 +220,22 @@ const ContestPlayView: React.FC<{
             </div>
 
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-dark dark:text-white">
+              <h1 className="text-h2 tracking-tight text-brand-dark dark:text-white">
                 {t('contestSubmitted')}
               </h1>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
+              <p className="text-body font-medium text-text-theme-secondary dark:text-text-theme-dark-secondary mt-1">
                 {t('contestWaitingResults')}
               </p>
             </div>
 
             {playState.score !== undefined && playState.total !== undefined && (
-              <div className="bg-gray-50 dark:bg-slate-900 rounded-[24px] p-8 border border-gray-100 dark:border-slate-800">
+              <div className="bg-surface-secondary dark:bg-surface-dark-primary rounded-[24px] p-8 border border-gray-100 dark:border-slate-800">
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-7xl font-bold text-brand-primary tabular-nums">{playState.score}</span>
                   <span className="text-3xl font-bold text-gray-300 dark:text-slate-600 tabular-nums">/{playState.total}</span>
                 </div>
                 {pct !== null && (
-                  <p className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[3px] mt-3">
+                  <p className="text-label font-mono font-bold text-text-theme-muted dark:text-text-theme-dark-muted uppercase tracking-[3px] mt-3">
                     {pct >= 70 ? 'Great work!' : pct >= 50 ? 'Good effort!' : 'Keep practicing!'}
                   </p>
                 )}
@@ -245,10 +245,10 @@ const ContestPlayView: React.FC<{
         </div>
 
         {/* Sticky bottom */}
-        <div className="p-4 md:p-8 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-8">
+        <div className="p-4 md:p-8 bg-surface-primary dark:bg-surface-dark-secondary border-t border-gray-100 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-8">
           <button
             onClick={() => onNavigate({ view: 'list', contestId: null })}
-            className="w-full max-w-4xl mx-auto py-4 rounded-[16px] font-bold font-mono text-sm text-white bg-brand-primary hover:bg-brand-primary/90 shadow-lg shadow-brand-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 block text-center"
+            className="w-full max-w-4xl mx-auto py-4 rounded-[16px] font-bold font-mono text-body text-white bg-brand-primary hover:bg-brand-primary/90 shadow-lg shadow-brand-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 block text-center"
           >
             {t('contestBackToList')}
           </button>
@@ -268,9 +268,9 @@ const ContestPlayView: React.FC<{
   // Timer urgency styles
   const timerStyles = {
     normal: {
-      bar: 'bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800',
+      bar: 'bg-surface-primary dark:bg-surface-dark-secondary border-gray-100 dark:border-slate-800',
       icon: 'text-brand-primary',
-      text: 'text-gray-700 dark:text-slate-300',
+      text: 'text-gray-700 dark:text-text-theme-dark-secondary',
       value: 'text-brand-primary',
       ring: '',
     },
@@ -292,22 +292,22 @@ const ContestPlayView: React.FC<{
   const ts = timerStyles[timerUrgency];
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-hidden flex flex-col animate-in duration-500">
+    <div className="fixed inset-0 z-[100] bg-surface-primary dark:bg-surface-dark-primary overflow-hidden flex flex-col animate-in duration-500">
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Sticky header: close + progress + counter + timer */}
-      <div className={`flex items-center gap-3 p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6 transition-all duration-500 ${ts.ring}`}>
+      <div className={`flex items-center gap-3 p-4 md:p-6 border-b border-gray-100 dark:border-slate-800 bg-surface-primary/80 dark:bg-surface-dark-secondary/80 backdrop-blur-md pt-[calc(env(safe-area-inset-top)+1rem)] md:pt-6 transition-all duration-500 ${ts.ring}`}>
         {/* Close / back */}
         <button
           onClick={() => goBack('contests')}
-          className="p-2 -ml-2 text-gray-400 hover:text-brand-primary transition-colors shrink-0"
+          className="p-2 -ml-2 text-text-theme-muted hover:text-brand-primary transition-colors shrink-0"
           aria-label="Exit contest"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
 
         {/* Progress bar */}
-        <div className="flex-1 h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div className="flex-1 h-2 bg-surface-secondary dark:bg-surface-dark-elevated rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ease-out ${
               timerUrgency === 'critical'
@@ -326,7 +326,7 @@ const ContestPlayView: React.FC<{
         </span>
 
         {/* Timer */}
-        <div className={`flex items-center gap-1.5 text-xs font-mono font-bold tabular-nums shrink-0 ${ts.value}`}>
+        <div className={`flex items-center gap-2 text-xs font-mono font-bold tabular-nums shrink-0 ${ts.value}`}>
           <Clock className={`w-3.5 h-3.5 ${ts.icon} ${timerUrgency === 'critical' ? 'animate-pulse' : ''}`} />
           {countdown}
         </div>
@@ -336,13 +336,13 @@ const ContestPlayView: React.FC<{
       <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
         <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 py-2">
           {/* Question card */}
-          <div className="bg-gray-50 dark:bg-slate-900/50 rounded-[24px] p-5 md:p-10 text-center border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+          <div className="bg-surface-secondary dark:bg-surface-dark-secondary/50 rounded-[24px] p-4 md:p-8 text-center border border-gray-100 dark:border-slate-800 shadow-card relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-primary opacity-50 rounded-r-full" />
             <span className="text-[10px] md:text-[11px] font-mono font-bold text-brand-primary uppercase tracking-[3px] mb-2 block opacity-70">Question</span>
-            <h3 className={`${q.question_text.length > 80 ? 'text-lg md:text-2xl' : 'text-xl md:text-3xl'} font-bold text-brand-dark dark:text-white leading-tight mb-3`}>
+            <h3 className={`${q.question_text.length > 80 ? 'text-h3' : 'text-h2'} text-brand-dark dark:text-white leading-tight mb-3`}>
               {q.question_text}
             </h3>
-            <p className="text-[12px] md:text-sm font-medium text-gray-500 dark:text-slate-400 italic opacity-80">Choose the correct answer from the options below</p>
+            <p className="text-caption font-medium text-text-theme-secondary dark:text-text-theme-dark-secondary italic opacity-80">Choose the correct answer from the options below</p>
           </div>
 
           {/* Options -- 2-col on all screen sizes (matches Lessons quiz) */}
@@ -353,20 +353,20 @@ const ContestPlayView: React.FC<{
                 <button
                   key={opt.id}
                   onClick={() => handleSelectOption(q.id, opt.id)}
-                  className={`w-full p-3 md:p-5 rounded-[20px] border-2 text-left flex items-center gap-3 transition-all duration-200 group/opt ${
+                  className={`w-full p-3 md:p-4 rounded-[20px] border-2 text-left flex items-center gap-3 transition-all duration-200 group/opt ${
                     isSelected
                       ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10 ring-4 ring-brand-primary/10 scale-[1.01]'
-                      : 'border-gray-100 dark:border-slate-800/50 hover:border-brand-primary/40 bg-white dark:bg-slate-900 shadow-sm active:scale-[0.99]'
+                      : 'border-gray-100 dark:border-slate-800/50 hover:border-brand-primary/40 bg-surface-primary dark:bg-surface-dark-secondary shadow-card active:scale-[0.99]'
                   }`}
                 >
                   <div className={`w-5 h-5 md:w-6 md:h-6 rounded-[6px] md:rounded-[8px] flex items-center justify-center border-2 shrink-0 transition-all ${
                     isSelected
                       ? 'border-brand-primary bg-brand-primary text-white scale-110'
-                      : 'border-gray-200 dark:border-slate-700 group-hover/opt:border-brand-primary/50'
+                      : 'border-gray-200 dark:border-slate-700/70 group-hover/opt:border-brand-primary/50'
                   }`}>
                     {isSelected && <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4" />}
                   </div>
-                  <span className={`text-[13px] md:text-base font-bold flex-1 leading-snug ${isSelected ? 'text-brand-dark dark:text-white' : 'text-gray-600 dark:text-slate-300'}`}>
+                  <span className={`text-body font-bold flex-1 leading-snug ${isSelected ? 'text-brand-dark dark:text-white' : 'text-text-theme-secondary dark:text-text-theme-dark-secondary'}`}>
                     {opt.content}
                   </span>
                 </button>
@@ -377,13 +377,13 @@ const ContestPlayView: React.FC<{
       </div>
 
       {/* Sticky bottom nav */}
-      <div className="bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 px-4 py-3 md:px-8 md:py-5 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:pb-5">
+      <div className="bg-surface-primary dark:bg-surface-dark-secondary border-t border-gray-100 dark:border-slate-800 px-4 py-3 md:px-8 md:py-4 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:pb-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => setCurrentQ(q => Math.max(0, q - 1))}
               disabled={currentQ === 0}
-              className="px-4 md:px-10 py-3.5 rounded-[16px] font-bold text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
+              className="px-4 md:px-8 py-3 rounded-[16px] font-bold text-caption text-text-theme-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-secondary disabled:opacity-30 transition-all flex items-center justify-center gap-2 uppercase tracking-widest font-mono"
             >
               <ChevronLeft className="w-4 h-4" />
               <span className="hidden md:inline">{t('previousQuestion')}</span>
@@ -394,7 +394,7 @@ const ContestPlayView: React.FC<{
               <button
                 onClick={handleSubmit}
                 disabled={!allAnswered || submitting || autoSubmitting}
-                className="px-8 md:px-12 py-3.5 bg-gradient-to-r from-brand-primary to-cyan-500 text-white rounded-[16px] font-bold text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+                className="px-8 md:px-12 py-3 bg-gradient-to-r from-brand-primary to-cyan-500 text-white rounded-[16px] font-bold text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
               >
                 {(submitting || autoSubmitting) ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trophy className="w-5 h-5" />}
                 {t('finishQuiz')}
@@ -403,7 +403,7 @@ const ContestPlayView: React.FC<{
           </div>
 
           {/* Quick-jump dots */}
-          <div className="flex flex-wrap gap-1.5 mt-2.5 justify-center">
+          <div className="flex flex-wrap gap-2 mt-2 justify-center">
             {questions.map((question, idx) => {
               const answered = playState.answers.some(a => a.question_id === question.id);
               const isCurrent = idx === currentQ;
@@ -416,7 +416,7 @@ const ContestPlayView: React.FC<{
                       ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/40 scale-110'
                       : answered
                       ? 'bg-brand-primary/20 text-brand-primary border border-brand-primary/30'
-                      : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 hover:bg-gray-200 dark:hover:bg-slate-700'
+                      : 'bg-surface-secondary dark:bg-surface-dark-secondary text-text-theme-muted dark:text-text-theme-dark-muted hover:bg-gray-200 dark:hover:bg-surface-dark-elevated'
                     }`}
                 >
                   {idx + 1}

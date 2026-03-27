@@ -4,7 +4,7 @@ import Shimmer from '../../components/ui/Shimmer';
 export const ContestListSkeleton: React.FC = () => (
   <div className="space-y-3">
     {[0, 1, 2].map(i => (
-      <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-5 space-y-3">
+      <div key={i} className="bg-surface-primary dark:bg-surface-dark-primary rounded-2xl border border-gray-100 dark:border-slate-800 p-4 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-2 flex-1">
             <Shimmer className="h-4 w-36 rounded-lg" />
