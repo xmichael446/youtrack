@@ -36,7 +36,7 @@
 
 ### Cross-Cutting
 
-- [ ] **UX-01**: All pages responsive and usable on mobile (375px+) and desktop
+- [x] **UX-01**: All pages responsive and usable on mobile (375px+) and desktop
 - [x] **UX-02**: Dark mode feels intentional — distinct surface colors, proper contrast, not just inverted
 - [ ] **UX-03**: Micro-interactions and transitions on buttons, cards, page transitions, loading states
 - [ ] **UX-04**: Accessible contrast ratios (WCAG AA), visible focus states, semantic HTML
@@ -84,7 +84,7 @@
 | PAGE-06 | Phase 3 | Complete |
 | PAGE-07 | Phase 3 | Complete |
 | PAGE-08 | Phase 3 | Complete |
-| UX-01 | Phase 4 | Pending |
+| UX-01 | Phase 4 | Complete |
 | UX-02 | Phase 4 | Complete |
 | UX-03 | Phase 4 | Pending |
 | UX-04 | Phase 4 | Pending |
