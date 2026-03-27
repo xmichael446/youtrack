@@ -8,11 +8,11 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
   default:
-    'bg-surface-secondary dark:bg-surface-dark-secondary shadow-card dark:shadow-card-dark dark:ring-1 dark:ring-white/5',
+    'bg-surface-secondary dark:bg-surface-dark-secondary shadow-card dark:shadow-card-dark dark:ring-1 dark:ring-white/[0.07]',
   bordered:
-    'bg-surface-secondary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated dark:ring-1 dark:ring-white/5',
+    'bg-surface-secondary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated dark:ring-1 dark:ring-white/[0.07]',
   elevated:
-    'bg-surface-elevated dark:bg-surface-dark-elevated shadow-modal dark:shadow-modal-dark dark:ring-1 dark:ring-white/5',
+    'bg-surface-elevated dark:bg-surface-dark-elevated shadow-modal dark:shadow-modal-dark dark:ring-1 dark:ring-white/[0.07]',
 };
 
 const paddingClasses: Record<NonNullable<CardProps['padding']>, string> = {
