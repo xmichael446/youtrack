@@ -15,6 +15,7 @@ import { useNavigation } from '../context/NavigationContext';
 import LoadingScreen from '../components/LoadingScreen';
 import Curriculum from '../components/Curriculum';
 import { openExternalLink } from '../utils/telegram';
+import { Card, Button, Badge } from '../components/ui';
 
 const RankBadge: React.FC<{ delta: number }> = ({ delta }) => {
   if (delta === 0) return null;
@@ -100,15 +101,19 @@ const Dashboard: React.FC = () => {
       {/* ── 1. HERO GRID: Competitive Card + Countdown ── */}
       <section aria-label={t('dashboard')} className={`grid grid-cols-1 ${event ? 'lg:grid-cols-3' : ''} gap-4`}>
 
-        {/* Competitive Hero Card — theme-adaptive */}
-        <div className={`${event ? 'lg:col-span-2' : ''} bg-surface-primary dark:bg-surface-dark-secondary rounded-card p-4 md:p-6 relative overflow-hidden group animate-in fade-in duration-700 border-none shadow-none`}>
+        {/* Competitive Hero Card */}
+        <Card
+          variant="default"
+          padding="none"
+          className={`${event ? 'lg:col-span-2' : ''} p-4 md:p-6 relative overflow-hidden group animate-in fade-in duration-700`}
+        >
           <div className="relative z-10">
             {/* Greeting */}
             <div className="mb-6 md:mb-8">
               <p className="text-caption text-brand-primary mb-2 opacity-80">
                 {t('welcomeBack')}
               </p>
-              <h1 className="text-h1 md:text-h1 tracking-tight text-brand-dark dark:text-text-theme-dark-primary leading-tight">
+              <h1 className="text-h1 tracking-tight text-brand-dark dark:text-text-theme-dark-primary leading-tight">
                 {user.name}
               </h1>
               {streak > 0 ? (
@@ -171,20 +176,27 @@ const Dashboard: React.FC = () => {
               )}
             </p>
           </div>
-        </div>
+        </Card>
 
         {/* Right Column — Event Card */}
         {event && (
           <div className="flex flex-col gap-4">
-            <div className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card p-4 relative overflow-hidden group animate-in fade-in duration-700 border-none shadow-none">
+            <Card
+              variant="default"
+              padding="md"
+              className="relative overflow-hidden group animate-in fade-in duration-700"
+            >
               <div className="relative z-10 h-full flex flex-col">
                 <div className="flex items-center gap-2 mb-3">
                   <div className={`w-1.5 h-1.5 rounded-full ${event.is_active ? 'bg-emerald-500 animate-ping' : event.type === 'contest' ? 'bg-violet-500' : 'bg-brand-primary'} ${!event.is_active && 'animate-pulse'}`} />
-                  <span className={`text-xs font-medium ${event.is_active ? 'text-emerald-600 dark:text-emerald-400' : event.type === 'contest' ? 'text-violet-600 dark:text-violet-400' : 'text-brand-primary'}`}>
+                  <Badge
+                    variant={event.is_active ? 'success' : event.type === 'contest' ? 'warning' : 'brand'}
+                    size="sm"
+                  >
                     {event.is_active ? t('liveNow') : event.type === 'contest' ? t('upcomingContest') : t('upcomingEvent')}
-                  </span>
+                  </Badge>
                 </div>
-                
+
                 <h3 className="text-h4 md:text-h3 leading-snug mb-2 tracking-tight text-brand-dark dark:text-text-theme-dark-primary">
                   {event.type === 'lesson' && event.number != null && (
                     <span className="inline-flex items-center bg-brand-dark dark:bg-white/10 text-white px-1 py-px rounded-[4px] text-[10px] font-mono uppercase tracking-wide mr-1 align-middle">
@@ -206,13 +218,17 @@ const Dashboard: React.FC = () => {
                 </p>
 
                 {event.is_active ? (
-                  <button 
+                  <Button
+                    variant="primary"
+                    size="md"
+                    fullWidth
+                    icon={<ChevronRight className="w-4 h-4" />}
+                    iconPosition="right"
                     onClick={() => navigateTo('lessons')}
-                    className="mt-auto w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-card flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 group/btn"
+                    className="mt-auto bg-emerald-500 from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/20"
                   >
-                    <span className="text-xs font-bold">{t('markAttendance')}</span>
-                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </button>
+                    {t('markAttendance')}
+                  </Button>
                 ) : (
                   <div className="grid grid-cols-3 gap-2 mt-auto">
                     {[
@@ -235,13 +251,18 @@ const Dashboard: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </Card>
           </div>
         )}
       </section>
 
       {/* ── 3. COURSE INFO STRIP ── */}
-      <section aria-label={course.name} className="bg-surface-primary dark:bg-surface-dark-secondary rounded-card border border-surface-secondary dark:border-surface-dark-elevated shadow-card dark:shadow-card-dark overflow-hidden animate-in fade-in duration-500 delay-75 fill-mode-both">
+      <section aria-label={course.name} className="animate-in fade-in duration-500 delay-75 fill-mode-both">
+      <Card
+        variant="bordered"
+        padding="none"
+        className="overflow-hidden"
+      >
         <div className="flex flex-col md:flex-row">
 
           {/* Image / Logo — full bleed on both axes */}
@@ -295,6 +316,7 @@ const Dashboard: React.FC = () => {
             )}
           </div>
         </div>
+      </Card>
       </section>
 
 
@@ -305,7 +327,12 @@ const Dashboard: React.FC = () => {
       </section>
 
       {/* ── 6. TUTORIAL / VIDEO BANNER (moved to bottom) ── */}
-      <section aria-label={t('guideVideo')} className="bg-brand-dark dark:bg-surface-dark-secondary rounded-card p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 animate-in fade-in duration-700 delay-300 fill-mode-both">
+      <section aria-label={t('guideVideo')} className="animate-in fade-in duration-700 delay-300 fill-mode-both">
+      <Card
+        variant="default"
+        padding="none"
+        className="p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-white/5 bg-brand-dark dark:bg-surface-dark-secondary"
+      >
         <div className="relative z-10 text-center md:text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/15 text-brand-primary rounded-full mb-4 border border-brand-primary/20 text-caption">
             <PlayCircle className="w-3 h-3" />
@@ -317,13 +344,17 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
 
-        <button
+        <Button
+          variant="primary"
+          size="md"
+          icon={<PlayCircle className="w-4 h-4" />}
+          iconPosition="right"
           onClick={() => openExternalLink('https://youtu.be/5xAfErTQvic')}
-          className="w-full md:w-auto shrink-0 px-6 py-3 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-card text-body transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 relative z-10 group/btn"
+          className="w-full md:w-auto shrink-0 relative z-10"
         >
           {t('watchTutorial')}
-          <PlayCircle className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
-        </button>
+        </Button>
+      </Card>
       </section>
 
     </div>
