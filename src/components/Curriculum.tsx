@@ -92,7 +92,7 @@ const Curriculum: React.FC = () => {
                 <h2 className="section-label text-brand-dark dark:text-white">{t('courseCurriculum')}</h2>
             </div>
 
-            <div className="bg-surface-primary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated rounded-3xl shadow-card dark:shadow-card-dark overflow-hidden">
+            <div className="bg-surface-primary dark:bg-surface-dark-secondary border border-surface-secondary dark:border-surface-dark-elevated rounded-card shadow-card dark:shadow-card-dark overflow-hidden">
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto custom-scrollbar">
                     <table className="min-w-full">
@@ -113,7 +113,7 @@ const Curriculum: React.FC = () => {
                                 return (
                                     <tr
                                         key={item.id}
-                                        className={`group/row transition-all duration-300 animate-in fade-in duration-500 fill-mode-both ${delayClass} ${isUpcoming ? 'hover:bg-surface-secondary/40 dark:hover:bg-surface-dark-elevated/20' : 'opacity-50'}`}
+                                        className={`group/row transition-all duration-normal animate-in fade-in duration-500 fill-mode-both ${delayClass} ${isUpcoming ? 'hover:bg-surface-secondary/40 dark:hover:bg-surface-dark-elevated/20' : 'opacity-50'}`}
                                     >
                                         <td className="px-6 py-4">
                                             <span className="text-body font-mono text-surface-secondary dark:text-surface-dark-elevated tabular-nums">
@@ -122,7 +122,7 @@ const Curriculum: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${isUpcoming ? 'bg-brand-primary/8 text-brand-primary group-hover/row:bg-brand-primary group-hover/row:text-white' : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted'}`}>
+                                                <div className={`w-9 h-9 rounded-input flex items-center justify-center shrink-0 transition-all duration-normal ${isUpcoming ? 'bg-brand-primary/8 text-brand-primary group-hover/row:bg-brand-primary group-hover/row:text-white' : 'bg-surface-secondary dark:bg-surface-dark-elevated text-text-theme-muted'}`}>
                                                     <BookOpen className="w-4 h-4" />
                                                 </div>
                                                 <span className="text-body text-brand-dark dark:text-text-theme-dark-primary tracking-tight">{item.topic}</span>
@@ -160,7 +160,7 @@ const Curriculum: React.FC = () => {
                             <div key={item.id} className={`px-4 py-4 transition-colors ${!isUpcoming ? 'opacity-50' : 'hover:bg-surface-secondary/40 dark:hover:bg-surface-dark-elevated/20'}`}>
                                 <div className="flex items-center gap-3">
                                     {/* Lesson Number Badge */}
-                                    <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center shrink-0 border transition-all ${isUpcoming ? 'bg-brand-primary/8 border-brand-primary/15 text-brand-primary' : 'bg-surface-secondary dark:bg-surface-dark-elevated border-surface-secondary dark:border-surface-dark-elevated text-text-theme-muted'}`}>
+                                    <div className={`w-11 h-11 rounded-input flex flex-col items-center justify-center shrink-0 border transition-all ${isUpcoming ? 'bg-brand-primary/8 border-brand-primary/15 text-brand-primary' : 'bg-surface-secondary dark:bg-surface-dark-elevated border-surface-secondary dark:border-surface-dark-elevated text-text-theme-muted'}`}>
                                         <span className="text-xs font-mono font-bold leading-none uppercase opacity-70 mb-0.5">LSN</span>
                                         <span className="text-sm font-mono font-bold leading-none">{item.number.toString().padStart(2, '0')}</span>
                                     </div>

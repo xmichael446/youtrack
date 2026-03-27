@@ -154,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
 
   return (
     <>
-      <header className="bg-surface-primary/95 dark:bg-surface-dark-secondary/95 backdrop-blur-lg border-b border-surface-secondary/80 dark:border-surface-dark-elevated/80 fixed w-full md:sticky top-0 z-30 px-3 md:px-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3 md:py-3 flex items-center justify-between shadow-[0_1px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.2)] transition-colors duration-300">
+      <header className="bg-surface-primary/95 dark:bg-surface-dark-secondary/95 backdrop-blur-lg border-b border-surface-secondary/80 dark:border-surface-dark-elevated/80 fixed w-full md:sticky top-0 z-30 px-3 md:px-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3 md:py-3 flex items-center justify-between shadow-[0_1px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_20px_rgba(0,0,0,0.2)] transition-colors duration-normal">
         {/* Mobile Logo */}
         <div className="flex items-center md:hidden min-w-0">
           <img
@@ -172,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
           {/* Stats cluster */}
           <div className="flex items-center gap-2">
             {/* Streak chip */}
-            <div className="hidden md:flex items-center gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 rounded-xl px-2 py-1 shrink-0">
+            <div className="hidden md:flex items-center gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 rounded-input px-2 py-1 shrink-0">
               <Flame className={`w-3.5 h-3.5 shrink-0 ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-500' : 'text-surface-secondary dark:text-surface-dark-elevated'}`} />
               <span className={`text-body tabular-nums leading-none ${(enrollment?.streak ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-text-theme-muted dark:text-text-theme-dark-muted'}`}>
                 {enrollment?.streak ?? 0}d
@@ -180,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
             </div>
 
             {/* Level + XP chip */}
-            <div className="hidden md:flex items-center gap-2 bg-surface-secondary dark:bg-surface-dark-secondary/70 border border-surface-secondary dark:border-surface-dark-elevated/50 rounded-xl px-2 py-1 shrink-0">
+            <div className="hidden md:flex items-center gap-2 bg-surface-secondary dark:bg-surface-dark-secondary/70 border border-surface-secondary dark:border-surface-dark-elevated/50 rounded-input px-2 py-1 shrink-0">
               {enrollment?.level ? (
                 <span className="w-[18px] h-[18px] rounded-md flex items-center justify-center text-caption shrink-0 leading-none"
                   style={{ backgroundColor: `${enrollment.level.badge_color}22` }}>
@@ -197,7 +197,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
             </div>
 
             {/* Coins chip */}
-            <div className="flex items-center gap-2 bg-surface-secondary dark:bg-surface-dark-secondary/70 border border-surface-secondary dark:border-surface-dark-elevated/50 rounded-xl px-2 py-1 shrink-0">
+            <div className="flex items-center gap-2 bg-surface-secondary dark:bg-surface-dark-secondary/70 border border-surface-secondary dark:border-surface-dark-elevated/50 rounded-input px-2 py-1 shrink-0">
               <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <span className="text-body text-text-theme-secondary dark:text-text-theme-dark-primary whitespace-nowrap tabular-nums leading-none">
                 {user?.coins || 0}
@@ -215,7 +215,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                 aria-label={unreadCount > 0 ? t('notificationsUnread', { count: unreadCount }) : t('notifications')}
                 aria-expanded={showNotifications}
                 aria-haspopup="true"
-                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 relative ${showNotifications ? 'bg-brand-primary/10 text-brand-primary' : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated'}`}
+                className={`w-10 h-10 flex items-center justify-center rounded-input transition-all duration-fast relative ${showNotifications ? 'bg-brand-primary/10 text-brand-primary' : 'text-text-theme-secondary dark:text-text-theme-dark-secondary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated'}`}
               >
                 <Bell className="w-[18px] h-[18px]" />
                 {unreadCount > 0 && (
@@ -228,7 +228,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   ref={notificationPanelRef}
                   role="region"
                   aria-label={t('notifications')}
-                  className="absolute top-full right-0 mt-2 w-[280px] md:w-[340px] bg-surface-primary dark:bg-surface-dark-secondary rounded-2xl shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden z-50 animate-in fade-in duration-200"
+                  className="absolute top-full right-0 mt-2 w-[280px] md:w-[340px] bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden z-50 animate-in fade-in duration-fast"
                 >
                   <div className="px-4 py-3 bg-surface-secondary/50 dark:bg-surface-dark-elevated/50 border-b border-surface-secondary dark:border-surface-dark-elevated flex justify-between items-center">
                     <h3 className="text-caption text-text-theme-primary dark:text-text-theme-dark-primary">{t('notifications')}</h3>
@@ -289,9 +289,9 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   <div className="relative">
                     {headerAvatarUrl ? (
                       <img src={headerAvatarUrl} alt="avatar"
-                        className={`w-9 h-9 rounded-xl object-cover border-2 border-surface-primary dark:border-surface-dark-elevated shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`} />
+                        className={`w-9 h-9 rounded-input object-cover border-2 border-surface-primary dark:border-surface-dark-elevated shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`} />
                     ) : (
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white text-body border-2 border-surface-primary dark:border-surface-dark-elevated shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`}
+                      <div className={`w-9 h-9 rounded-input flex items-center justify-center text-white text-body border-2 border-surface-primary dark:border-surface-dark-elevated shadow-sm ring-2 ${showProfileMenu ? 'ring-brand-primary' : 'ring-brand-primary/10 group-hover:ring-brand-primary/30'} transition-all`}
                         style={{ backgroundColor: avatarBg }}>
                         {initials}
                       </div>
@@ -305,7 +305,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   ref={profilePanelRef}
                   role="menu"
                   aria-label={user?.name ?? t('student')}
-                  className="absolute top-full right-0 mt-2 w-72 bg-surface-primary dark:bg-surface-dark-secondary rounded-2xl shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden z-50 animate-in fade-in duration-200"
+                  className="absolute top-full right-0 mt-2 w-72 bg-surface-primary dark:bg-surface-dark-secondary rounded-card shadow-2xl border border-surface-secondary dark:border-surface-dark-elevated overflow-hidden z-50 animate-in fade-in duration-fast"
                 >
                   {/* Profile Header (Name also clickable here) */}
                   <div 
@@ -317,9 +317,9 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                   >
                     {headerAvatarUrl ? (
                       <img src={headerAvatarUrl} alt="avatar"
-                        className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                        className="w-12 h-12 rounded-input object-cover shrink-0" />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0"
+                      <div className="w-12 h-12 rounded-input flex items-center justify-center text-white text-sm font-bold shrink-0"
                         style={{ backgroundColor: avatarBg }}>
                         {initials}
                       </div>
@@ -338,7 +338,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                     <button
                       role="menuitem"
                       onClick={toggleTheme}
-                      className="w-full flex items-center justify-between px-3 py-2 text-body text-text-theme-secondary dark:text-text-theme-dark-primary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated rounded-xl transition-colors group"
+                      className="w-full flex items-center justify-between px-3 py-2 text-body text-text-theme-secondary dark:text-text-theme-dark-primary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated rounded-input transition-colors group"
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-indigo-500 flex items-center justify-center shrink-0">
@@ -346,20 +346,20 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                         </div>
                         <span>{t('nightMode')}</span>
                       </div>
-                      <div className={`w-9 h-5 rounded-full relative transition-colors duration-300 ${isDark ? 'bg-brand-primary' : 'bg-surface-secondary'}`}>
-                        <div className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-300 ${isDark ? 'translate-x-4' : 'translate-x-0'}`} />
+                      <div className={`w-9 h-5 rounded-full relative transition-colors duration-normal ${isDark ? 'bg-brand-primary' : 'bg-surface-secondary'}`}>
+                        <div className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-normal ${isDark ? 'translate-x-4' : 'translate-x-0'}`} />
                       </div>
                     </button>
 
                     {/* Language */}
-                    <div className="w-full flex items-center justify-between px-3 py-2 text-body text-text-theme-secondary dark:text-text-theme-dark-primary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated rounded-xl transition-colors">
+                    <div className="w-full flex items-center justify-between px-3 py-2 text-body text-text-theme-secondary dark:text-text-theme-dark-primary hover:bg-surface-secondary dark:hover:bg-surface-dark-elevated rounded-input transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="text-sky-500 flex items-center justify-center shrink-0">
                           <span className="text-xs font-medium">{language.toUpperCase()}</span>
                         </div>
                         <span>{t('language')}</span>
                       </div>
-                      <div className="flex bg-surface-secondary dark:bg-surface-dark-elevated p-1 rounded-lg gap-0.5">
+                      <div className="flex bg-surface-secondary dark:bg-surface-dark-elevated p-1 rounded-button gap-0.5">
                         <button onClick={() => setLanguage('uz')}
                           className={`px-2 py-1 rounded-md text-caption transition-all ${language === 'uz' ? 'bg-surface-primary dark:bg-surface-dark-elevated shadow-sm text-brand-dark dark:text-text-theme-dark-primary' : 'text-text-theme-muted dark:text-text-theme-dark-muted hover:text-text-theme-secondary'}`}>
                           UZB
@@ -376,7 +376,7 @@ const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme, onLogout }) => {
                     {/* Logout */}
                     <button
                       role="menuitem"
-                      className="w-full flex items-center gap-3 px-3 py-2 text-body text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors group"
+                      className="w-full flex items-center gap-3 px-3 py-2 text-body text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-input transition-colors group"
                       onClick={() => { setShowProfileMenu(false); onLogout(); }}
                     >
                       <div className="text-red-500 flex items-center justify-center shrink-0 group-hover:text-red-600 transition-colors">

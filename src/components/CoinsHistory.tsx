@@ -36,7 +36,7 @@ const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, co
     if (displayActions.length === 0) {
         return (
             <div className="text-center py-12 px-6">
-                <div className="w-14 h-14 rounded-2xl bg-surface-secondary dark:bg-surface-dark-elevated flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 rounded-card bg-surface-secondary dark:bg-surface-dark-elevated flex items-center justify-center mx-auto mb-4">
                     <Coins className="w-6 h-6 text-text-theme-muted dark:text-text-theme-dark-muted" />
                 </div>
                 <p className="text-body text-text-theme-muted dark:text-text-theme-dark-muted italic">"{t('noCoinTransactions')}"</p>
@@ -48,7 +48,7 @@ const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, co
         <div className={compact ? "space-y-0" : "space-y-6"}>
             {showTitle && (
                 <div className="flex items-center gap-3 px-1">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-input bg-amber-500/10 border border-amber-500/10 flex items-center justify-center shrink-0">
                         <Coins className="w-[18px] h-[18px] text-amber-500" />
                     </div>
                     <div>
@@ -81,7 +81,7 @@ const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, co
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-transform group-hover/row:scale-110 duration-300 ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-surface-secondary dark:bg-surface-dark-elevated border-surface-secondary dark:border-surface-dark-elevated'}`}>
+                                                <div className={`w-10 h-10 rounded-input border flex items-center justify-center shrink-0 transition-transform group-hover/row:scale-110 duration-normal ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-surface-secondary dark:bg-surface-dark-elevated border-surface-secondary dark:border-surface-dark-elevated'}`}>
                                                     {getIcon(item.action, item.negative)}
                                                 </div>
                                                 <span className="text-body text-brand-dark dark:text-text-theme-dark-primary tracking-tight">{item.action}</span>
@@ -118,7 +118,7 @@ const CoinsHistory: React.FC<CoinsHistoryProps> = ({ limit, showTitle = true, co
                     {displayActions.map((item) => (
                         <div key={item.id} className="p-4 hover:bg-surface-secondary/40 dark:hover:bg-surface-dark-elevated/20 transition-colors">
                             <div className="flex items-center gap-3">
-                                <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-surface-secondary dark:bg-surface-dark-elevated border-surface-secondary dark:border-surface-dark-elevated'}`}>
+                                <div className={`w-11 h-11 rounded-input border flex items-center justify-center shrink-0 ${item.negative ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-surface-secondary dark:bg-surface-dark-elevated border-surface-secondary dark:border-surface-dark-elevated'}`}>
                                     {getIcon(item.action, item.negative)}
                                 </div>
                                 <div className="flex-1 min-w-0">

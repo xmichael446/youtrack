@@ -17,7 +17,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration = 3000 }
 
   return createPortal(
     <div
-      className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 md:px-6 md:py-3 rounded-2xl shadow-modal flex items-center gap-2 animate-in duration-300 max-w-[90vw] ${
+      className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 md:px-6 md:py-3 rounded-card shadow-modal flex items-center gap-2 animate-in duration-normal max-w-[90vw] ${
         type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
       }`}
     >
