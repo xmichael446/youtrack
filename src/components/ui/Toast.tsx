@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
-
-// TODO: import Z_INDEX.toast from constants/zIndex when available
-// z-[70] corresponds to Z_INDEX.toast in the shared z-index scale
+import { Z_INDEX } from '../../constants/zIndex';
 
 interface ToastProps {
   message: string;
@@ -34,7 +32,8 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration = 3000 }
 
   return createPortal(
     <div
-      className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[70] px-4 py-2 md:px-6 md:py-3 rounded-card shadow-modal flex items-center gap-2 animate-in duration-normal max-w-[90vw] ${variantStyles[type]}`}
+      style={{ zIndex: Z_INDEX.toast }}
+      className={`fixed bottom-24 left-1/2 -translate-x-1/2 px-4 py-2 md:px-6 md:py-3 rounded-card shadow-modal flex items-center gap-2 animate-in duration-normal max-w-[90vw] ${variantStyles[type]}`}
     >
       {variantIcons[type]}
       <span className="text-caption font-bold uppercase tracking-wide leading-snug">
