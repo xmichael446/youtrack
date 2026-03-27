@@ -166,7 +166,7 @@ const ContestCard: React.FC<{
           <ChevronRight className="w-4 h-4 text-gray-300 dark:text-text-theme-dark-muted group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all duration-fast shrink-0 mt-0.5" />
         </div>
 
-        <div className="flex items-center gap-4 text-caption font-mono text-text-theme-muted dark:text-text-theme-dark-muted mb-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-caption font-mono text-text-theme-muted dark:text-text-theme-dark-muted mb-4">
           <span className="flex items-center gap-2">
             <BookOpen className="w-3.5 h-3.5 text-brand-primary/60" />
             {t('contestQuestions').replace('{count}', String(item.question_count))}

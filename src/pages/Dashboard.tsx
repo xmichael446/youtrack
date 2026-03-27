@@ -99,13 +99,13 @@ const Dashboard: React.FC = () => {
     <div className="space-y-5 md:space-y-6 animate-in fade-in duration-700 pb-10">
 
       {/* ── 1. HERO GRID: Competitive Card + Countdown ── */}
-      <section aria-label={t('dashboard')} className={`grid grid-cols-1 ${event ? 'lg:grid-cols-3' : ''} gap-4`}>
+      <section aria-label={t('dashboard')} className={`grid grid-cols-1 ${event ? 'md:grid-cols-3' : ''} gap-4`}>
 
         {/* Competitive Hero Card */}
         <Card
           variant="default"
           padding="none"
-          className={`${event ? 'lg:col-span-2' : ''} p-4 md:p-6 relative overflow-hidden group animate-in fade-in duration-700`}
+          className={`${event ? 'md:col-span-2' : ''} p-4 md:p-6 relative overflow-hidden group animate-in fade-in duration-700`}
         >
           <div className="relative z-10">
             {/* Greeting */}
