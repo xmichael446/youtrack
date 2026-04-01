@@ -186,10 +186,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                                                 return;
                                             }
 
-                                            const numbersOnly = rawVal.replace(/[^0-9]/g, '');
+                                            const hexOnly = rawVal.toUpperCase().replace(/[^0-9A-F]/g, '');
 
-                                            if (numbersOnly) {
-                                                setStudentCode('YT-E' + numbersOnly.slice(0, 6));
+                                            if (hexOnly) {
+                                                setStudentCode('YT-E' + hexOnly.slice(0, 6));
                                             } else {
                                                 setStudentCode('YT-E');
                                             }
