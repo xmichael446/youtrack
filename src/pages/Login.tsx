@@ -179,21 +179,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDark, toggleTheme }) =>
                                         type="text"
                                         placeholder={t('enterStudentCode')}
                                         value={studentCode}
-                                        onChange={(e) => {
-                                            const rawVal = e.target.value;
-                                            if (!rawVal) {
-                                                setStudentCode('');
-                                                return;
-                                            }
-
-                                            const hexOnly = rawVal.toUpperCase().replace(/[^0-9A-F]/g, '');
-
-                                            if (hexOnly) {
-                                                setStudentCode('YT-E' + hexOnly.slice(0, 6));
-                                            } else {
-                                                setStudentCode('YT-E');
-                                            }
-                                        }}
+                                        onChange={(e) => setStudentCode(e.target.value)}
                                         className="font-mono"
                                         error={apiError ? (apiError.data?.message || apiError.message || t('pleaseEnterCode')) : undefined}
                                     />
